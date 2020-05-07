@@ -312,3 +312,39 @@ func TestDedicatedServerPowerFeeds(t *testing.T) {
 	g.Expect(powerFeed.Name).To(Equal("Power 1"))
 	g.Expect(powerFeed.Status).To(Equal("on"))
 }
+
+func TestDedicatedServerPTRRecordCreate(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/ptr_records").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/ptr_record_create_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	ttlValue := 60
+	priorityValue := 3
+
+	input := PTRRecordCreateInput{
+		IP:       "100.0.0.4",
+		Domain:   "ai.privateservergrid.com",
+		TTL:      &ttlValue,
+		Priority: &priorityValue,
+	}
+
+	ptrRecord, err := client.Hosts.DedicatedServerPTRRecordCreate(ctx, "xkazYeJ0", input)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(ptrRecord).ToNot(BeNil())
+
+	g.Expect(ptrRecord.ID).To(Equal("oQeZzvep"))
+	g.Expect(ptrRecord.IP).To(Equal("100.0.0.4"))
+	g.Expect(ptrRecord.Domain).To(Equal("ai.privateservergrid.com"))
+	g.Expect(ptrRecord.Priority).To(Equal(3))
+	g.Expect(ptrRecord.TTL).To(Equal(60))
+}

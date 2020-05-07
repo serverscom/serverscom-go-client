@@ -16,6 +16,7 @@ const (
 	dedicatedServerPowerOffPath        = "/hosts/dedicated_servers/%s/power_off"
 	dedicatedServerPowerCyclePath      = "/hosts/dedicated_servers/%s/power_cycle"
 	dedicatedServerPowerFeedsPath      = "/hosts/dedicated_servers/%s/power_feeds"
+	dedicatedServerPTRRecordCreatePath = "/hosts/dedicated_servers/%s/ptr_records"
 )
 
 // HostsService is an interface for interfacing with Host, Dedicated Server endpoints
@@ -41,6 +42,7 @@ type HostsService interface {
 	DedicatedServerNetworks(ctx context.Context, id string) HostNetworksCollection
 
 	DedicatedServerPTRRecords(ctx context.Context, id string) HostPTRRecordsCollection
+	DedicatedServerPTRRecordCreate(ctx context.Context, id string, input PTRRecordCreateInput) (*PTRRecord, error)
 }
 
 // HostsHandler handles operations around hosts
@@ -232,4 +234,24 @@ func (h *HostsHandler) DedicatedServerNetworks(ctx context.Context, id string) H
 // DedicatedServerPTRRecords builds a new HostPTRRecordsCollection interface
 func (h *HostsHandler) DedicatedServerPTRRecords(ctx context.Context, id string) HostPTRRecordsCollection {
 	return NewHostPTRRecordsCollection(h.client, dedicatedServerTypePrefix, id)
+}
+
+// DedicatedServerPTRRecordCreate creates ptr record for the dedicated server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/CreatePtrRecordForServerNetworks
+func (h *HostsHandler) DedicatedServerPTRRecordCreate(ctx context.Context, id string, input PTRRecordCreateInput) (*PTRRecord, error) {
+	url := h.client.buildURL(dedicatedServerPTRRecordCreatePath, []interface{}{id}...)
+
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	ptrRecord := new(PTRRecord)
+
+	if err := json.Unmarshal(body, &ptrRecord); err != nil {
+		return nil, err
+	}
+
+	return ptrRecord, nil
 }

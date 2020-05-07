@@ -368,3 +368,11 @@ type PTRRecord struct {
 	Priority int    `json:"priority"`
 	TTL      int    `json:"ttl"`
 }
+
+// PTRRecordCreateInput represents ptr record create input
+type PTRRecordCreateInput struct {
+	IP       string `json:"ip"`
+	Domain   string `json:"domain"`
+	Priority *int   `json:"priority"`
+	TTL      *int   `json:"ttl"`
+}
