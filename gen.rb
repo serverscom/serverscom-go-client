@@ -114,3 +114,11 @@ CollectionGenerator.new(
   entity: 'L2LocationGroup',
   api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllLocationGroups'
 ).render_to_file('pkg/l2_location_groups_collection.go')
+
+CollectionGenerator.new(
+  name: 'HostConnection',
+  path: '/hosts/%s/%s/connections',
+  entity: 'HostConnection',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllConnectionsForAnExistingDedicatedServer',
+  args: {hostType: 'string', hostID: 'string'}
+).render_to_file('pkg/host_connections_collection.go')

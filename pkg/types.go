@@ -349,3 +349,10 @@ type HostPowerFeed struct {
 	Name   string `json:"name"`
 	Status string `json:"status"`
 }
+
+// HostConnection represents host connection
+type HostConnection struct {
+	Port       string  `json:"port"`
+	Type       string  `json:"type"`
+	MACAddress *string `json:"macaddr"`
+}

@@ -6,6 +6,8 @@ import (
 )
 
 const (
+	dedicatedServerTypePrefix = "dedicated_servers"
+
 	dedicatedServerCreatePath          = "/hosts/dedicated_servers"
 	dedicatedServerPath                = "/hosts/dedicated_servers/%s"
 	dedicatedServerScheduleReleasePath = "/hosts/dedicated_servers/%s/schedule_release"
@@ -209,4 +211,9 @@ func (h *HostsHandler) DedicatedServerPowerFeeds(ctx context.Context, id string)
 	}
 
 	return powerFeeds, nil
+}
+
+// DedicatedServerConnections builds a new HostConnectionsCollection interface
+func (h *HostsHandler) DedicatedServerConnections(ctx context.Context, id string) HostConnectionsCollection {
+	return NewHostConnectionsCollection(h.client, dedicatedServerTypePrefix, id)
 }
