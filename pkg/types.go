@@ -335,3 +335,11 @@ type Network struct {
 	Created            time.Time `json:"created_at"`
 	Updated            time.Time `json:"updated_at"`
 }
+
+// L2LocationGroup represents l2 location groups
+type L2LocationGroup struct {
+	ID          int64   `json:"id"`
+	Name        string  `json:"name"`
+	GroupType   string  `json:"group_type"`
+	LocationIDs []int64 `json:"location_ids"`
+}

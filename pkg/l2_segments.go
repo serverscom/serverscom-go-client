@@ -24,6 +24,8 @@ type L2SegmentsService interface {
 	Update(ctx context.Context, segmentID string, input L2SegmentUpdateInput) (*L2Segment, error)
 	Delete(ctx context.Context, segmentID string) error
 
+	LocationGroupsCollection() L2LocationGroupsCollection
+
 	MembersCollection(segmentID string) L2MembersCollection
 
 	NetworksCollection(segmentID string) L2NetworksCollection
@@ -120,6 +122,11 @@ func (l2 *L2SegmentsHandler) Delete(ctx context.Context, segmentID string) error
 	_, err := l2.client.buildAndExecRequest(ctx, "DELETE", url, nil)
 
 	return err
+}
+
+// LocationGroupsCollection builds a new L2LocationGroupsCollection interface
+func (l2 *L2SegmentsHandler) LocationGroupsCollection() L2LocationGroupsCollection {
+	return NewL2LocationGroupsCollection(l2.client)
 }
 
 // MembersCollection builds a new L2MembersCollection interface

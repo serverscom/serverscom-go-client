@@ -107,3 +107,10 @@ CollectionGenerator.new(
   api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllL2SegmentNetworks',
   args: {segmentID: 'string'}
 ).render_to_file('pkg/l2_networks_collection.go')
+
+CollectionGenerator.new(
+  name: 'L2LocationGroup',
+  path: '/l2_segments/location_groups',
+  entity: 'L2LocationGroup',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllLocationGroups'
+).render_to_file('pkg/l2_location_groups_collection.go')
