@@ -366,3 +366,56 @@ func TestDedicatedServerPTRRecordDelete(t *testing.T) {
 
 	g.Expect(err).To(BeNil())
 }
+
+func TestDedicatedServerOperatingSystemReinstall(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/reinstall").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	osUbuntuServerID := int64(1)
+	rootFilesystem := "ext4"
+	raidLevel := 0
+
+	input := OperatingSystemReinstallInput{
+		Hostname: "new-hostname",
+		Drives: OperatingSystemReinstallDrivesInput{
+			Layout: []OperatingSystemReinstallLayoutInput{
+				OperatingSystemReinstallLayoutInput{
+					SlotPositions: []int{0, 1},
+					Raid:          &raidLevel,
+					Partitions: []OperatingSystemReinstallPartitionInput{
+						OperatingSystemReinstallPartitionInput{Target: "swap", Size: 4096, Fill: false},
+						OperatingSystemReinstallPartitionInput{Target: "/", Fs: &rootFilesystem, Size: 100000, Fill: true},
+					},
+				},
+			},
+		},
+		OperatingSystemID:  &osUbuntuServerID,
+		SSHKeyFingerprints: []string{"48:81:0c:43:99:12:71:5e:ba:fd:e7:2f:20:d7:95:e8"},
+	}
+
+	ctx := context.TODO()
+
+	dedicatedServer, err := client.Hosts.DedicatedServerOperatingSystemReinstall(ctx, "xkazYeJ0", input)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(dedicatedServer).ToNot(BeNil())
+
+	g.Expect(dedicatedServer.ID).To(Equal("xkazYeJ0"))
+	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
+	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
+	g.Expect(dedicatedServer.Status).To(Equal("active"))
+	g.Expect(dedicatedServer.Configuration).To(Equal("REMM R123"))
+	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
+	g.Expect(*dedicatedServer.PublicIPv4Address).To(Equal("169.254.0.1"))
+	g.Expect(dedicatedServer.ScheduledRelease).To(BeNil())
+	g.Expect(dedicatedServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}

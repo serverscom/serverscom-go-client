@@ -18,6 +18,7 @@ const (
 	dedicatedServerPowerFeedsPath      = "/hosts/dedicated_servers/%s/power_feeds"
 	dedicatedServerPTRRecordCreatePath = "/hosts/dedicated_servers/%s/ptr_records"
 	dedicatedServerPTRRecordDeletePath = "/hosts/dedicated_servers/%s/ptr_records/%s"
+	dedicatedServerReinstallPath       = "/hosts/dedicated_servers/%s/reinstall"
 )
 
 // HostsService is an interface for interfacing with Host, Dedicated Server endpoints
@@ -45,6 +46,8 @@ type HostsService interface {
 	DedicatedServerPTRRecords(ctx context.Context, id string) HostPTRRecordsCollection
 	DedicatedServerPTRRecordCreate(ctx context.Context, id string, input PTRRecordCreateInput) (*PTRRecord, error)
 	DedicatedServerPTRRecordDelete(ctx context.Context, hostID string, ptrRecordID string) error
+
+	DedicatedServerOperatingSystemReinstall(ctx context.Context, id string, input OperatingSystemReinstallInput) (*DedicatedServer, error)
 }
 
 // HostsHandler handles operations around hosts
@@ -266,4 +269,30 @@ func (h *HostsHandler) DedicatedServerPTRRecordDelete(ctx context.Context, hostI
 	_, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
 
 	return err
+}
+
+// DedicatedServerOperatingSystemReinstall performs operating system reinstallation
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/StartOperatingSystemReinstallProcess
+func (h *HostsHandler) DedicatedServerOperatingSystemReinstall(ctx context.Context, id string, input OperatingSystemReinstallInput) (*DedicatedServer, error) {
+	payload, err := json.Marshal(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	url := h.client.buildURL(dedicatedServerReinstallPath, []interface{}{id}...)
+
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, payload)
+
+	if err != nil {
+		return nil, err
+	}
+
+	dedicatedServer := new(DedicatedServer)
+
+	if err := json.Unmarshal(body, &dedicatedServer); err != nil {
+		return nil, err
+	}
+
+	return dedicatedServer, nil
 }

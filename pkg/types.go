@@ -71,7 +71,7 @@ type DedicatedServerLayoutPartitionInput struct {
 	Target string  `json:"target"`
 	Size   int     `json:"size"`
 	Fs     *string `json:"fs,omitempty"`
-	Fill   bool    `json:"fill"`
+	Fill   bool    `json:"fill,omitempty"`
 }
 
 // DedicatedServerLayoutInput represents layout for DedicatedServerDrivesInput
@@ -375,4 +375,33 @@ type PTRRecordCreateInput struct {
 	Domain   string `json:"domain"`
 	Priority *int   `json:"priority"`
 	TTL      *int   `json:"ttl"`
+}
+
+// OperatingSystemReinstallPartitionInput represents partition for os reinstallation layout input
+type OperatingSystemReinstallPartitionInput struct {
+	Target string  `json:"target"`
+	Size   int     `json:"size"`
+	Fs     *string `json:"fs,omitempty"`
+	Fill   bool    `json:"fill,omitempty"`
+}
+
+// OperatingSystemReinstallLayoutInput represents layout for os reinstallation drives input
+type OperatingSystemReinstallLayoutInput struct {
+	SlotPositions []int                                    `json:"slot_positions"`
+	Raid          *int                                     `json:"raid,omitempty"`
+	Ignore        *bool                                    `json:"ignore,omitempty"`
+	Partitions    []OperatingSystemReinstallPartitionInput `json:"partitions,omitempty"`
+}
+
+// OperatingSystemReinstallDrivesInput represents drives for os reinstallation input
+type OperatingSystemReinstallDrivesInput struct {
+	Layout []OperatingSystemReinstallLayoutInput `json:"layout,omitempty"`
+}
+
+// OperatingSystemReinstallInput represents os reinstallation input
+type OperatingSystemReinstallInput struct {
+	Hostname           string                              `json:"hostname"`
+	Drives             OperatingSystemReinstallDrivesInput `json:"drives"`
+	OperatingSystemID  *int64                              `json:"operating_system_id,omitempty"`
+	SSHKeyFingerprints []string                            `json:"ssh_key_fingerprints,omitempty"`
 }
