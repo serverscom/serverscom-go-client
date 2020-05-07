@@ -7,11 +7,11 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestDriveModelOptionsEmptyCollection(t *testing.T) {
+func TestHostDriveSlotsEmptyCollection(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithResponseBodyStubInline(`[]`).
 		WithResponseCode(200).
@@ -19,7 +19,7 @@ func TestDriveModelOptionsEmptyCollection(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewDriveModelOptionsCollection(client, int64(1), int64(1))
+	collection := NewHostDriveSlotsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
@@ -33,19 +33,19 @@ func TestDriveModelOptionsEmptyCollection(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestDriveModelOptionsCollectionList(t *testing.T) {
+func TestHostDriveSlotsCollectionList(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
-		WithResponseBodyStubInline(`[{"id": 1}, {"id": 2}]`).
+		WithResponseBodyStubInline(`[{"position": 0}, {"position": 1}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewDriveModelOptionsCollection(client, int64(1), int64(1))
+	collection := NewHostDriveSlotsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
@@ -59,22 +59,22 @@ func TestDriveModelOptionsCollectionList(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestDriveModelOptionsCollectionHasNext(t *testing.T) {
+func TestHostDriveSlotsCollectionHasNext(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/locations/1/order_options/server_models/1/drive_models?page=2&per_page=2>; rel="next"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/drive_slots?page=2&per_page=2>; rel="next"`,
 		}).
-		WithResponseBodyStubInline(`[{"id": 1}, {"id": 2}]`).
+		WithResponseBodyStubInline(`[{"position": 0}, {"position": 1}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewDriveModelOptionsCollection(client, int64(1), int64(1))
+	collection := NewHostDriveSlotsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
@@ -88,22 +88,22 @@ func TestDriveModelOptionsCollectionHasNext(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestDriveModelOptionsCollectionHasPrevious(t *testing.T) {
+func TestHostDriveSlotsCollectionHasPrevious(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/locations/1/order_options/server_models/1/drive_models?page=1&per_page=2>; rel="prev"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/drive_slots?page=1&per_page=2>; rel="prev"`,
 		}).
-		WithResponseBodyStubInline(`[{"id": 1}, {"id": 2}]`).
+		WithResponseBodyStubInline(`[{"position": 0}, {"position": 1}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewDriveModelOptionsCollection(client, int64(1), int64(1))
+	collection := NewHostDriveSlotsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
@@ -117,22 +117,22 @@ func TestDriveModelOptionsCollectionHasPrevious(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestDriveModelOptionsCollectionHasFirst(t *testing.T) {
+func TestHostDriveSlotsCollectionHasFirst(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/locations/1/order_options/server_models/1/drive_models?page=1&per_page=2>; rel="first"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/drive_slots?page=1&per_page=2>; rel="first"`,
 		}).
-		WithResponseBodyStubInline(`[{"id": 1}, {"id": 2}]`).
+		WithResponseBodyStubInline(`[{"position": 0}, {"position": 1}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewDriveModelOptionsCollection(client, int64(1), int64(1))
+	collection := NewHostDriveSlotsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
@@ -146,22 +146,22 @@ func TestDriveModelOptionsCollectionHasFirst(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestDriveModelOptionsCollectionHasLast(t *testing.T) {
+func TestHostDriveSlotsCollectionHasLast(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/locations/1/order_options/server_models/1/drive_models?page=2&per_page=2>; rel="last"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/drive_slots?page=2&per_page=2>; rel="last"`,
 		}).
-		WithResponseBodyStubInline(`[{"id": 1}, {"id": 2}]`).
+		WithResponseBodyStubInline(`[{"position": 0}, {"position": 1}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewDriveModelOptionsCollection(client, int64(1), int64(1))
+	collection := NewHostDriveSlotsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
@@ -175,22 +175,22 @@ func TestDriveModelOptionsCollectionHasLast(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(true))
 }
 
-func TestDriveModelOptionsCollectionHasRelations(t *testing.T) {
+func TestHostDriveSlotsCollectionHasRelations(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/locations/1/order_options/server_models/1/drive_models?page=3&per_page=2>; rel="next",<https://dummy.api.com/locations/1/order_options/server_models/1/drive_models?page=1&per_page=2>; rel="prev",<https://dummy.api.com/locations/1/order_options/server_models/1/drive_models?page=1&per_page=2>; rel="first",<https://dummy.api.com/locations/1/order_options/server_models/1/drive_models?page=3&per_page=2>; rel="last"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/drive_slots?page=3&per_page=2>; rel="next",<https://dummy.api.com/hosts/dedicated_servers/a/drive_slots?page=1&per_page=2>; rel="prev",<https://dummy.api.com/hosts/dedicated_servers/a/drive_slots?page=1&per_page=2>; rel="first",<https://dummy.api.com/hosts/dedicated_servers/a/drive_slots?page=3&per_page=2>; rel="last"`,
 		}).
-		WithResponseBodyStubInline(`[{"id": 1}, {"id": 2}]`).
+		WithResponseBodyStubInline(`[{"position": 0}, {"position": 1}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewDriveModelOptionsCollection(client, int64(1), int64(1))
+	collection := NewHostDriveSlotsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
@@ -204,32 +204,32 @@ func TestDriveModelOptionsCollectionHasRelations(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(true))
 }
 
-func TestDriveModelOptionsCollectionNext(t *testing.T) {
+func TestHostDriveSlotsCollectionNext(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/locations/1/order_options/server_models/1/drive_models?page=2&per_page=2>; rel="next"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/drive_slots?page=2&per_page=2>; rel="next"`,
 		}).
-		WithResponseBodyStubInline(`[{"id": 1}, {"id": 2}]`).
+		WithResponseBodyStubInline(`[{"position": 0}, {"position": 1}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=2&per_page=2`).
-		WithResponseBodyStubInline(`[{"id": 3}, {"id": 4}]`).
+		WithResponseBodyStubInline(`[{"position": 2}, {"position": 3}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewDriveModelOptionsCollection(client, int64(1), int64(1))
+	collection := NewHostDriveSlotsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
-	var list []DriveModel
+	var list []HostDriveSlot
 	var err error
 
 	list, err = collection.List(ctx)
@@ -245,33 +245,33 @@ func TestDriveModelOptionsCollectionNext(t *testing.T) {
 	g.Expect(collection.HasNextPage()).To(Equal(false))
 }
 
-func TestDriveModelOptionsCollectionPrevious(t *testing.T) {
+func TestHostDriveSlotsCollectionPrevious(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=2&per_page=2`).
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/locations/1/order_options/server_models/1/drive_models?page=1&per_page=2>; rel="prev"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/drive_slots?page=1&per_page=2>; rel="prev"`,
 		}).
-		WithResponseBodyStubInline(`[{"id": 3}, {"id": 4}]`).
+		WithResponseBodyStubInline(`[{"position": 2}, {"position": 3}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=1&per_page=2`).
-		WithResponseBodyStubInline(`[{"id": 1}, {"id": 2}]`).
+		WithResponseBodyStubInline(`[{"position": 0}, {"position": 1}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewDriveModelOptionsCollection(client, int64(1), int64(1)).SetPage(2).SetPerPage(2)
+	collection := NewHostDriveSlotsCollection(client, "dedicated_servers", "a").SetPage(2).SetPerPage(2)
 
 	ctx := context.TODO()
 
-	var list []DriveModel
+	var list []HostDriveSlot
 	var err error
 
 	list, err = collection.List(ctx)
@@ -287,33 +287,33 @@ func TestDriveModelOptionsCollectionPrevious(t *testing.T) {
 	g.Expect(collection.HasPreviousPage()).To(Equal(false))
 }
 
-func TestDriveModelOptionsCollectionFirst(t *testing.T) {
+func TestHostDriveSlotsCollectionFirst(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=2&per_page=2`).
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/locations/1/order_options/server_models/1/drive_models?page=1&per_page=2>; rel="first"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/drive_slots?page=1&per_page=2>; rel="first"`,
 		}).
-		WithResponseBodyStubInline(`[{"id": 3}, {"id": 4}]`).
+		WithResponseBodyStubInline(`[{"position": 2}, {"position": 3}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=1&per_page=2`).
-		WithResponseBodyStubInline(`[{"id": 1}, {"id": 2}]`).
+		WithResponseBodyStubInline(`[{"position": 0}, {"position": 1}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewDriveModelOptionsCollection(client, int64(1), int64(1)).SetPage(2).SetPerPage(2)
+	collection := NewHostDriveSlotsCollection(client, "dedicated_servers", "a").SetPage(2).SetPerPage(2)
 
 	ctx := context.TODO()
 
-	var list []DriveModel
+	var list []HostDriveSlot
 	var err error
 
 	list, err = collection.List(ctx)
@@ -329,32 +329,32 @@ func TestDriveModelOptionsCollectionFirst(t *testing.T) {
 	g.Expect(collection.HasFirstPage()).To(Equal(false))
 }
 
-func TestDriveModelOptionsCollectionLast(t *testing.T) {
+func TestHostDriveSlotsCollectionLast(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/locations/1/order_options/server_models/1/drive_models?page=2&per_page=2>; rel="last"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/drive_slots?page=2&per_page=2>; rel="last"`,
 		}).
-		WithResponseBodyStubInline(`[{"id": 1}, {"id": 2}]`).
+		WithResponseBodyStubInline(`[{"position": 0}, {"position": 1}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=2&per_page=2`).
-		WithResponseBodyStubInline(`[{"id": 3}, {"id": 4}]`).
+		WithResponseBodyStubInline(`[{"position": 2}, {"position": 3}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewDriveModelOptionsCollection(client, int64(1), int64(1))
+	collection := NewHostDriveSlotsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
-	var list []DriveModel
+	var list []HostDriveSlot
 	var err error
 
 	list, err = collection.List(ctx)
@@ -370,37 +370,37 @@ func TestDriveModelOptionsCollectionLast(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestDriveModelOptionsCollectionCollect(t *testing.T) {
+func TestHostDriveSlotsCollectionCollect(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/locations/1/order_options/server_models/1/drive_models?page=2&per_page=2>; rel="next"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/drive_slots?page=2&per_page=2>; rel="next"`,
 		}).
-		WithResponseBodyStubInline(`[{"id": 1}, {"id": 2}]`).
+		WithResponseBodyStubInline(`[{"position": 0}, {"position": 1}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=2&per_page=2`).
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/locations/1/order_options/server_models/1/drive_models?page=3&per_page=2>; rel="next"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/drive_slots?page=3&per_page=2>; rel="next"`,
 		}).
-		WithResponseBodyStubInline(`[{"id": 3}, {"id": 4}]`).
+		WithResponseBodyStubInline(`[{"position": 2}, {"position": 3}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/locations/1/order_options/server_models/1/drive_models").
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=3&per_page=2`).
-		WithResponseBodyStubInline(`[{"id": 5}, {"id": 6}]`).
+		WithResponseBodyStubInline(`[{"position": 4}, {"position": 5}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewDriveModelOptionsCollection(client, int64(1), int64(1))
+	collection := NewHostDriveSlotsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 

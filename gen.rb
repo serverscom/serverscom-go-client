@@ -57,7 +57,7 @@ CollectionGenerator.new(
 CollectionGenerator.new(
   name: 'DriveModelOption',
   path: '/locations/%d/order_options/server_models/%d/drive_models',
-  entity: 'DriveModelOption',
+  entity: 'DriveModel',
   api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllDriveModelsOptionsForServerModel',
   args: {LocationID: 'int64', ServerModelID: 'int64'}
 ).render_to_file('pkg/drive_model_options_collection.go')
@@ -141,3 +141,12 @@ CollectionGenerator.new(
   var_prefix: 'hostPTRs',
   args: {hostType: 'string', hostID: 'string'}
 ).render_to_file('pkg/host_ptr_records_collection.go')
+
+CollectionGenerator.new(
+  name: 'HostDriveSlot',
+  path: '/hosts/%s/%s/drive_slots',
+  entity: 'HostDriveSlot',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllDriveSlotsForAnExistingDedicatedServer',
+  var_prefix: 'hostDriveSlot',
+  args: {hostType: 'string', hostID: 'string'}
+).render_to_file('pkg/host_drive_slots_collection.go')

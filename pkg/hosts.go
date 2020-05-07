@@ -48,6 +48,8 @@ type HostsService interface {
 	DedicatedServerPTRRecordDelete(ctx context.Context, hostID string, ptrRecordID string) error
 
 	DedicatedServerOperatingSystemReinstall(ctx context.Context, id string, input OperatingSystemReinstallInput) (*DedicatedServer, error)
+
+	DedicatedServerDriveSlots(ctx context.Context, id string) HostDriveSlotsCollection
 }
 
 // HostsHandler handles operations around hosts
@@ -295,4 +297,9 @@ func (h *HostsHandler) DedicatedServerOperatingSystemReinstall(ctx context.Conte
 	}
 
 	return dedicatedServer, nil
+}
+
+// DedicatedServerDriveSlots builds a new HostConnectionsCollection interface
+func (h *HostsHandler) DedicatedServerDriveSlots(ctx context.Context, id string) HostDriveSlotsCollection {
+	return NewHostDriveSlotsCollection(h.client, dedicatedServerTypePrefix, id)
 }

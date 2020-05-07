@@ -204,8 +204,8 @@ type BandwidthOption struct {
 	Commit *int64 `json:"commit,omitempty"`
 }
 
-// DriveModelOption represents drive model option
-type DriveModelOption struct {
+// DriveModel represents drive model
+type DriveModel struct {
 	ID         int64  `json:"id"`
 	Name       string `json:"name"`
 	Capacity   int    `json:"capacity"`
@@ -404,4 +404,12 @@ type OperatingSystemReinstallInput struct {
 	Drives             OperatingSystemReinstallDrivesInput `json:"drives"`
 	OperatingSystemID  *int64                              `json:"operating_system_id,omitempty"`
 	SSHKeyFingerprints []string                            `json:"ssh_key_fingerprints,omitempty"`
+}
+
+// HostDriveSlot represents host drive slot
+type HostDriveSlot struct {
+	Position   int         `json:"position"`
+	Interface  string      `json:"interface"`
+	FormFactor string      `json:"form_factor"`
+	DriveModel *DriveModel `json:"drive_model"`
 }
