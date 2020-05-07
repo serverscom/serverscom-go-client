@@ -11,6 +11,7 @@ const (
 	dedicatedServerScheduleReleasePath = "/hosts/dedicated_servers/%s/schedule_release"
 	dedicatedServerAbortReleasePath    = "/hosts/dedicated_servers/%s/abort_release"
 	dedicatedServerPowerOnPath         = "/hosts/dedicated_servers/%s/power_on"
+	dedicatedServerPowerOffPath        = "/hosts/dedicated_servers/%s/power_off"
 )
 
 // HostsService is an interface for interfacing with Host, Dedicated Server endpoints
@@ -27,6 +28,7 @@ type HostsService interface {
 	DedicatedServerAbortRelease(ctx context.Context, id string) (*DedicatedServer, error)
 
 	DedicatedServerPowerOn(ctx context.Context, id string) (*DedicatedServer, error)
+	DedicatedServerPowerOff(ctx context.Context, id string) (*DedicatedServer, error)
 }
 
 // HostsHandler handles operations around hosts
@@ -129,6 +131,26 @@ func (h *HostsHandler) DedicatedServerAbortRelease(ctx context.Context, id strin
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/SendPowerOnCommandToAnExistingDedicatedServer
 func (h *HostsHandler) DedicatedServerPowerOn(ctx context.Context, id string) (*DedicatedServer, error) {
 	url := h.client.buildURL(dedicatedServerPowerOnPath, []interface{}{id}...)
+
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	dedicatedServer := new(DedicatedServer)
+
+	if err := json.Unmarshal(body, &dedicatedServer); err != nil {
+		return nil, err
+	}
+
+	return dedicatedServer, nil
+}
+
+// DedicatedServerPowerOff sends power on command to the dedicated server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/SendPowerOffCommandToAnExistingDedicatedServer
+func (h *HostsHandler) DedicatedServerPowerOff(ctx context.Context, id string) (*DedicatedServer, error) {
+	url := h.client.buildURL(dedicatedServerPowerOffPath, []interface{}{id}...)
 
 	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
 
