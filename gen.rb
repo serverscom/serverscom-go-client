@@ -13,14 +13,14 @@ CollectionGenerator.new(
   name: 'Host',
   path: '/hosts',
   entity: 'Host',
-  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllHosts',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllHosts'
 ).render_to_file('pkg/hosts_collection.go')
 
 CollectionGenerator.new(
   name: 'Location',
   path: '/locations',
   entity: 'Location',
-  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/Locations',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/Locations'
 ).render_to_file('pkg/locations_collection.go')
 
 CollectionGenerator.new(
@@ -75,12 +75,42 @@ CollectionGenerator.new(
   path: '/ssh_keys',
   entity: 'SSHKey',
   var_prefix: 'sshKey',
-  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllSshKeys',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllSshKeys'
 ).render_to_file('pkg/ssh_keys_collection.go')
 
 CollectionGenerator.new(
   name: 'CloudInstance',
   path: '/cloud_computing/instances',
   entity: 'CloudInstance',
-  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListCloudInstances',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListCloudInstances'
 ).render_to_file('pkg/cloud_instances_collection.go')
+
+CollectionGenerator.new(
+  name: 'L2Segment',
+  path: '/l2_segments',
+  entity: 'L2Segment',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllL2Segments'
+).render_to_file('pkg/l2_segments_collection.go')
+
+CollectionGenerator.new(
+  name: 'L2Member',
+  path: '/l2_segments/%s/members',
+  entity: 'L2Member',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllL2SegmentMembers',
+  args: {segmentID: 'string'}
+).render_to_file('pkg/l2_members_collection.go')
+
+CollectionGenerator.new(
+  name: 'L2Network',
+  path: '/l2_segments/%s/networks',
+  entity: 'Network',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllL2SegmentNetworks',
+  args: {segmentID: 'string'}
+).render_to_file('pkg/l2_networks_collection.go')
+
+CollectionGenerator.new(
+  name: 'L2LocationGroup',
+  path: '/l2_segments/location_groups',
+  entity: 'L2LocationGroup',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllLocationGroups'
+).render_to_file('pkg/l2_location_groups_collection.go')

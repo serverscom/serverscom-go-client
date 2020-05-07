@@ -20,6 +20,7 @@ type Client struct {
 
 	CloudInstances CloudInstancesService
 	Hosts          HostsService
+	L2Segments     L2SegmentsService
 
 	Locations       LocationsService
 	SSHKeys         SSHKeysService
@@ -63,6 +64,7 @@ func (cli *Client) SetupUserAgent(userAgent string) {
 func (cli *Client) configureResources() {
 	cli.CloudInstances = &CloudInstancesHandler{cli}
 	cli.Hosts = &HostsHandler{cli}
+	cli.L2Segments = &L2SegmentsHandler{cli}
 	cli.Locations = &LocationsHandler{cli}
 	cli.SSHKeys = &SSHKeysHandler{cli}
 	cli.SSLCertificates = &SSLCertificatesHandler{cli}

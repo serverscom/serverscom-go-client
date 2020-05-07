@@ -267,3 +267,79 @@ type CloudInstanceUpdateInput struct {
 	GpnEnabled   *bool   `json:"gpn_enabled,omitempty"`
 	Ipv6Enabled  *bool   `json:"ipv6_enabled,omitempty"`
 }
+
+// L2Segment represents l2 segment
+type L2Segment struct {
+	ID              string    `json:"id"`
+	Name            string    `json:"name"`
+	Type            string    `json:"type"`
+	Status          string    `json:"status"`
+	LocationGroupID int64     `json:"location_group_id"`
+	Created         time.Time `json:"created_at"`
+	Updated         time.Time `json:"updated_at"`
+}
+
+// L2SegmentMemberInput represents l2 segment member input for L2SegmentCreateInput and L2SegmentUpdateInput
+type L2SegmentMemberInput struct {
+	ID   string `json:"id"`
+	Mode string `json:"mode"`
+}
+
+// L2SegmentCreateInput represents l2 segment create input
+type L2SegmentCreateInput struct {
+	Name            *string                `json:"name,omitempty"`
+	Type            string                 `json:"type"`
+	LocationGroupID int64                  `json:"location_group_id"`
+	Members         []L2SegmentMemberInput `json:"members"`
+}
+
+// L2SegmentUpdateInput represents l2 segment update input
+type L2SegmentUpdateInput struct {
+	Name    *string                `json:"name,omitempty"`
+	Members []L2SegmentMemberInput `json:"members,omitempty"`
+}
+
+// L2Member respresents l2 segment member
+type L2Member struct {
+	ID      string    `json:"id"`
+	Title   string    `json:"title"`
+	Mode    string    `json:"mode"`
+	Vlan    *int      `json:"vlan"`
+	Status  string    `json:"status"`
+	Created time.Time `json:"created_at"`
+	Updated time.Time `json:"updated_at"`
+}
+
+// L2SegmentCreateNetworksInput represents input to create networks for L2SegmentChangeNetworksInput
+type L2SegmentCreateNetworksInput struct {
+	Mask               int    `json:"mask"`
+	DistributionMethod string `json:"distribution_method"`
+}
+
+// L2SegmentChangeNetworksInput represents input to change networks
+type L2SegmentChangeNetworksInput struct {
+	Create []L2SegmentCreateNetworksInput `json:"create,omitempty"`
+	Delete []string                       `json:"delete,omitempty"`
+}
+
+// Network represents network
+type Network struct {
+	ID                 string    `json:"id"`
+	Title              *string   `json:"title,omitempty"`
+	State              string    `json:"state"`
+	Cidr               *string   `json:"cidr,omitempty"`
+	Family             string    `json:"family"`
+	InterfaceType      string    `json:"interface_type"`
+	DistributionMethod string    `json:"distribution_method"`
+	Additional         bool      `json:"additional"`
+	Created            time.Time `json:"created_at"`
+	Updated            time.Time `json:"updated_at"`
+}
+
+// L2LocationGroup represents l2 location groups
+type L2LocationGroup struct {
+	ID          int64   `json:"id"`
+	Name        string  `json:"name"`
+	GroupType   string  `json:"group_type"`
+	LocationIDs []int64 `json:"location_ids"`
+}
