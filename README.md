@@ -1,5 +1,7 @@
 # Servers.com go client
 
+[![GoDoc](https://godoc.org/github.com/serverscom/serverscom-go-client?status.svg)](https://godoc.org/github.com/serverscom/serverscom-go-client)
+
 serverscom-go-client is a Go client library for accessing the [Servers.com API](https://developers.servers.com/api-documentation/v1/)
 
 ## Development status
