@@ -229,7 +229,7 @@ func TestDriveModelOptionsCollectionNext(t *testing.T) {
 
 	ctx := context.TODO()
 
-	var list []DriveModelOption
+	var list []DriveModel
 	var err error
 
 	list, err = collection.List(ctx)
@@ -271,7 +271,7 @@ func TestDriveModelOptionsCollectionPrevious(t *testing.T) {
 
 	ctx := context.TODO()
 
-	var list []DriveModelOption
+	var list []DriveModel
 	var err error
 
 	list, err = collection.List(ctx)
@@ -313,7 +313,7 @@ func TestDriveModelOptionsCollectionFirst(t *testing.T) {
 
 	ctx := context.TODO()
 
-	var list []DriveModelOption
+	var list []DriveModel
 	var err error
 
 	list, err = collection.List(ctx)
@@ -354,7 +354,7 @@ func TestDriveModelOptionsCollectionLast(t *testing.T) {
 
 	ctx := context.TODO()
 
-	var list []DriveModelOption
+	var list []DriveModel
 	var err error
 
 	list, err = collection.List(ctx)

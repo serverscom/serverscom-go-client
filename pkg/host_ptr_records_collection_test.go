@@ -7,11 +7,11 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestL2NetworksEmptyCollection(t *testing.T) {
+func TestHostPTRRecordsEmptyCollection(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithResponseBodyStubInline(`[]`).
 		WithResponseCode(200).
@@ -19,7 +19,7 @@ func TestL2NetworksEmptyCollection(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewL2NetworksCollection(client, "a")
+	collection := NewHostPTRRecordsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
@@ -33,11 +33,11 @@ func TestL2NetworksEmptyCollection(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestL2NetworksCollectionList(t *testing.T) {
+func TestHostPTRRecordsCollectionList(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
@@ -45,7 +45,7 @@ func TestL2NetworksCollectionList(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewL2NetworksCollection(client, "a")
+	collection := NewHostPTRRecordsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
@@ -59,14 +59,14 @@ func TestL2NetworksCollectionList(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestL2NetworksCollectionHasNext(t *testing.T) {
+func TestHostPTRRecordsCollectionHasNext(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/l2_segments/a/networks?page=2&per_page=2>; rel="next"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/ptr_records?page=2&per_page=2>; rel="next"`,
 		}).
 		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
@@ -74,7 +74,7 @@ func TestL2NetworksCollectionHasNext(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewL2NetworksCollection(client, "a")
+	collection := NewHostPTRRecordsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
@@ -88,14 +88,14 @@ func TestL2NetworksCollectionHasNext(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestL2NetworksCollectionHasPrevious(t *testing.T) {
+func TestHostPTRRecordsCollectionHasPrevious(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/l2_segments/a/networks?page=1&per_page=2>; rel="prev"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/ptr_records?page=1&per_page=2>; rel="prev"`,
 		}).
 		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
@@ -103,7 +103,7 @@ func TestL2NetworksCollectionHasPrevious(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewL2NetworksCollection(client, "a")
+	collection := NewHostPTRRecordsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
@@ -117,14 +117,14 @@ func TestL2NetworksCollectionHasPrevious(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestL2NetworksCollectionHasFirst(t *testing.T) {
+func TestHostPTRRecordsCollectionHasFirst(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/l2_segments/a/networks?page=1&per_page=2>; rel="first"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/ptr_records?page=1&per_page=2>; rel="first"`,
 		}).
 		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
@@ -132,7 +132,7 @@ func TestL2NetworksCollectionHasFirst(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewL2NetworksCollection(client, "a")
+	collection := NewHostPTRRecordsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
@@ -146,14 +146,14 @@ func TestL2NetworksCollectionHasFirst(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestL2NetworksCollectionHasLast(t *testing.T) {
+func TestHostPTRRecordsCollectionHasLast(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/l2_segments/a/networks?page=2&per_page=2>; rel="last"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/ptr_records?page=2&per_page=2>; rel="last"`,
 		}).
 		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
@@ -161,7 +161,7 @@ func TestL2NetworksCollectionHasLast(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewL2NetworksCollection(client, "a")
+	collection := NewHostPTRRecordsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
@@ -175,14 +175,14 @@ func TestL2NetworksCollectionHasLast(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(true))
 }
 
-func TestL2NetworksCollectionHasRelations(t *testing.T) {
+func TestHostPTRRecordsCollectionHasRelations(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/l2_segments/a/networks?page=3&per_page=2>; rel="next",<https://dummy.api.com/l2_segments/a/networks?page=1&per_page=2>; rel="prev",<https://dummy.api.com/l2_segments/a/networks?page=1&per_page=2>; rel="first",<https://dummy.api.com/l2_segments/a/networks?page=3&per_page=2>; rel="last"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/ptr_records?page=3&per_page=2>; rel="next",<https://dummy.api.com/hosts/dedicated_servers/a/ptr_records?page=1&per_page=2>; rel="prev",<https://dummy.api.com/hosts/dedicated_servers/a/ptr_records?page=1&per_page=2>; rel="first",<https://dummy.api.com/hosts/dedicated_servers/a/ptr_records?page=3&per_page=2>; rel="last"`,
 		}).
 		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
@@ -190,7 +190,7 @@ func TestL2NetworksCollectionHasRelations(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewL2NetworksCollection(client, "a")
+	collection := NewHostPTRRecordsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
@@ -204,19 +204,19 @@ func TestL2NetworksCollectionHasRelations(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(true))
 }
 
-func TestL2NetworksCollectionNext(t *testing.T) {
+func TestHostPTRRecordsCollectionNext(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/l2_segments/a/networks?page=2&per_page=2>; rel="next"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/ptr_records?page=2&per_page=2>; rel="next"`,
 		}).
 		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=2&per_page=2`).
 		WithResponseBodyStubInline(`[{"id": "c"}, {"id": "d"}]`).
@@ -225,11 +225,11 @@ func TestL2NetworksCollectionNext(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewL2NetworksCollection(client, "a")
+	collection := NewHostPTRRecordsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
-	var list []Network
+	var list []PTRRecord
 	var err error
 
 	list, err = collection.List(ctx)
@@ -245,20 +245,20 @@ func TestL2NetworksCollectionNext(t *testing.T) {
 	g.Expect(collection.HasNextPage()).To(Equal(false))
 }
 
-func TestL2NetworksCollectionPrevious(t *testing.T) {
+func TestHostPTRRecordsCollectionPrevious(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=2&per_page=2`).
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/l2_segments/a/networks?page=1&per_page=2>; rel="prev"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/ptr_records?page=1&per_page=2>; rel="prev"`,
 		}).
 		WithResponseBodyStubInline(`[{"id": "c"}, {"id": "d"}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=1&per_page=2`).
 		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
@@ -267,11 +267,11 @@ func TestL2NetworksCollectionPrevious(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewL2NetworksCollection(client, "a").SetPage(2).SetPerPage(2)
+	collection := NewHostPTRRecordsCollection(client, "dedicated_servers", "a").SetPage(2).SetPerPage(2)
 
 	ctx := context.TODO()
 
-	var list []Network
+	var list []PTRRecord
 	var err error
 
 	list, err = collection.List(ctx)
@@ -287,20 +287,20 @@ func TestL2NetworksCollectionPrevious(t *testing.T) {
 	g.Expect(collection.HasPreviousPage()).To(Equal(false))
 }
 
-func TestL2NetworksCollectionFirst(t *testing.T) {
+func TestHostPTRRecordsCollectionFirst(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=2&per_page=2`).
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/l2_segments/a/networks?page=1&per_page=2>; rel="first"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/ptr_records?page=1&per_page=2>; rel="first"`,
 		}).
 		WithResponseBodyStubInline(`[{"id": "c"}, {"id": "d"}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=1&per_page=2`).
 		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
@@ -309,11 +309,11 @@ func TestL2NetworksCollectionFirst(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewL2NetworksCollection(client, "a").SetPage(2).SetPerPage(2)
+	collection := NewHostPTRRecordsCollection(client, "dedicated_servers", "a").SetPage(2).SetPerPage(2)
 
 	ctx := context.TODO()
 
-	var list []Network
+	var list []PTRRecord
 	var err error
 
 	list, err = collection.List(ctx)
@@ -329,19 +329,19 @@ func TestL2NetworksCollectionFirst(t *testing.T) {
 	g.Expect(collection.HasFirstPage()).To(Equal(false))
 }
 
-func TestL2NetworksCollectionLast(t *testing.T) {
+func TestHostPTRRecordsCollectionLast(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/l2_segments/a/networks?page=2&per_page=2>; rel="last"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/ptr_records?page=2&per_page=2>; rel="last"`,
 		}).
 		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=2&per_page=2`).
 		WithResponseBodyStubInline(`[{"id": "c"}, {"id": "d"}]`).
@@ -350,11 +350,11 @@ func TestL2NetworksCollectionLast(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewL2NetworksCollection(client, "a")
+	collection := NewHostPTRRecordsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 
-	var list []Network
+	var list []PTRRecord
 	var err error
 
 	list, err = collection.List(ctx)
@@ -370,28 +370,28 @@ func TestL2NetworksCollectionLast(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestL2NetworksCollectionCollect(t *testing.T) {
+func TestHostPTRRecordsCollectionCollect(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/l2_segments/a/networks?page=2&per_page=2>; rel="next"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/ptr_records?page=2&per_page=2>; rel="next"`,
 		}).
 		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=2&per_page=2`).
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/l2_segments/a/networks?page=3&per_page=2>; rel="next"`,
+			"Link": `<https://dummy.api.com/hosts/dedicated_servers/a/ptr_records?page=3&per_page=2>; rel="next"`,
 		}).
 		WithResponseBodyStubInline(`[{"id": "c"}, {"id": "d"}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/l2_segments/a/networks").
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=3&per_page=2`).
 		WithResponseBodyStubInline(`[{"id": "e"}, {"id": "f"}]`).
@@ -400,7 +400,7 @@ func TestL2NetworksCollectionCollect(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewL2NetworksCollection(client, "a")
+	collection := NewHostPTRRecordsCollection(client, "dedicated_servers", "a")
 
 	ctx := context.TODO()
 

@@ -57,7 +57,7 @@ CollectionGenerator.new(
 CollectionGenerator.new(
   name: 'DriveModelOption',
   path: '/locations/%d/order_options/server_models/%d/drive_models',
-  entity: 'DriveModelOption',
+  entity: 'DriveModel',
   api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllDriveModelsOptionsForServerModel',
   args: {LocationID: 'int64', ServerModelID: 'int64'}
 ).render_to_file('pkg/drive_model_options_collection.go')
@@ -105,6 +105,7 @@ CollectionGenerator.new(
   path: '/l2_segments/%s/networks',
   entity: 'Network',
   api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllL2SegmentNetworks',
+  var_prefix: 'l2Networks',
   args: {segmentID: 'string'}
 ).render_to_file('pkg/l2_networks_collection.go')
 
@@ -114,3 +115,38 @@ CollectionGenerator.new(
   entity: 'L2LocationGroup',
   api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllLocationGroups'
 ).render_to_file('pkg/l2_location_groups_collection.go')
+
+CollectionGenerator.new(
+  name: 'HostConnection',
+  path: '/hosts/%s/%s/connections',
+  entity: 'HostConnection',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllConnectionsForAnExistingDedicatedServer',
+  args: {hostType: 'string', hostID: 'string'}
+).render_to_file('pkg/host_connections_collection.go')
+
+CollectionGenerator.new(
+  name: 'HostNetwork',
+  path: '/hosts/%s/%s/networks',
+  entity: 'Network',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllNetworksForAnExistingDedicatedServer',
+  var_prefix: 'hostNetworks',
+  args: {hostType: 'string', hostID: 'string'}
+).render_to_file('pkg/host_networks_collection.go')
+
+CollectionGenerator.new(
+  name: 'HostPTRRecord',
+  path: '/hosts/%s/%s/ptr_records',
+  entity: 'PTRRecord',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllPtrRecordsForServerNetworks',
+  var_prefix: 'hostPTRs',
+  args: {hostType: 'string', hostID: 'string'}
+).render_to_file('pkg/host_ptr_records_collection.go')
+
+CollectionGenerator.new(
+  name: 'HostDriveSlot',
+  path: '/hosts/%s/%s/drive_slots',
+  entity: 'HostDriveSlot',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllDriveSlotsForAnExistingDedicatedServer',
+  var_prefix: 'hostDriveSlot',
+  args: {hostType: 'string', hostID: 'string'}
+).render_to_file('pkg/host_drive_slots_collection.go')

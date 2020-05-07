@@ -11,12 +11,12 @@ import (
 )
 
 const (
-	driveModelListPath = "/locations/%d/order_options/server_models/%d/drive_models"
+	hostPTRsListPath = "/hosts/%s/%s/ptr_records"
 )
 
-// DriveModelOptionsCollection is an interface for interfacing with the collection of DriveModel
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ListAllDriveModelsOptionsForServerModel
-type DriveModelOptionsCollection interface {
+// HostPTRRecordsCollection is an interface for interfacing with the collection of PTRRecord
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ListAllPtrRecordsForServerNetworks
+type HostPTRRecordsCollection interface {
 	IsClean() bool
 
 	HasPreviousPage() bool
@@ -24,53 +24,53 @@ type DriveModelOptionsCollection interface {
 	HasFirstPage() bool
 	HasLastPage() bool
 
-	NextPage(ctx context.Context) ([]DriveModel, error)
-	PreviousPage(ctx context.Context) ([]DriveModel, error)
-	FirstPage(ctx context.Context) ([]DriveModel, error)
-	LastPage(ctx context.Context) ([]DriveModel, error)
+	NextPage(ctx context.Context) ([]PTRRecord, error)
+	PreviousPage(ctx context.Context) ([]PTRRecord, error)
+	FirstPage(ctx context.Context) ([]PTRRecord, error)
+	LastPage(ctx context.Context) ([]PTRRecord, error)
 
-	Collect(ctx context.Context) ([]DriveModel, error)
-	List(ctx context.Context) ([]DriveModel, error)
+	Collect(ctx context.Context) ([]PTRRecord, error)
+	List(ctx context.Context) ([]PTRRecord, error)
 
-	SetPage(page int) DriveModelOptionsCollection
-	SetPerPage(perPage int) DriveModelOptionsCollection
+	SetPage(page int) HostPTRRecordsCollection
+	SetPerPage(perPage int) HostPTRRecordsCollection
 
 	Refresh(ctx context.Context) error
 }
 
-// DriveModelOptionsCollectionHandler handles opertations aroud collection
-type DriveModelOptionsCollectionHandler struct {
+// HostPTRRecordsCollectionHandler handles opertations aroud collection
+type HostPTRRecordsCollectionHandler struct {
 	client *Client
 
-	LocationID    int64
-	ServerModelID int64
+	hostType string
+	hostID   string
 
 	params map[string]string
 
 	clean bool
 
 	rels       map[string]string
-	collection []DriveModel
+	collection []PTRRecord
 }
 
-// NewDriveModelOptionsCollection produces a new DriveModelOptionsCollectionHandler and represents this as an interface of DriveModelOptionsCollection
-func NewDriveModelOptionsCollection(client *Client, LocationID int64, ServerModelID int64) DriveModelOptionsCollection {
-	return &DriveModelOptionsCollectionHandler{
+// NewHostPTRRecordsCollection produces a new HostPTRRecordsCollectionHandler and represents this as an interface of HostPTRRecordsCollection
+func NewHostPTRRecordsCollection(client *Client, hostType string, hostID string) HostPTRRecordsCollection {
+	return &HostPTRRecordsCollectionHandler{
 		client: client,
 
-		LocationID: LocationID,
+		hostType: hostType,
 
-		ServerModelID: ServerModelID,
+		hostID: hostID,
 
 		params:     make(map[string]string),
 		rels:       make(map[string]string),
 		clean:      true,
-		collection: make([]DriveModel, 0),
+		collection: make([]PTRRecord, 0),
 	}
 }
 
 // IsClean returns a bool value where true is means, this collection not used yet and doesn't contain any state.
-func (col *DriveModelOptionsCollectionHandler) IsClean() bool {
+func (col *HostPTRRecordsCollectionHandler) IsClean() bool {
 	return col.clean
 }
 
@@ -80,7 +80,7 @@ func (col *DriveModelOptionsCollectionHandler) IsClean() bool {
 // were made and collection doesn't have metadata to know about pagination.
 //
 // First metadata will come with the first called methods such: NextPage, PreviousPage, LastPage, FirstPage, List, Refresh, Collect.
-func (col *DriveModelOptionsCollectionHandler) HasPreviousPage() bool {
+func (col *HostPTRRecordsCollectionHandler) HasPreviousPage() bool {
 	return col.hasRel("prev")
 }
 
@@ -90,7 +90,7 @@ func (col *DriveModelOptionsCollectionHandler) HasPreviousPage() bool {
 // were made and collection doesn't have metadata to know about pagination.
 //
 // First metadata will come with the first called methods such: NextPage, PreviousPage, LastPage, FirstPage, List, Refresh, Collect.
-func (col *DriveModelOptionsCollectionHandler) HasNextPage() bool {
+func (col *HostPTRRecordsCollectionHandler) HasNextPage() bool {
 	return col.hasRel("next")
 }
 
@@ -100,7 +100,7 @@ func (col *DriveModelOptionsCollectionHandler) HasNextPage() bool {
 // were made and collection doesn't have metadata to know about pagination.
 //
 // First metadata will come with the first called methods such: NextPage, PreviousPage, LastPage, FirstPage, List, Refresh, Collect.
-func (col *DriveModelOptionsCollectionHandler) HasFirstPage() bool {
+func (col *HostPTRRecordsCollectionHandler) HasFirstPage() bool {
 	return col.hasRel("first")
 }
 
@@ -110,51 +110,51 @@ func (col *DriveModelOptionsCollectionHandler) HasFirstPage() bool {
 // were made and collection doesn't have metadata to know about pagination.
 //
 // First metadata will come with the first called methods such: NextPage, PreviousPage, LastPage, FirstPage, List, Refresh, Collect.
-func (col *DriveModelOptionsCollectionHandler) HasLastPage() bool {
+func (col *HostPTRRecordsCollectionHandler) HasLastPage() bool {
 	return col.hasRel("last")
 }
 
-// NextPage navigates to the next page returns a []DriveModel, produces an error, when a
+// NextPage navigates to the next page returns a []PTRRecord, produces an error, when a
 // collection has no next page.
 //
 // Before using this method please ensure IsClean returns false and HasNextPage returns true.
 // You can force to load pagination metadata by calling Refresh or List methods.
-func (col *DriveModelOptionsCollectionHandler) NextPage(ctx context.Context) ([]DriveModel, error) {
+func (col *HostPTRRecordsCollectionHandler) NextPage(ctx context.Context) ([]PTRRecord, error) {
 	return col.navigate(ctx, "next")
 }
 
-// PreviousPage navigates to the previous page returns a []DriveModel, produces an error, when a
+// PreviousPage navigates to the previous page returns a []PTRRecord, produces an error, when a
 // collection has no previous page.
 //
 // Before using this method please ensure IsClean returns false and HasPreviousPage returns true.
 // You can force to load pagination metadata by calling Refresh or List methods.
-func (col *DriveModelOptionsCollectionHandler) PreviousPage(ctx context.Context) ([]DriveModel, error) {
+func (col *HostPTRRecordsCollectionHandler) PreviousPage(ctx context.Context) ([]PTRRecord, error) {
 	return col.navigate(ctx, "prev")
 }
 
-// FirstPage navigates to the first page returns a []DriveModel, produces an error, when a
+// FirstPage navigates to the first page returns a []PTRRecord, produces an error, when a
 // collection has no first page.
 //
 // Before using this method please ensure IsClean returns false and HasFirstPage returns true.
 // You can force to load pagination metadata by calling Refresh or List methods.
-func (col *DriveModelOptionsCollectionHandler) FirstPage(ctx context.Context) ([]DriveModel, error) {
+func (col *HostPTRRecordsCollectionHandler) FirstPage(ctx context.Context) ([]PTRRecord, error) {
 	return col.navigate(ctx, "first")
 }
 
-// LastPage navigates to the last page returns a []DriveModel, produces an error, when a
+// LastPage navigates to the last page returns a []PTRRecord, produces an error, when a
 // collection has no last page.
 //
 // Before using this method please ensure IsClean returns false and HasLastPage returns true.
 // You can force to load pagination metadata by calling Refresh or List methods.
-func (col *DriveModelOptionsCollectionHandler) LastPage(ctx context.Context) ([]DriveModel, error) {
+func (col *HostPTRRecordsCollectionHandler) LastPage(ctx context.Context) ([]PTRRecord, error) {
 	return col.navigate(ctx, "last")
 }
 
 // Collect navigates by pages until the last page is reached will be reached and returns accumulated data between pages.
 //
 // This method uses NextPage.
-func (col *DriveModelOptionsCollectionHandler) Collect(ctx context.Context) ([]DriveModel, error) {
-	var accumulatedCollectionElements []DriveModel
+func (col *HostPTRRecordsCollectionHandler) Collect(ctx context.Context) ([]PTRRecord, error) {
+	var accumulatedCollectionElements []PTRRecord
 
 	currentCollectionElements, err := col.List(ctx)
 
@@ -187,7 +187,7 @@ func (col *DriveModelOptionsCollectionHandler) Collect(ctx context.Context) ([]D
 // perform request when such methods were called before: NextPage, PreviousPage, LastPage, FirstPage, Refresh, Collect.
 //
 // In the case when previously called method is Collect, this method returns data from the last page.
-func (col *DriveModelOptionsCollectionHandler) List(ctx context.Context) ([]DriveModel, error) {
+func (col *HostPTRRecordsCollectionHandler) List(ctx context.Context) ([]PTRRecord, error) {
 	if col.IsClean() {
 		if err := col.Refresh(ctx); err != nil {
 			return nil, err
@@ -198,7 +198,7 @@ func (col *DriveModelOptionsCollectionHandler) List(ctx context.Context) ([]Driv
 }
 
 // SetPage sets current page param.
-func (col *DriveModelOptionsCollectionHandler) SetPage(page int) DriveModelOptionsCollection {
+func (col *HostPTRRecordsCollectionHandler) SetPage(page int) HostPTRRecordsCollection {
 	var currentPage string
 
 	if page > 1 {
@@ -213,7 +213,7 @@ func (col *DriveModelOptionsCollectionHandler) SetPage(page int) DriveModelOptio
 }
 
 // SetPerPage sets current per page param.
-func (col *DriveModelOptionsCollectionHandler) SetPerPage(perPage int) DriveModelOptionsCollection {
+func (col *HostPTRRecordsCollectionHandler) SetPerPage(perPage int) HostPTRRecordsCollection {
 	var currentPerPage string
 
 	if perPage > 0 {
@@ -230,7 +230,7 @@ func (col *DriveModelOptionsCollectionHandler) SetPerPage(perPage int) DriveMode
 // Refresh performs the request and then updates accumulated data limited by pagination.
 //
 // After calling this method accumulated data can be extracted by List method.
-func (col *DriveModelOptionsCollectionHandler) Refresh(ctx context.Context) error {
+func (col *HostPTRRecordsCollectionHandler) Refresh(ctx context.Context) error {
 	if err := col.fireHTTPRequest(ctx); err != nil {
 		return err
 	}
@@ -238,10 +238,10 @@ func (col *DriveModelOptionsCollectionHandler) Refresh(ctx context.Context) erro
 	return nil
 }
 
-func (col *DriveModelOptionsCollectionHandler) fireHTTPRequest(ctx context.Context) error {
-	var accumulatedCollectionElements []DriveModel
+func (col *HostPTRRecordsCollectionHandler) fireHTTPRequest(ctx context.Context) error {
+	var accumulatedCollectionElements []PTRRecord
 
-	initialURL := col.client.buildURL(driveModelListPath, col.LocationID, col.ServerModelID)
+	initialURL := col.client.buildURL(hostPTRsListPath, col.hostType, col.hostID)
 	url := col.client.applyParams(
 		initialURL,
 		col.params,
@@ -263,7 +263,7 @@ func (col *DriveModelOptionsCollectionHandler) fireHTTPRequest(ctx context.Conte
 	return nil
 }
 
-func (col *DriveModelOptionsCollectionHandler) navigate(ctx context.Context, name string) ([]DriveModel, error) {
+func (col *HostPTRRecordsCollectionHandler) navigate(ctx context.Context, name string) ([]PTRRecord, error) {
 	if col.IsClean() {
 		if err := col.Refresh(ctx); err != nil {
 			return nil, err
@@ -281,7 +281,7 @@ func (col *DriveModelOptionsCollectionHandler) navigate(ctx context.Context, nam
 	return col.collection, nil
 }
 
-func (col *DriveModelOptionsCollectionHandler) applyParam(name, value string) {
+func (col *HostPTRRecordsCollectionHandler) applyParam(name, value string) {
 	if value == "" {
 		delete(col.params, name)
 	} else {
@@ -289,7 +289,7 @@ func (col *DriveModelOptionsCollectionHandler) applyParam(name, value string) {
 	}
 }
 
-func (col *DriveModelOptionsCollectionHandler) applyRel(name string) error {
+func (col *HostPTRRecordsCollectionHandler) applyRel(name string) error {
 	if !col.hasRel(name) {
 		return fmt.Errorf("No rel for: %s", name)
 	}
@@ -306,7 +306,7 @@ func (col *DriveModelOptionsCollectionHandler) applyRel(name string) error {
 	return nil
 }
 
-func (col *DriveModelOptionsCollectionHandler) hasRel(name string) bool {
+func (col *HostPTRRecordsCollectionHandler) hasRel(name string) bool {
 	if _, ok := col.rels[name]; ok {
 		return true
 	}

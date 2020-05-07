@@ -71,7 +71,7 @@ type DedicatedServerLayoutPartitionInput struct {
 	Target string  `json:"target"`
 	Size   int     `json:"size"`
 	Fs     *string `json:"fs,omitempty"`
-	Fill   bool    `json:"fill"`
+	Fill   bool    `json:"fill,omitempty"`
 }
 
 // DedicatedServerLayoutInput represents layout for DedicatedServerDrivesInput
@@ -162,7 +162,7 @@ type DedicatedServerCreateInput struct {
 	UplinkModels       DedicatedServerUplinkModelsInput `json:"uplink_models"`
 	Drives             DedicatedServerDrivesInput       `json:"drives"`
 	Features           []string                         `json:"features,omitempty"`
-	Ipv6               bool                             `json:"ipv6"`
+	IPv6               bool                             `json:"ipv6"`
 	Hosts              []DedicatedServerHostInput       `json:"hosts"`
 	OperatingSystemID  *int64                           `json:"operating_system_id"`
 	SSHKeyFingerprints []string                         `json:"ssh_key_fingerprints,omitempty"`
@@ -204,8 +204,8 @@ type BandwidthOption struct {
 	Commit *int64 `json:"commit,omitempty"`
 }
 
-// DriveModelOption represents drive model option
-type DriveModelOption struct {
+// DriveModel represents drive model
+type DriveModel struct {
 	ID         int64  `json:"id"`
 	Name       string `json:"name"`
 	Capacity   int    `json:"capacity"`
@@ -326,7 +326,7 @@ type L2SegmentChangeNetworksInput struct {
 type Network struct {
 	ID                 string    `json:"id"`
 	Title              *string   `json:"title,omitempty"`
-	State              string    `json:"state"`
+	Status             string    `json:"status"`
 	Cidr               *string   `json:"cidr,omitempty"`
 	Family             string    `json:"family"`
 	InterfaceType      string    `json:"interface_type"`
@@ -334,6 +334,9 @@ type Network struct {
 	Additional         bool      `json:"additional"`
 	Created            time.Time `json:"created_at"`
 	Updated            time.Time `json:"updated_at"`
+
+	// DEPRECATED: should be replaced by Statu
+	State string `json:"state"`
 }
 
 // L2LocationGroup represents l2 location groups
@@ -342,4 +345,71 @@ type L2LocationGroup struct {
 	Name        string  `json:"name"`
 	GroupType   string  `json:"group_type"`
 	LocationIDs []int64 `json:"location_ids"`
+}
+
+// HostPowerFeed represents feed status
+type HostPowerFeed struct {
+	Name   string `json:"name"`
+	Status string `json:"status"`
+}
+
+// HostConnection represents host connection
+type HostConnection struct {
+	Port       string  `json:"port"`
+	Type       string  `json:"type"`
+	MACAddress *string `json:"macaddr"`
+}
+
+// PTRRecord represents ptr record
+type PTRRecord struct {
+	ID       string `json:"id"`
+	IP       string `json:"ip"`
+	Domain   string `json:"domain"`
+	Priority int    `json:"priority"`
+	TTL      int    `json:"ttl"`
+}
+
+// PTRRecordCreateInput represents ptr record create input
+type PTRRecordCreateInput struct {
+	IP       string `json:"ip"`
+	Domain   string `json:"domain"`
+	Priority *int   `json:"priority"`
+	TTL      *int   `json:"ttl"`
+}
+
+// OperatingSystemReinstallPartitionInput represents partition for os reinstallation layout input
+type OperatingSystemReinstallPartitionInput struct {
+	Target string  `json:"target"`
+	Size   int     `json:"size"`
+	Fs     *string `json:"fs,omitempty"`
+	Fill   bool    `json:"fill,omitempty"`
+}
+
+// OperatingSystemReinstallLayoutInput represents layout for os reinstallation drives input
+type OperatingSystemReinstallLayoutInput struct {
+	SlotPositions []int                                    `json:"slot_positions"`
+	Raid          *int                                     `json:"raid,omitempty"`
+	Ignore        *bool                                    `json:"ignore,omitempty"`
+	Partitions    []OperatingSystemReinstallPartitionInput `json:"partitions,omitempty"`
+}
+
+// OperatingSystemReinstallDrivesInput represents drives for os reinstallation input
+type OperatingSystemReinstallDrivesInput struct {
+	Layout []OperatingSystemReinstallLayoutInput `json:"layout,omitempty"`
+}
+
+// OperatingSystemReinstallInput represents os reinstallation input
+type OperatingSystemReinstallInput struct {
+	Hostname           string                              `json:"hostname"`
+	Drives             OperatingSystemReinstallDrivesInput `json:"drives"`
+	OperatingSystemID  *int64                              `json:"operating_system_id,omitempty"`
+	SSHKeyFingerprints []string                            `json:"ssh_key_fingerprints,omitempty"`
+}
+
+// HostDriveSlot represents host drive slot
+type HostDriveSlot struct {
+	Position   int         `json:"position"`
+	Interface  string      `json:"interface"`
+	FormFactor string      `json:"form_factor"`
+	DriveModel *DriveModel `json:"drive_model"`
 }

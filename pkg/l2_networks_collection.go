@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	networkListPath = "/l2_segments/%s/networks"
+	l2NetworksListPath = "/l2_segments/%s/networks"
 )
 
 // L2NetworksCollection is an interface for interfacing with the collection of Network
@@ -238,7 +238,7 @@ func (col *L2NetworksCollectionHandler) Refresh(ctx context.Context) error {
 func (col *L2NetworksCollectionHandler) fireHTTPRequest(ctx context.Context) error {
 	var accumulatedCollectionElements []Network
 
-	initialURL := col.client.buildURL(networkListPath, col.segmentID)
+	initialURL := col.client.buildURL(l2NetworksListPath, col.segmentID)
 	url := col.client.applyParams(
 		initialURL,
 		col.params,
