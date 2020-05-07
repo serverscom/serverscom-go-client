@@ -359,3 +359,12 @@ type HostConnection struct {
 	Type       string  `json:"type"`
 	MACAddress *string `json:"macaddr"`
 }
+
+// PTRRecord represents ptr record
+type PTRRecord struct {
+	ID       string `json:"id"`
+	IP       string `json:"ip"`
+	Domain   string `json:"domain"`
+	Priority int    `json:"priority"`
+	TTL      int    `json:"ttl"`
+}

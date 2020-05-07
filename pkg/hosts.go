@@ -37,6 +37,10 @@ type HostsService interface {
 	DedicatedServerPowerFeeds(ctx context.Context, id string) ([]HostPowerFeed, error)
 
 	DedicatedServerConnections(ctx context.Context, id string) HostConnectionsCollection
+
+	DedicatedServerNetworks(ctx context.Context, id string) HostNetworksCollection
+
+	DedicatedServerPTRRecords(ctx context.Context, id string) HostPTRRecordsCollection
 }
 
 // HostsHandler handles operations around hosts
@@ -220,7 +224,12 @@ func (h *HostsHandler) DedicatedServerConnections(ctx context.Context, id string
 	return NewHostConnectionsCollection(h.client, dedicatedServerTypePrefix, id)
 }
 
-// DedicatedServerNetworks builds a new HostConnectionsCollection interface
+// DedicatedServerNetworks builds a new HostNetworksCollection interface
 func (h *HostsHandler) DedicatedServerNetworks(ctx context.Context, id string) HostNetworksCollection {
 	return NewHostNetworksCollection(h.client, dedicatedServerTypePrefix, id)
+}
+
+// DedicatedServerPTRRecords builds a new HostPTRRecordsCollection interface
+func (h *HostsHandler) DedicatedServerPTRRecords(ctx context.Context, id string) HostPTRRecordsCollection {
+	return NewHostPTRRecordsCollection(h.client, dedicatedServerTypePrefix, id)
 }

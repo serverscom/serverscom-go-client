@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	hostNetworkListPath = "/hosts/%s/%s/networks"
+	hostNetworksListPath = "/hosts/%s/%s/networks"
 )
 
 // HostNetworksCollection is an interface for interfacing with the collection of Network
@@ -241,7 +241,7 @@ func (col *HostNetworksCollectionHandler) Refresh(ctx context.Context) error {
 func (col *HostNetworksCollectionHandler) fireHTTPRequest(ctx context.Context) error {
 	var accumulatedCollectionElements []Network
 
-	initialURL := col.client.buildURL(hostNetworkListPath, col.hostType, col.hostID)
+	initialURL := col.client.buildURL(hostNetworksListPath, col.hostType, col.hostID)
 	url := col.client.applyParams(
 		initialURL,
 		col.params,

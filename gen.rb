@@ -132,3 +132,12 @@ CollectionGenerator.new(
   var_prefix: 'hostNetworks',
   args: {hostType: 'string', hostID: 'string'}
 ).render_to_file('pkg/host_networks_collection.go')
+
+CollectionGenerator.new(
+  name: 'HostPTRRecord',
+  path: '/hosts/%s/%s/ptr_records',
+  entity: 'PTRRecord',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllPtrRecordsForServerNetworks',
+  var_prefix: 'hostPTRs',
+  args: {hostType: 'string', hostID: 'string'}
+).render_to_file('pkg/host_ptr_records_collection.go')
