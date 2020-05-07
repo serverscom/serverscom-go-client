@@ -10,6 +10,7 @@ const (
 	dedicatedServerPath                = "/hosts/dedicated_servers/%s"
 	dedicatedServerScheduleReleasePath = "/hosts/dedicated_servers/%s/schedule_release"
 	dedicatedServerAbortReleasePath    = "/hosts/dedicated_servers/%s/abort_release"
+	dedicatedServerPowerOnPath         = "/hosts/dedicated_servers/%s/power_on"
 )
 
 // HostsService is an interface for interfacing with Host, Dedicated Server endpoints
@@ -21,8 +22,11 @@ type HostsService interface {
 
 	DedicatedServerGet(ctx context.Context, id string) (*DedicatedServer, error)
 	DedicatedServersCreate(ctx context.Context, input DedicatedServerCreateInput) ([]DedicatedServer, error)
+
 	DedicatedServerScheduleRelease(ctx context.Context, id string) (*DedicatedServer, error)
 	DedicatedServerAbortRelease(ctx context.Context, id string) (*DedicatedServer, error)
+
+	DedicatedServerPowerOn(ctx context.Context, id string) (*DedicatedServer, error)
 }
 
 // HostsHandler handles operations around hosts
@@ -105,6 +109,26 @@ func (h *HostsHandler) DedicatedServerScheduleRelease(ctx context.Context, id st
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/AbortReleaseForAnExistingDedicatedServer
 func (h *HostsHandler) DedicatedServerAbortRelease(ctx context.Context, id string) (*DedicatedServer, error) {
 	url := h.client.buildURL(dedicatedServerAbortReleasePath, []interface{}{id}...)
+
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	dedicatedServer := new(DedicatedServer)
+
+	if err := json.Unmarshal(body, &dedicatedServer); err != nil {
+		return nil, err
+	}
+
+	return dedicatedServer, nil
+}
+
+// DedicatedServerPowerOn sends power on command to the dedicated server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/SendPowerOnCommandToAnExistingDedicatedServer
+func (h *HostsHandler) DedicatedServerPowerOn(ctx context.Context, id string) (*DedicatedServer, error) {
+	url := h.client.buildURL(dedicatedServerPowerOnPath, []interface{}{id}...)
 
 	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
 

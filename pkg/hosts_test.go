@@ -94,7 +94,7 @@ func TestDedicatedServersCreate(t *testing.T) {
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:04 +0000 UTC"))
 }
 
-func TestDedicatedServersGet(t *testing.T) {
+func TestDedicatedServerGet(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -125,7 +125,7 @@ func TestDedicatedServersGet(t *testing.T) {
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
 
-func TestDedicatedServersScheduleRelease(t *testing.T) {
+func TestDedicatedServerScheduleRelease(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -159,7 +159,7 @@ func TestDedicatedServersScheduleRelease(t *testing.T) {
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
 
-func TestDedicatedServersAbortRelease(t *testing.T) {
+func TestDedicatedServerAbortRelease(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -174,6 +174,37 @@ func TestDedicatedServersAbortRelease(t *testing.T) {
 	ctx := context.TODO()
 
 	dedicatedServer, err := client.Hosts.DedicatedServerAbortRelease(ctx, "xkazYeJ0")
+
+	g.Expect(err).To(BeNil())
+	g.Expect(dedicatedServer).ToNot(BeNil())
+
+	g.Expect(dedicatedServer.ID).To(Equal("xkazYeJ0"))
+	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
+	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
+	g.Expect(dedicatedServer.Status).To(Equal("active"))
+	g.Expect(dedicatedServer.Configuration).To(Equal("REMM R123"))
+	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
+	g.Expect(*dedicatedServer.PublicIPv4Address).To(Equal("169.254.0.1"))
+	g.Expect(dedicatedServer.ScheduledRelease).To(BeNil())
+	g.Expect(dedicatedServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}
+
+func TestDedicatedServerPowerOn(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/power_on").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	dedicatedServer, err := client.Hosts.DedicatedServerPowerOn(ctx, "xkazYeJ0")
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())
