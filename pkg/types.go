@@ -343,3 +343,9 @@ type L2LocationGroup struct {
 	GroupType   string  `json:"group_type"`
 	LocationIDs []int64 `json:"location_ids"`
 }
+
+// HostPowerFeed represents feed status
+type HostPowerFeed struct {
+	Name   string `json:"name"`
+	Status string `json:"status"`
+}

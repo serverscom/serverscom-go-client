@@ -197,7 +197,7 @@ func TestDedicatedServerPowerOn(t *testing.T) {
 		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/power_on").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_response.json").
-		WithResponseCode(200).
+		WithResponseCode(202).
 		Build()
 
 	defer ts.Close()
@@ -228,7 +228,7 @@ func TestDedicatedServerPowerOff(t *testing.T) {
 		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/power_off").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_response.json").
-		WithResponseCode(200).
+		WithResponseCode(202).
 		Build()
 
 	defer ts.Close()
@@ -259,7 +259,7 @@ func TestDedicatedServerPowerCycle(t *testing.T) {
 		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/power_cycle").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_response.json").
-		WithResponseCode(200).
+		WithResponseCode(202).
 		Build()
 
 	defer ts.Close()
@@ -281,4 +281,34 @@ func TestDedicatedServerPowerCycle(t *testing.T) {
 	g.Expect(dedicatedServer.ScheduledRelease).To(BeNil())
 	g.Expect(dedicatedServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}
+
+func TestDedicatedServerPowerFeeds(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/power_feeds").
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/power_feeds_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	powerFeeds, err := client.Hosts.DedicatedServerPowerFeeds(ctx, "xkazYeJ0")
+
+	g.Expect(err).To(BeNil())
+	g.Expect(len(powerFeeds)).To(Equal(2))
+
+	powerFeed := powerFeeds[0]
+
+	g.Expect(powerFeed.Name).To(Equal("Power 2"))
+	g.Expect(powerFeed.Status).To(Equal("on"))
+
+	powerFeed = powerFeeds[1]
+
+	g.Expect(powerFeed.Name).To(Equal("Power 1"))
+	g.Expect(powerFeed.Status).To(Equal("on"))
 }

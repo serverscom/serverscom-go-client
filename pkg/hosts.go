@@ -13,6 +13,7 @@ const (
 	dedicatedServerPowerOnPath         = "/hosts/dedicated_servers/%s/power_on"
 	dedicatedServerPowerOffPath        = "/hosts/dedicated_servers/%s/power_off"
 	dedicatedServerPowerCyclePath      = "/hosts/dedicated_servers/%s/power_cycle"
+	dedicatedServerPowerFeedsPath      = "/hosts/dedicated_servers/%s/power_feeds"
 )
 
 // HostsService is an interface for interfacing with Host, Dedicated Server endpoints
@@ -31,6 +32,7 @@ type HostsService interface {
 	DedicatedServerPowerOn(ctx context.Context, id string) (*DedicatedServer, error)
 	DedicatedServerPowerOff(ctx context.Context, id string) (*DedicatedServer, error)
 	DedicatedServerPowerCycle(ctx context.Context, id string) (*DedicatedServer, error)
+	DedicatedServerPowerFeeds(ctx context.Context, id string) ([]HostPowerFeed, error)
 }
 
 // HostsHandler handles operations around hosts
@@ -187,4 +189,24 @@ func (h *HostsHandler) DedicatedServerPowerCycle(ctx context.Context, id string)
 	}
 
 	return dedicatedServer, nil
+}
+
+// DedicatedServerPowerFeeds returns list of dedicated server power feeds with status
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ListAllPowerFeedsForAnExistingDedicatedServer
+func (h *HostsHandler) DedicatedServerPowerFeeds(ctx context.Context, id string) ([]HostPowerFeed, error) {
+	url := h.client.buildURL(dedicatedServerPowerFeedsPath, []interface{}{id}...)
+
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var powerFeeds []HostPowerFeed
+
+	if err := json.Unmarshal(body, &powerFeeds); err != nil {
+		return nil, err
+	}
+
+	return powerFeeds, nil
 }
