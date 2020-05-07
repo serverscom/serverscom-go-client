@@ -298,3 +298,28 @@ type L2SegmentUpdateInput struct {
 	Name    *string                `json:"name,omitempty"`
 	Members []L2SegmentMemberInput `json:"members,omitempty"`
 }
+
+// L2Member respresents l2 segment member
+type L2Member struct {
+	ID      string    `json:"id"`
+	Title   string    `json:"title"`
+	Mode    string    `json:"mode"`
+	Vlan    *int      `json:"vlan"`
+	Status  string    `json:"status"`
+	Created time.Time `json:"created_at"`
+	Updated time.Time `json:"updated_at"`
+}
+
+// Network represents network
+type Network struct {
+	ID                 string    `json:"id"`
+	Title              *string   `json:"title,omitempty"`
+	State              string    `json:"state"`
+	Cidr               *string   `json:"cidr,omitempty"`
+	Family             string    `json:"family"`
+	InterfaceType      string    `json:"interface_type"`
+	DistributionMethod string    `json:"distribution_method"`
+	Additional         bool      `json:"additional"`
+	Created            time.Time `json:"created_at"`
+	Updated            time.Time `json:"updated_at"`
+}

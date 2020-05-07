@@ -22,6 +22,9 @@ type L2SegmentsService interface {
 	Create(ctx context.Context, input L2SegmentCreateInput) (*L2Segment, error)
 	Update(ctx context.Context, segmentID string, input L2SegmentUpdateInput) (*L2Segment, error)
 	Delete(ctx context.Context, segmentID string) error
+
+	MembersCollection(segmentID string) L2MembersCollection
+	NetworksCollection(segmentID string) L2NetworksCollection
 }
 
 // L2SegmentsHandler handles  operatings around l2 segments
@@ -114,4 +117,14 @@ func (l2 *L2SegmentsHandler) Delete(ctx context.Context, segmentID string) error
 	_, err := l2.client.buildAndExecRequest(ctx, "DELETE", url, nil)
 
 	return err
+}
+
+// MembersCollection builds a new L2MembersCollection interface
+func (l2 *L2SegmentsHandler) MembersCollection(segmentID string) L2MembersCollection {
+	return NewL2MembersCollection(l2.client, segmentID)
+}
+
+// NetworksCollection builds a new L2NetworksCollection interface
+func (l2 *L2SegmentsHandler) NetworksCollection(segmentID string) L2NetworksCollection {
+	return NewL2NetworksCollection(l2.client, segmentID)
 }
