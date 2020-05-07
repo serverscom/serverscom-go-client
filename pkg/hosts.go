@@ -35,6 +35,8 @@ type HostsService interface {
 	DedicatedServerPowerOff(ctx context.Context, id string) (*DedicatedServer, error)
 	DedicatedServerPowerCycle(ctx context.Context, id string) (*DedicatedServer, error)
 	DedicatedServerPowerFeeds(ctx context.Context, id string) ([]HostPowerFeed, error)
+
+	DedicatedServerConnections(ctx context.Context, id string) HostConnectionsCollection
 }
 
 // HostsHandler handles operations around hosts
