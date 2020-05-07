@@ -162,7 +162,7 @@ type DedicatedServerCreateInput struct {
 	UplinkModels       DedicatedServerUplinkModelsInput `json:"uplink_models"`
 	Drives             DedicatedServerDrivesInput       `json:"drives"`
 	Features           []string                         `json:"features,omitempty"`
-	Ipv6               bool                             `json:"ipv6"`
+	IPv6               bool                             `json:"ipv6"`
 	Hosts              []DedicatedServerHostInput       `json:"hosts"`
 	OperatingSystemID  *int64                           `json:"operating_system_id"`
 	SSHKeyFingerprints []string                         `json:"ssh_key_fingerprints,omitempty"`

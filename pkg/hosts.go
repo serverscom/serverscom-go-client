@@ -18,9 +18,9 @@ const (
 type HostsService interface {
 	Collection() HostsCollection
 
-	GetDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
-	CreateDedicatedServer(ctx context.Context, input DedicatedServerCreateInput) ([]DedicatedServer, error)
-	ScheduleReleaseDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
+	DedicatedServerGet(ctx context.Context, id string) (*DedicatedServer, error)
+	DedicatedServersCreate(ctx context.Context, input DedicatedServerCreateInput) ([]DedicatedServer, error)
+	DedicatedServerScheduleRelease(ctx context.Context, id string) (*DedicatedServer, error)
 }
 
 // HostsHandler handles operations around hosts
@@ -33,9 +33,9 @@ func (h *HostsHandler) Collection() HostsCollection {
 	return NewHostsCollection(h.client)
 }
 
-// GetDedicatedServer returns a dedicated server
+// DedicatedServerGet returns a dedicated server
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/RetrieveAnExistingDedicatedServer
-func (h *HostsHandler) GetDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error) {
+func (h *HostsHandler) DedicatedServerGet(ctx context.Context, id string) (*DedicatedServer, error) {
 	url := h.client.buildURL(dedicatedServerPath, []interface{}{id}...)
 
 	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
@@ -53,9 +53,9 @@ func (h *HostsHandler) GetDedicatedServer(ctx context.Context, id string) (*Dedi
 	return dedicatedServer, nil
 }
 
-// CreateDedicatedServer creates a dedicated servers
+// DedicatedServersCreate creates a dedicated servers
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/CreateANewDedicatedServer
-func (h *HostsHandler) CreateDedicatedServer(ctx context.Context, input DedicatedServerCreateInput) ([]DedicatedServer, error) {
+func (h *HostsHandler) DedicatedServersCreate(ctx context.Context, input DedicatedServerCreateInput) ([]DedicatedServer, error) {
 	payload, err := json.Marshal(input)
 
 	if err != nil {
@@ -79,9 +79,9 @@ func (h *HostsHandler) CreateDedicatedServer(ctx context.Context, input Dedicate
 	return dedicatedServers, nil
 }
 
-// ScheduleReleaseDedicatedServer schedules dedicated server release
+// DedicatedServerScheduleRelease schedules dedicated server release
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ScheduleReleaseForAnExistingDedicatedServer
-func (h *HostsHandler) ScheduleReleaseDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error) {
+func (h *HostsHandler) DedicatedServerScheduleRelease(ctx context.Context, id string) (*DedicatedServer, error) {
 	url := h.client.buildURL(dedicatedServerScheduleReleasePath, []interface{}{id}...)
 
 	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
