@@ -84,3 +84,10 @@ CollectionGenerator.new(
   entity: 'CloudInstance',
   api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListCloudInstances',
 ).render_to_file('pkg/cloud_instances_collection.go')
+
+CollectionGenerator.new(
+  name: 'L2Segment',
+  path: '/l2_segments',
+  entity: 'L2Segment',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllL2Segments',
+).render_to_file('pkg/l2_segments_collection.go')

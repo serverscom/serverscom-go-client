@@ -267,3 +267,34 @@ type CloudInstanceUpdateInput struct {
 	GpnEnabled   *bool   `json:"gpn_enabled,omitempty"`
 	Ipv6Enabled  *bool   `json:"ipv6_enabled,omitempty"`
 }
+
+// L2Segment represents l2 segment
+type L2Segment struct {
+	ID              string    `json:"id"`
+	Name            string    `json:"name"`
+	Type            string    `json:"type"`
+	Status          string    `json:"status"`
+	LocationGroupID int64     `json:"location_group_id"`
+	Created         time.Time `json:"created_at"`
+	Updated         time.Time `json:"updated_at"`
+}
+
+// L2SegmentMemberInput represents l2 segment member input for L2SegmentCreateInput and L2SegmentUpdateInput
+type L2SegmentMemberInput struct {
+	ID   string `json:"id"`
+	Mode string `json:"mode"`
+}
+
+// L2SegmentCreateInput represents l2 segment create input
+type L2SegmentCreateInput struct {
+	Name            *string                `json:"name,omitempty"`
+	Type            string                 `json:"type"`
+	LocationGroupID int64                  `json:"location_group_id"`
+	Members         []L2SegmentMemberInput `json:"members"`
+}
+
+// L2SegmentUpdateInput represents l2 segment update input
+type L2SegmentUpdateInput struct {
+	Name    *string                `json:"name,omitempty"`
+	Members []L2SegmentMemberInput `json:"members,omitempty"`
+}
