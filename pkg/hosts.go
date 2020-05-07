@@ -129,7 +129,7 @@ func (h *HostsHandler) DedicatedServerAbortRelease(ctx context.Context, id strin
 	return dedicatedServer, nil
 }
 
-// DedicatedServerPowerOn sends power on command to the dedicated server
+// DedicatedServerPowerOn sends power-on command to the dedicated server
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/SendPowerOnCommandToAnExistingDedicatedServer
 func (h *HostsHandler) DedicatedServerPowerOn(ctx context.Context, id string) (*DedicatedServer, error) {
 	url := h.client.buildURL(dedicatedServerPowerOnPath, []interface{}{id}...)
@@ -149,7 +149,7 @@ func (h *HostsHandler) DedicatedServerPowerOn(ctx context.Context, id string) (*
 	return dedicatedServer, nil
 }
 
-// DedicatedServerPowerOff sends power on command to the dedicated server
+// DedicatedServerPowerOff sends power-off command to the dedicated server
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/SendPowerOffCommandToAnExistingDedicatedServer
 func (h *HostsHandler) DedicatedServerPowerOff(ctx context.Context, id string) (*DedicatedServer, error) {
 	url := h.client.buildURL(dedicatedServerPowerOffPath, []interface{}{id}...)
@@ -169,7 +169,7 @@ func (h *HostsHandler) DedicatedServerPowerOff(ctx context.Context, id string) (
 	return dedicatedServer, nil
 }
 
-// DedicatedServerPowerCycle sends power on command to the dedicated server
+// DedicatedServerPowerCycle sends power-cycle command to the dedicated server
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/SendPowerCycleCommandToAnExistingDedicatedServer
 func (h *HostsHandler) DedicatedServerPowerCycle(ctx context.Context, id string) (*DedicatedServer, error) {
 	url := h.client.buildURL(dedicatedServerPowerCyclePath, []interface{}{id}...)
