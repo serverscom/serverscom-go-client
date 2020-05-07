@@ -17,6 +17,7 @@ const (
 	dedicatedServerPowerCyclePath      = "/hosts/dedicated_servers/%s/power_cycle"
 	dedicatedServerPowerFeedsPath      = "/hosts/dedicated_servers/%s/power_feeds"
 	dedicatedServerPTRRecordCreatePath = "/hosts/dedicated_servers/%s/ptr_records"
+	dedicatedServerPTRRecordDeletePath = "/hosts/dedicated_servers/%s/ptr_records/%s"
 )
 
 // HostsService is an interface for interfacing with Host, Dedicated Server endpoints
@@ -43,6 +44,7 @@ type HostsService interface {
 
 	DedicatedServerPTRRecords(ctx context.Context, id string) HostPTRRecordsCollection
 	DedicatedServerPTRRecordCreate(ctx context.Context, id string, input PTRRecordCreateInput) (*PTRRecord, error)
+	DedicatedServerPTRRecordDelete(ctx context.Context, hostID string, ptrRecordID string) error
 }
 
 // HostsHandler handles operations around hosts
@@ -254,4 +256,14 @@ func (h *HostsHandler) DedicatedServerPTRRecordCreate(ctx context.Context, id st
 	}
 
 	return ptrRecord, nil
+}
+
+// DedicatedServerPTRRecordDelete deleted ptr record for the dedicated server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/DeleteAnExistingPtrRecord
+func (h *HostsHandler) DedicatedServerPTRRecordDelete(ctx context.Context, hostID string, ptrRecordID string) error {
+	url := h.client.buildURL(dedicatedServerPTRRecordDeletePath, []interface{}{hostID, ptrRecordID}...)
+
+	_, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
+
+	return err
 }

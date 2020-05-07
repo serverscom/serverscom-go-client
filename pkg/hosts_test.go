@@ -348,3 +348,21 @@ func TestDedicatedServerPTRRecordCreate(t *testing.T) {
 	g.Expect(ptrRecord.Priority).To(Equal(3))
 	g.Expect(ptrRecord.TTL).To(Equal(60))
 }
+
+func TestDedicatedServerPTRRecordDelete(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/ptr_records/oQeZzvep").
+		WithRequestMethod("DELETE").
+		WithResponseCode(204).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	err := client.Hosts.DedicatedServerPTRRecordDelete(ctx, "xkazYeJ0", "oQeZzvep")
+
+	g.Expect(err).To(BeNil())
+}
