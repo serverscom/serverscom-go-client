@@ -8,8 +8,6 @@ import (
 const (
 	sslCreatificatedCreatePath = "/ssl_certificates/custom"
 	sslCertificatePath         = "/ssl_certificates/custom/%s"
-
-	sslSertificateCustomType = "custom"
 )
 
 // SSLCertificatesService is an interface to interfacing with the SSL Certificate endpoints
