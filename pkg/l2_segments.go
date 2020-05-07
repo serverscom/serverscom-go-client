@@ -6,10 +6,11 @@ import (
 )
 
 const (
-	l2SegmentPath       = "/l2_segments/%s"
-	l2SegmentCreatePath = "/l2_segments"
-	l2SegmentUpdatePath = "/l2_segments/%s"
-	l2SegemntDeletePath = "/l2_segments/%s"
+	l2SegmentPath               = "/l2_segments/%s"
+	l2SegmentCreatePath         = "/l2_segments"
+	l2SegmentUpdatePath         = "/l2_segments/%s"
+	l2SegemntDeletePath         = "/l2_segments/%s"
+	l2SegmentChangeNetworksPath = "/l2_segments/%s/networks"
 )
 
 // L2SegmentsService is an interface for interfacing with Host, Dedicated Server endpoints
@@ -24,7 +25,9 @@ type L2SegmentsService interface {
 	Delete(ctx context.Context, segmentID string) error
 
 	MembersCollection(segmentID string) L2MembersCollection
+
 	NetworksCollection(segmentID string) L2NetworksCollection
+	ChangeNetworks(ctx context.Context, segmentID string, input L2SegmentChangeNetworksInput) (*L2Segment, error)
 }
 
 // L2SegmentsHandler handles  operatings around l2 segments
@@ -127,4 +130,30 @@ func (l2 *L2SegmentsHandler) MembersCollection(segmentID string) L2MembersCollec
 // NetworksCollection builds a new L2NetworksCollection interface
 func (l2 *L2SegmentsHandler) NetworksCollection(segmentID string) L2NetworksCollection {
 	return NewL2NetworksCollection(l2.client, segmentID)
+}
+
+// ChangeNetworks changes networks set
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/UpdateAnExistingL2SegmentNetworks
+func (l2 *L2SegmentsHandler) ChangeNetworks(ctx context.Context, segmentID string, input L2SegmentChangeNetworksInput) (*L2Segment, error) {
+	payload, err := json.Marshal(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	url := l2.client.buildURL(l2SegmentChangeNetworksPath, []interface{}{segmentID}...)
+
+	body, err := l2.client.buildAndExecRequest(ctx, "PUT", url, payload)
+
+	if err != nil {
+		return nil, err
+	}
+
+	l2Segment := new(L2Segment)
+
+	if err := json.Unmarshal(body, &l2Segment); err != nil {
+		return nil, err
+	}
+
+	return l2Segment, nil
 }

@@ -310,6 +310,18 @@ type L2Member struct {
 	Updated time.Time `json:"updated_at"`
 }
 
+// L2SegmentCreateNetworksInput represents input to create networks for L2SegmentChangeNetworksInput
+type L2SegmentCreateNetworksInput struct {
+	Mask               int    `json:"mask"`
+	DistributionMethod string `json:"distribution_method"`
+}
+
+// L2SegmentChangeNetworksInput represents input to change networks
+type L2SegmentChangeNetworksInput struct {
+	Create []L2SegmentCreateNetworksInput `json:"create,omitempty"`
+	Delete []string                       `json:"delete,omitempty"`
+}
+
 // Network represents network
 type Network struct {
 	ID                 string    `json:"id"`

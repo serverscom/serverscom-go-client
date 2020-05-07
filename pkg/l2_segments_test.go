@@ -122,3 +122,71 @@ func TestL2SegmentsDelete(t *testing.T) {
 
 	g.Expect(err).To(BeNil())
 }
+
+func TestL2SegmentsChangeNetworksDeleteOnly(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/l2_segments/y1aKReQG/networks").
+		WithRequestMethod("PUT").
+		WithRequestBody(`{"delete":["a","b"]}`).
+		WithResponseBodyStubFile("fixtures/l2_segments/update_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	input := L2SegmentChangeNetworksInput{
+		Delete: []string{"a", "b"},
+	}
+
+	L2Segments, err := client.L2Segments.ChangeNetworks(ctx, "y1aKReQG", input)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(L2Segments).ToNot(BeNil())
+
+	g.Expect(L2Segments.ID).To(Equal("y1aKReQG"))
+	g.Expect(L2Segments.Status).To(Equal("pending"))
+	g.Expect(L2Segments.Name).To(Equal("some"))
+	g.Expect(L2Segments.Type).To(Equal("public"))
+	g.Expect(L2Segments.LocationGroupID).To(Equal(int64(15)))
+	g.Expect(L2Segments.Created.String()).To(Equal("2020-04-22 06:22:50 +0000 UTC"))
+	g.Expect(L2Segments.Updated.String()).To(Equal("2020-04-22 06:22:50 +0000 UTC"))
+}
+
+func TestL2SegmentsChangeNetworksCreateOnly(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/l2_segments/y1aKReQG/networks").
+		WithRequestMethod("PUT").
+		WithRequestBody(`{"create":[{"mask":32,"distribution_method":"route"}]}`).
+		WithResponseBodyStubFile("fixtures/l2_segments/update_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	input := L2SegmentChangeNetworksInput{
+		Create: []L2SegmentCreateNetworksInput{
+			L2SegmentCreateNetworksInput{Mask: 32, DistributionMethod: "route"},
+		},
+	}
+
+	L2Segments, err := client.L2Segments.ChangeNetworks(ctx, "y1aKReQG", input)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(L2Segments).ToNot(BeNil())
+
+	g.Expect(L2Segments.ID).To(Equal("y1aKReQG"))
+	g.Expect(L2Segments.Status).To(Equal("pending"))
+	g.Expect(L2Segments.Name).To(Equal("some"))
+	g.Expect(L2Segments.Type).To(Equal("public"))
+	g.Expect(L2Segments.LocationGroupID).To(Equal(int64(15)))
+	g.Expect(L2Segments.Created.String()).To(Equal("2020-04-22 06:22:50 +0000 UTC"))
+	g.Expect(L2Segments.Updated.String()).To(Equal("2020-04-22 06:22:50 +0000 UTC"))
+}
