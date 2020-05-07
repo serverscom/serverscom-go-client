@@ -12,16 +12,22 @@ type Location struct {
 
 // SSLCertificate represents ssl certificate
 type SSLCertificate struct {
-	ID              string `json:"id"`
-	Name            string `json:"name"`
-	Sha1Fingerprint string `json:"sha1_fingerprint"`
+	ID              string     `json:"id"`
+	Name            string     `json:"name"`
+	Sha1Fingerprint string     `json:"sha1_fingerprint"`
+	Expires         *time.Time `json:"expires_at"`
+	Created         time.Time  `json:"created_at"`
+	Updated         time.Time  `json:"updated_at"`
 }
 
 // SSLCertificateCustom represents custom ssl certificate
 type SSLCertificateCustom struct {
-	ID              string `json:"id"`
-	Name            string `json:"name"`
-	Sha1Fingerprint string `json:"sha1_fingerprint"`
+	ID              string     `json:"id"`
+	Name            string     `json:"name"`
+	Sha1Fingerprint string     `json:"sha1_fingerprint"`
+	Expires         *time.Time `json:"expires_at"`
+	Created         time.Time  `json:"created_at"`
+	Updated         time.Time  `json:"updated_at"`
 }
 
 // SSLCertificateCreateCustomInput represents custom ssl certificate create input
@@ -34,26 +40,30 @@ type SSLCertificateCreateCustomInput struct {
 
 // Host represents host
 type Host struct {
-	ID                 string  `json:"id"`
-	Title              string  `json:"title"`
-	LocationID         int64   `json:"location_id"`
-	Status             string  `json:"status"`
-	Configuration      string  `json:"configuration"`
-	ScheduledReleaseAt *string `json:"scheduled_release_at"`
-	PrivateIPv4Address *string `json:"private_ipv4_address"`
-	PublicIPv4Address  *string `json:"public_ipv4_address"`
+	ID                 string    `json:"id"`
+	Title              string    `json:"title"`
+	LocationID         int64     `json:"location_id"`
+	Status             string    `json:"status"`
+	Configuration      string    `json:"configuration"`
+	ScheduledReleaseAt *string   `json:"scheduled_release_at"`
+	PrivateIPv4Address *string   `json:"private_ipv4_address"`
+	PublicIPv4Address  *string   `json:"public_ipv4_address"`
+	Created            time.Time `json:"created_at"`
+	Updated            time.Time `json:"updated_at"`
 }
 
 // DedicatedServer represents dedicated server
 type DedicatedServer struct {
-	ID                 string  `json:"id"`
-	Title              string  `json:"title"`
-	LocationID         int64   `json:"location_id"`
-	Status             string  `json:"status"`
-	Configuration      string  `json:"configuration"`
-	ScheduledReleaseAt *string `json:"scheduled_release_at"`
-	PrivateIPv4Address *string `json:"private_ipv4_address"`
-	PublicIPv4Address  *string `json:"public_ipv4_address"`
+	ID                 string    `json:"id"`
+	Title              string    `json:"title"`
+	LocationID         int64     `json:"location_id"`
+	Status             string    `json:"status"`
+	Configuration      string    `json:"configuration"`
+	ScheduledReleaseAt *string   `json:"scheduled_release_at"`
+	PrivateIPv4Address *string   `json:"private_ipv4_address"`
+	PublicIPv4Address  *string   `json:"public_ipv4_address"`
+	Created            time.Time `json:"created_at"`
+	Updated            time.Time `json:"updated_at"`
 }
 
 // DedicatedServerLayoutPartitionInput represents partition for DedicatedServerLayoutInput
