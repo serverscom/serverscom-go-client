@@ -1,0 +1,13 @@
+{
+  "id": "LDdwRb1Y",
+  "openstack_uuid": "04e59a31-efe6-440c-9568-142fca1a6123",
+  "status": "PROVISIONING",
+  "name": "test-instance-2",
+  "flavor_id": "102",
+  "image_id": "76effbf9-76e5-46d2-a21d-ee2a72cc8757",
+  "public_ipv4_address": null,
+  "public_ipv6_address": null,
+  "private_ipv4_address": null,
+  "created_at": "2020-04-22T06:22:28Z",
+  "updated_at": "2020-04-22T06:22:28Z"
+}
