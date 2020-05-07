@@ -142,7 +142,8 @@ func (fs *fakeServer) Build() (*fakeServer, *Client) {
 
 		if len(fs.Requests) == 0 {
 			w.WriteHeader(http.StatusTeapot)
-			w.Write([]byte(fmt.Sprintf("End of scenario was reached")))
+			_, err := w.Write([]byte(fmt.Sprintf("End of scenario was reached")))
+			crashIfErrorPresent(err)
 			return
 		}
 
@@ -159,19 +160,21 @@ func (fs *fakeServer) Build() (*fakeServer, *Client) {
 		if currentRequest.RequestPath == "" || r.URL.Path == finalURL {
 			if currentRequest.RequestMethod != "" && currentRequest.RequestMethod != r.Method {
 				w.WriteHeader(http.StatusTeapot)
-				w.Write([]byte(fmt.Sprintf(
+				_, err := w.Write([]byte(fmt.Sprintf(
 					"Unexpected request method, expected: %s %s, but got: %s %s",
 					currentRequest.RequestMethod,
 					finalURL,
 					r.Method,
 					r.URL.Path,
 				)))
+				crashIfErrorPresent(err)
 				return
 			}
 
 			if currentRequest.RequestParams != "" && currentRequest.RequestParams != r.URL.Query().Encode() {
 				w.WriteHeader(http.StatusTeapot)
-				w.Write([]byte(fmt.Sprintf("Unexpected query params, expected: %s, but got: %s", currentRequest.RequestParams, r.URL.Query().Encode())))
+				_, err := w.Write([]byte(fmt.Sprintf("Unexpected query params, expected: %s, but got: %s", currentRequest.RequestParams, r.URL.Query().Encode())))
+				crashIfErrorPresent(err)
 				return
 			}
 
@@ -185,7 +188,8 @@ func (fs *fakeServer) Build() (*fakeServer, *Client) {
 
 				if currentRequest.RequestBody != string(b) {
 					w.WriteHeader(http.StatusTeapot)
-					w.Write([]byte(fmt.Sprintf("Unexpected request body: %s", string(b))))
+					_, err := w.Write([]byte(fmt.Sprintf("Unexpected request body: %s", string(b))))
+					crashIfErrorPresent(err)
 					return
 				}
 			}
@@ -201,10 +205,12 @@ func (fs *fakeServer) Build() (*fakeServer, *Client) {
 				w.WriteHeader(http.StatusOK)
 			}
 
-			w.Write(currentRequest.ResponseBody)
+			_, err := w.Write(currentRequest.ResponseBody)
+			crashIfErrorPresent(err)
 		} else {
 			w.WriteHeader(http.StatusTeapot)
-			w.Write([]byte(fmt.Sprintf("Unhandled route: %s %s, expected: %s %s", r.Method, r.URL.String(), currentRequest.RequestMethod, finalURL)))
+			_, err := w.Write([]byte(fmt.Sprintf("Unhandled route: %s %s, expected: %s %s", r.Method, r.URL.String(), currentRequest.RequestMethod, finalURL)))
+			crashIfErrorPresent(err)
 		}
 	}))
 
@@ -213,4 +219,10 @@ func (fs *fakeServer) Build() (*fakeServer, *Client) {
 	client := NewClientWithEndpoint("testing_token", fmt.Sprintf("%s/v1", ts.URL))
 
 	return fs, client
+}
+
+func crashIfErrorPresent(err error) {
+	if err != nil {
+		panic(err)
+	}
 }

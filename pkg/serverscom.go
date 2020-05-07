@@ -81,7 +81,7 @@ func (cli *Client) buildPath(path string, values ...interface{}) string {
 }
 
 func (cli *Client) applyParams(endpointURL string, params map[string]string) string {
-	if params == nil || len(params) == 0 {
+	if len(params) == 0 {
 		return endpointURL
 	}
 
