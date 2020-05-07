@@ -1,5 +1,6 @@
 # Servers.com go client
 
+![Test](https://github.com/serverscom/serverscom-go-client/workflows/Test/badge.svg)
 [![GoDoc](https://godoc.org/github.com/serverscom/serverscom-go-client/pkg?status.svg)](https://godoc.org/github.com/serverscom/serverscom-go-client/pkg)
 
 serverscom-go-client is a Go client library for accessing the [Servers.com API](https://developers.servers.com/api-documentation/v1/)
