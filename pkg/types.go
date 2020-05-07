@@ -326,7 +326,7 @@ type L2SegmentChangeNetworksInput struct {
 type Network struct {
 	ID                 string    `json:"id"`
 	Title              *string   `json:"title,omitempty"`
-	State              string    `json:"state"`
+	Status             string    `json:"status"`
 	Cidr               *string   `json:"cidr,omitempty"`
 	Family             string    `json:"family"`
 	InterfaceType      string    `json:"interface_type"`
@@ -334,6 +334,9 @@ type Network struct {
 	Additional         bool      `json:"additional"`
 	Created            time.Time `json:"created_at"`
 	Updated            time.Time `json:"updated_at"`
+
+	// DEPRECATED: should be replaced by Statu
+	State string `json:"state"`
 }
 
 // L2LocationGroup represents l2 location groups

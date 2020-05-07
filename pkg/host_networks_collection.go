@@ -11,12 +11,12 @@ import (
 )
 
 const (
-	l2NetworkListPath = "/l2_segments/%s/networks"
+	hostNetworkListPath = "/hosts/%s/%s/networks"
 )
 
-// L2NetworksCollection is an interface for interfacing with the collection of Network
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ListAllL2SegmentNetworks
-type L2NetworksCollection interface {
+// HostNetworksCollection is an interface for interfacing with the collection of Network
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ListAllNetworksForAnExistingDedicatedServer
+type HostNetworksCollection interface {
 	IsClean() bool
 
 	HasPreviousPage() bool
@@ -32,17 +32,18 @@ type L2NetworksCollection interface {
 	Collect(ctx context.Context) ([]Network, error)
 	List(ctx context.Context) ([]Network, error)
 
-	SetPage(page int) L2NetworksCollection
-	SetPerPage(perPage int) L2NetworksCollection
+	SetPage(page int) HostNetworksCollection
+	SetPerPage(perPage int) HostNetworksCollection
 
 	Refresh(ctx context.Context) error
 }
 
-// L2NetworksCollectionHandler handles opertations aroud collection
-type L2NetworksCollectionHandler struct {
+// HostNetworksCollectionHandler handles opertations aroud collection
+type HostNetworksCollectionHandler struct {
 	client *Client
 
-	segmentID string
+	hostType string
+	hostID   string
 
 	params map[string]string
 
@@ -52,12 +53,14 @@ type L2NetworksCollectionHandler struct {
 	collection []Network
 }
 
-// NewL2NetworksCollection produces a new L2NetworksCollectionHandler and represents this as an interface of L2NetworksCollection
-func NewL2NetworksCollection(client *Client, segmentID string) L2NetworksCollection {
-	return &L2NetworksCollectionHandler{
+// NewHostNetworksCollection produces a new HostNetworksCollectionHandler and represents this as an interface of HostNetworksCollection
+func NewHostNetworksCollection(client *Client, hostType string, hostID string) HostNetworksCollection {
+	return &HostNetworksCollectionHandler{
 		client: client,
 
-		segmentID: segmentID,
+		hostType: hostType,
+
+		hostID: hostID,
 
 		params:     make(map[string]string),
 		rels:       make(map[string]string),
@@ -67,7 +70,7 @@ func NewL2NetworksCollection(client *Client, segmentID string) L2NetworksCollect
 }
 
 // IsClean returns a bool value where true is means, this collection not used yet and doesn't contain any state.
-func (col *L2NetworksCollectionHandler) IsClean() bool {
+func (col *HostNetworksCollectionHandler) IsClean() bool {
 	return col.clean
 }
 
@@ -77,7 +80,7 @@ func (col *L2NetworksCollectionHandler) IsClean() bool {
 // were made and collection doesn't have metadata to know about pagination.
 //
 // First metadata will come with the first called methods such: NextPage, PreviousPage, LastPage, FirstPage, List, Refresh, Collect.
-func (col *L2NetworksCollectionHandler) HasPreviousPage() bool {
+func (col *HostNetworksCollectionHandler) HasPreviousPage() bool {
 	return col.hasRel("prev")
 }
 
@@ -87,7 +90,7 @@ func (col *L2NetworksCollectionHandler) HasPreviousPage() bool {
 // were made and collection doesn't have metadata to know about pagination.
 //
 // First metadata will come with the first called methods such: NextPage, PreviousPage, LastPage, FirstPage, List, Refresh, Collect.
-func (col *L2NetworksCollectionHandler) HasNextPage() bool {
+func (col *HostNetworksCollectionHandler) HasNextPage() bool {
 	return col.hasRel("next")
 }
 
@@ -97,7 +100,7 @@ func (col *L2NetworksCollectionHandler) HasNextPage() bool {
 // were made and collection doesn't have metadata to know about pagination.
 //
 // First metadata will come with the first called methods such: NextPage, PreviousPage, LastPage, FirstPage, List, Refresh, Collect.
-func (col *L2NetworksCollectionHandler) HasFirstPage() bool {
+func (col *HostNetworksCollectionHandler) HasFirstPage() bool {
 	return col.hasRel("first")
 }
 
@@ -107,7 +110,7 @@ func (col *L2NetworksCollectionHandler) HasFirstPage() bool {
 // were made and collection doesn't have metadata to know about pagination.
 //
 // First metadata will come with the first called methods such: NextPage, PreviousPage, LastPage, FirstPage, List, Refresh, Collect.
-func (col *L2NetworksCollectionHandler) HasLastPage() bool {
+func (col *HostNetworksCollectionHandler) HasLastPage() bool {
 	return col.hasRel("last")
 }
 
@@ -116,7 +119,7 @@ func (col *L2NetworksCollectionHandler) HasLastPage() bool {
 //
 // Before using this method please ensure IsClean returns false and HasNextPage returns true.
 // You can force to load pagination metadata by calling Refresh or List methods.
-func (col *L2NetworksCollectionHandler) NextPage(ctx context.Context) ([]Network, error) {
+func (col *HostNetworksCollectionHandler) NextPage(ctx context.Context) ([]Network, error) {
 	return col.navigate(ctx, "next")
 }
 
@@ -125,7 +128,7 @@ func (col *L2NetworksCollectionHandler) NextPage(ctx context.Context) ([]Network
 //
 // Before using this method please ensure IsClean returns false and HasPreviousPage returns true.
 // You can force to load pagination metadata by calling Refresh or List methods.
-func (col *L2NetworksCollectionHandler) PreviousPage(ctx context.Context) ([]Network, error) {
+func (col *HostNetworksCollectionHandler) PreviousPage(ctx context.Context) ([]Network, error) {
 	return col.navigate(ctx, "prev")
 }
 
@@ -134,7 +137,7 @@ func (col *L2NetworksCollectionHandler) PreviousPage(ctx context.Context) ([]Net
 //
 // Before using this method please ensure IsClean returns false and HasFirstPage returns true.
 // You can force to load pagination metadata by calling Refresh or List methods.
-func (col *L2NetworksCollectionHandler) FirstPage(ctx context.Context) ([]Network, error) {
+func (col *HostNetworksCollectionHandler) FirstPage(ctx context.Context) ([]Network, error) {
 	return col.navigate(ctx, "first")
 }
 
@@ -143,14 +146,14 @@ func (col *L2NetworksCollectionHandler) FirstPage(ctx context.Context) ([]Networ
 //
 // Before using this method please ensure IsClean returns false and HasLastPage returns true.
 // You can force to load pagination metadata by calling Refresh or List methods.
-func (col *L2NetworksCollectionHandler) LastPage(ctx context.Context) ([]Network, error) {
+func (col *HostNetworksCollectionHandler) LastPage(ctx context.Context) ([]Network, error) {
 	return col.navigate(ctx, "last")
 }
 
 // Collect navigates by pages until the last page is reached will be reached and returns accumulated data between pages.
 //
 // This method uses NextPage.
-func (col *L2NetworksCollectionHandler) Collect(ctx context.Context) ([]Network, error) {
+func (col *HostNetworksCollectionHandler) Collect(ctx context.Context) ([]Network, error) {
 	var accumulatedCollectionElements []Network
 
 	currentCollectionElements, err := col.List(ctx)
@@ -184,7 +187,7 @@ func (col *L2NetworksCollectionHandler) Collect(ctx context.Context) ([]Network,
 // perform request when such methods were called before: NextPage, PreviousPage, LastPage, FirstPage, Refresh, Collect.
 //
 // In the case when previously called method is Collect, this method returns data from the last page.
-func (col *L2NetworksCollectionHandler) List(ctx context.Context) ([]Network, error) {
+func (col *HostNetworksCollectionHandler) List(ctx context.Context) ([]Network, error) {
 	if col.IsClean() {
 		if err := col.Refresh(ctx); err != nil {
 			return nil, err
@@ -195,7 +198,7 @@ func (col *L2NetworksCollectionHandler) List(ctx context.Context) ([]Network, er
 }
 
 // SetPage sets current page param.
-func (col *L2NetworksCollectionHandler) SetPage(page int) L2NetworksCollection {
+func (col *HostNetworksCollectionHandler) SetPage(page int) HostNetworksCollection {
 	var currentPage string
 
 	if page > 1 {
@@ -210,7 +213,7 @@ func (col *L2NetworksCollectionHandler) SetPage(page int) L2NetworksCollection {
 }
 
 // SetPerPage sets current per page param.
-func (col *L2NetworksCollectionHandler) SetPerPage(perPage int) L2NetworksCollection {
+func (col *HostNetworksCollectionHandler) SetPerPage(perPage int) HostNetworksCollection {
 	var currentPerPage string
 
 	if perPage > 0 {
@@ -227,7 +230,7 @@ func (col *L2NetworksCollectionHandler) SetPerPage(perPage int) L2NetworksCollec
 // Refresh performs the request and then updates accumulated data limited by pagination.
 //
 // After calling this method accumulated data can be extracted by List method.
-func (col *L2NetworksCollectionHandler) Refresh(ctx context.Context) error {
+func (col *HostNetworksCollectionHandler) Refresh(ctx context.Context) error {
 	if err := col.fireHTTPRequest(ctx); err != nil {
 		return err
 	}
@@ -235,10 +238,10 @@ func (col *L2NetworksCollectionHandler) Refresh(ctx context.Context) error {
 	return nil
 }
 
-func (col *L2NetworksCollectionHandler) fireHTTPRequest(ctx context.Context) error {
+func (col *HostNetworksCollectionHandler) fireHTTPRequest(ctx context.Context) error {
 	var accumulatedCollectionElements []Network
 
-	initialURL := col.client.buildURL(l2NetworkListPath, col.segmentID)
+	initialURL := col.client.buildURL(hostNetworkListPath, col.hostType, col.hostID)
 	url := col.client.applyParams(
 		initialURL,
 		col.params,
@@ -260,7 +263,7 @@ func (col *L2NetworksCollectionHandler) fireHTTPRequest(ctx context.Context) err
 	return nil
 }
 
-func (col *L2NetworksCollectionHandler) navigate(ctx context.Context, name string) ([]Network, error) {
+func (col *HostNetworksCollectionHandler) navigate(ctx context.Context, name string) ([]Network, error) {
 	if col.IsClean() {
 		if err := col.Refresh(ctx); err != nil {
 			return nil, err
@@ -278,7 +281,7 @@ func (col *L2NetworksCollectionHandler) navigate(ctx context.Context, name strin
 	return col.collection, nil
 }
 
-func (col *L2NetworksCollectionHandler) applyParam(name, value string) {
+func (col *HostNetworksCollectionHandler) applyParam(name, value string) {
 	if value == "" {
 		delete(col.params, name)
 	} else {
@@ -286,7 +289,7 @@ func (col *L2NetworksCollectionHandler) applyParam(name, value string) {
 	}
 }
 
-func (col *L2NetworksCollectionHandler) applyRel(name string) error {
+func (col *HostNetworksCollectionHandler) applyRel(name string) error {
 	if !col.hasRel(name) {
 		return fmt.Errorf("No rel for: %s", name)
 	}
@@ -303,7 +306,7 @@ func (col *L2NetworksCollectionHandler) applyRel(name string) error {
 	return nil
 }
 
-func (col *L2NetworksCollectionHandler) hasRel(name string) bool {
+func (col *HostNetworksCollectionHandler) hasRel(name string) bool {
 	if _, ok := col.rels[name]; ok {
 		return true
 	}

@@ -219,3 +219,8 @@ func (h *HostsHandler) DedicatedServerPowerFeeds(ctx context.Context, id string)
 func (h *HostsHandler) DedicatedServerConnections(ctx context.Context, id string) HostConnectionsCollection {
 	return NewHostConnectionsCollection(h.client, dedicatedServerTypePrefix, id)
 }
+
+// DedicatedServerNetworks builds a new HostConnectionsCollection interface
+func (h *HostsHandler) DedicatedServerNetworks(ctx context.Context, id string) HostNetworksCollection {
+	return NewHostNetworksCollection(h.client, dedicatedServerTypePrefix, id)
+}

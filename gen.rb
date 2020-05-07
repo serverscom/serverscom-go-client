@@ -105,6 +105,7 @@ CollectionGenerator.new(
   path: '/l2_segments/%s/networks',
   entity: 'Network',
   api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllL2SegmentNetworks',
+  var_prefix: 'l2Networks',
   args: {segmentID: 'string'}
 ).render_to_file('pkg/l2_networks_collection.go')
 
@@ -122,3 +123,12 @@ CollectionGenerator.new(
   api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllConnectionsForAnExistingDedicatedServer',
   args: {hostType: 'string', hostID: 'string'}
 ).render_to_file('pkg/host_connections_collection.go')
+
+CollectionGenerator.new(
+  name: 'HostNetwork',
+  path: '/hosts/%s/%s/networks',
+  entity: 'Network',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllNetworksForAnExistingDedicatedServer',
+  var_prefix: 'hostNetworks',
+  args: {hostType: 'string', hostID: 'string'}
+).render_to_file('pkg/host_networks_collection.go')
