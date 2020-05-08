@@ -150,3 +150,12 @@ CollectionGenerator.new(
   var_prefix: 'hostDriveSlot',
   args: {hostType: 'string', hostID: 'string'}
 ).render_to_file('pkg/host_drive_slots_collection.go')
+
+CollectionGenerator.new(
+  name: 'CloudInstancePTRRecord',
+  path: '/cloud_computing/instances/%s/ptr_records',
+  entity: 'PTRRecord',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ReturnsInstancePtrRecords',
+  var_prefix: 'cloudInstancePTRs',
+  args: {cloudInstanceID: 'string'}
+).render_to_file('pkg/cloud_instance_ptr_records_collection.go')
