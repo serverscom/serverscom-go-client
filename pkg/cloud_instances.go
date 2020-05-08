@@ -6,8 +6,11 @@ import (
 )
 
 const (
-	cloudInstanceCreatePath = "/cloud_computing/instances"
-	cloudInstancePath       = "/cloud_computing/instances/%s"
+	cloudInstanceCreatePath    = "/cloud_computing/instances"
+	cloudInstancePath          = "/cloud_computing/instances/%s"
+	cloudInstanceUpdatePath    = "/cloud_computing/instances/%s"
+	cloudInstanceDeletePath    = "/cloud_computing/instances/%s"
+	cloudInstanceReinstallPath = "/cloud_computing/instances/%s/reinstall"
 )
 
 // CloudInstancesService is an interface to interfacing with the Cloud Instance endpoints
@@ -19,6 +22,7 @@ type CloudInstancesService interface {
 	Create(ctx context.Context, input CloudInstanceCreateInput) (*CloudInstance, error)
 	Update(ctx context.Context, id string, input CloudInstanceUpdateInput) (*CloudInstance, error)
 	Delete(ctx context.Context, id string) error
+	Reinstall(ctx context.Context, id string, input CloudInstanceReinstallInput) (*CloudInstance, error)
 }
 
 // CloudInstancesHandler handles operations around cloud instances
@@ -86,7 +90,7 @@ func (ci *CloudInstancesHandler) Update(ctx context.Context, id string, input Cl
 		return nil, err
 	}
 
-	url := ci.client.buildURL(cloudInstancePath, []interface{}{id}...)
+	url := ci.client.buildURL(cloudInstanceUpdatePath, []interface{}{id}...)
 
 	body, err := ci.client.buildAndExecRequest(ctx, "PUT", url, payload)
 
@@ -106,9 +110,35 @@ func (ci *CloudInstancesHandler) Update(ctx context.Context, id string, input Cl
 // Delete cloud instance
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/DeleteInstance
 func (ci *CloudInstancesHandler) Delete(ctx context.Context, id string) error {
-	url := ci.client.buildURL(cloudInstancePath, []interface{}{id}...)
+	url := ci.client.buildURL(cloudInstanceDeletePath, []interface{}{id}...)
 
 	_, err := ci.client.buildAndExecRequest(ctx, "DELETE", url, nil)
 
 	return err
+}
+
+// Reinstall cloud instance
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ReinstallInstanceWithImage
+func (ci *CloudInstancesHandler) Reinstall(ctx context.Context, id string, input CloudInstanceReinstallInput) (*CloudInstance, error) {
+	payload, err := json.Marshal(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	url := ci.client.buildURL(cloudInstanceReinstallPath, []interface{}{id}...)
+
+	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, payload)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var cloudInstance *CloudInstance
+
+	if err := json.Unmarshal(body, &cloudInstance); err != nil {
+		return nil, err
+	}
+
+	return cloudInstance, nil
 }

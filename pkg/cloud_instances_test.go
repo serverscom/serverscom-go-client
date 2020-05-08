@@ -129,3 +129,35 @@ func TestCloudInstancesDelete(t *testing.T) {
 
 	g.Expect(err).To(BeNil())
 }
+
+func TestCloudInstancesReinstall(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/cloud_computing/instances/BDbDxbl2/reinstall").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/cloud_instances/reinstall_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	cloudInstance, err := client.CloudInstances.Reinstall(ctx, "BDbDxbl2", CloudInstanceReinstallInput{ImageID: "18e1cc16-b380-4c37-8ec1-b9d306961aae"})
+
+	g.Expect(err).To(BeNil())
+	g.Expect(cloudInstance).ToNot(BeNil())
+
+	g.Expect(cloudInstance.ID).To(Equal("BDbDxbl2"))
+	g.Expect(cloudInstance.Status).To(Equal("REBUILDING"))
+	g.Expect(cloudInstance.Name).To(Equal("some"))
+	g.Expect(cloudInstance.FlavorID).To(Equal("101"))
+	g.Expect(cloudInstance.OpenstackUUID).To(Equal("b9e388ff-e53b-498a-8ef4-764450236788"))
+	g.Expect(cloudInstance.ImageID).To(Equal("18e1cc16-b380-4c37-8ec1-b9d306961aae"))
+	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
+	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
+	g.Expect(*cloudInstance.PublicIpv6Address).To(Equal("::1"))
+	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
+	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
+}

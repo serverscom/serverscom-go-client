@@ -268,6 +268,11 @@ type CloudInstanceUpdateInput struct {
 	Ipv6Enabled  *bool   `json:"ipv6_enabled,omitempty"`
 }
 
+// CloudInstanceReinstallInput represents cloud instance reinstall input
+type CloudInstanceReinstallInput struct {
+	ImageID string `json:"image_id"`
+}
+
 // L2Segment represents l2 segment
 type L2Segment struct {
 	ID              string    `json:"id"`
