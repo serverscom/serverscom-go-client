@@ -11,6 +11,7 @@ const (
 	cloudInstanceUpdatePath    = "/cloud_computing/instances/%s"
 	cloudInstanceDeletePath    = "/cloud_computing/instances/%s"
 	cloudInstanceReinstallPath = "/cloud_computing/instances/%s/reinstall"
+	cloudInstanceRescuePath    = "/cloud_computing/instances/%s/rescue"
 )
 
 // CloudInstancesService is an interface to interfacing with the Cloud Instance endpoints
@@ -22,7 +23,10 @@ type CloudInstancesService interface {
 	Create(ctx context.Context, input CloudInstanceCreateInput) (*CloudInstance, error)
 	Update(ctx context.Context, id string, input CloudInstanceUpdateInput) (*CloudInstance, error)
 	Delete(ctx context.Context, id string) error
+
 	Reinstall(ctx context.Context, id string, input CloudInstanceReinstallInput) (*CloudInstance, error)
+
+	Rescue(ctx context.Context, id string) (*CloudInstance, error)
 }
 
 // CloudInstancesHandler handles operations around cloud instances
@@ -129,6 +133,26 @@ func (ci *CloudInstancesHandler) Reinstall(ctx context.Context, id string, input
 	url := ci.client.buildURL(cloudInstanceReinstallPath, []interface{}{id}...)
 
 	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, payload)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var cloudInstance *CloudInstance
+
+	if err := json.Unmarshal(body, &cloudInstance); err != nil {
+		return nil, err
+	}
+
+	return cloudInstance, nil
+}
+
+// Rescue cloud instance
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/MoveInstanceToRescueState
+func (ci *CloudInstancesHandler) Rescue(ctx context.Context, id string) (*CloudInstance, error) {
+	url := ci.client.buildURL(cloudInstanceRescuePath, []interface{}{id}...)
+
+	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, nil)
 
 	if err != nil {
 		return nil, err
