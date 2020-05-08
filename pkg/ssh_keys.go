@@ -13,7 +13,10 @@ const (
 // SSHKeysService is an interface to interfacing with the SSH Key endpoints
 // API documentation: https://developers.servers.com/api-documentation/v1/#tag/SSH-Key
 type SSHKeysService interface {
+	// Primary collection
 	Collection() SSHKeysCollection
+
+	// Generic operations
 	Get(ctx context.Context, fingerprint string) (*SSHKey, error)
 	Create(ctx context.Context, input SSHKeyCreateInput) (*SSHKey, error)
 	Update(ctx context.Context, fingerprint string, input SSHKeyUpdateInput) (*SSHKey, error)

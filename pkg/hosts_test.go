@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestDedicatedServersCreate(t *testing.T) {
+func TestHostsCreateDedicatedServers(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -62,7 +62,7 @@ func TestDedicatedServersCreate(t *testing.T) {
 
 	ctx := context.TODO()
 
-	dedicatedServers, err := client.Hosts.DedicatedServersCreate(ctx, input)
+	dedicatedServers, err := client.Hosts.CreateDedicatedServers(ctx, input)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(len(dedicatedServers)).To(Equal(2))
@@ -94,7 +94,7 @@ func TestDedicatedServersCreate(t *testing.T) {
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:04 +0000 UTC"))
 }
 
-func TestDedicatedServerGet(t *testing.T) {
+func TestHostsGetDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -108,7 +108,7 @@ func TestDedicatedServerGet(t *testing.T) {
 
 	ctx := context.TODO()
 
-	dedicatedServer, err := client.Hosts.DedicatedServerGet(ctx, "xkazYeJ0")
+	dedicatedServer, err := client.Hosts.GetDedicatedServer(ctx, "xkazYeJ0")
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())
@@ -125,7 +125,7 @@ func TestDedicatedServerGet(t *testing.T) {
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
 
-func TestDedicatedServerScheduleRelease(t *testing.T) {
+func TestHostsScheduleReleaseForDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -139,7 +139,7 @@ func TestDedicatedServerScheduleRelease(t *testing.T) {
 
 	ctx := context.TODO()
 
-	dedicatedServer, err := client.Hosts.DedicatedServerScheduleRelease(ctx, "xkazYeJ0")
+	dedicatedServer, err := client.Hosts.ScheduleReleaseForDedicatedServer(ctx, "xkazYeJ0")
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())
@@ -159,7 +159,7 @@ func TestDedicatedServerScheduleRelease(t *testing.T) {
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
 
-func TestDedicatedServerAbortRelease(t *testing.T) {
+func TestHostsAbortReleaseForDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -173,7 +173,7 @@ func TestDedicatedServerAbortRelease(t *testing.T) {
 
 	ctx := context.TODO()
 
-	dedicatedServer, err := client.Hosts.DedicatedServerAbortRelease(ctx, "xkazYeJ0")
+	dedicatedServer, err := client.Hosts.AbortReleaseForDedicatedServer(ctx, "xkazYeJ0")
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())
@@ -190,7 +190,7 @@ func TestDedicatedServerAbortRelease(t *testing.T) {
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
 
-func TestDedicatedServerPowerOn(t *testing.T) {
+func TestHostsPowerOnDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -204,7 +204,7 @@ func TestDedicatedServerPowerOn(t *testing.T) {
 
 	ctx := context.TODO()
 
-	dedicatedServer, err := client.Hosts.DedicatedServerPowerOn(ctx, "xkazYeJ0")
+	dedicatedServer, err := client.Hosts.PowerOnDedicatedServer(ctx, "xkazYeJ0")
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())
@@ -221,7 +221,7 @@ func TestDedicatedServerPowerOn(t *testing.T) {
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
 
-func TestDedicatedServerPowerOff(t *testing.T) {
+func TestHostsPowerOffDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -235,7 +235,7 @@ func TestDedicatedServerPowerOff(t *testing.T) {
 
 	ctx := context.TODO()
 
-	dedicatedServer, err := client.Hosts.DedicatedServerPowerOff(ctx, "xkazYeJ0")
+	dedicatedServer, err := client.Hosts.PowerOffDedicatedServer(ctx, "xkazYeJ0")
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())
@@ -252,7 +252,7 @@ func TestDedicatedServerPowerOff(t *testing.T) {
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
 
-func TestDedicatedServerPowerCycle(t *testing.T) {
+func TestHostsPowerCycleDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -266,7 +266,7 @@ func TestDedicatedServerPowerCycle(t *testing.T) {
 
 	ctx := context.TODO()
 
-	dedicatedServer, err := client.Hosts.DedicatedServerPowerCycle(ctx, "xkazYeJ0")
+	dedicatedServer, err := client.Hosts.PowerCycleDedicatedServer(ctx, "xkazYeJ0")
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())
@@ -283,7 +283,7 @@ func TestDedicatedServerPowerCycle(t *testing.T) {
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
 
-func TestDedicatedServerPowerFeeds(t *testing.T) {
+func TestHostsDedicatedServerPowerFeeds(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -313,7 +313,7 @@ func TestDedicatedServerPowerFeeds(t *testing.T) {
 	g.Expect(powerFeed.Status).To(Equal("on"))
 }
 
-func TestDedicatedServerPTRRecordCreate(t *testing.T) {
+func TestHostsCreatePTRRecordForDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -337,7 +337,7 @@ func TestDedicatedServerPTRRecordCreate(t *testing.T) {
 		Priority: &priorityValue,
 	}
 
-	ptrRecord, err := client.Hosts.DedicatedServerPTRRecordCreate(ctx, "xkazYeJ0", input)
+	ptrRecord, err := client.Hosts.CreatePTRRecordForDedicatedServer(ctx, "xkazYeJ0", input)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(ptrRecord).ToNot(BeNil())
@@ -349,7 +349,7 @@ func TestDedicatedServerPTRRecordCreate(t *testing.T) {
 	g.Expect(ptrRecord.TTL).To(Equal(60))
 }
 
-func TestDedicatedServerPTRRecordDelete(t *testing.T) {
+func TestHostsDeletePTRRecordForDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -362,12 +362,12 @@ func TestDedicatedServerPTRRecordDelete(t *testing.T) {
 
 	ctx := context.TODO()
 
-	err := client.Hosts.DedicatedServerPTRRecordDelete(ctx, "xkazYeJ0", "oQeZzvep")
+	err := client.Hosts.DeletePTRRecordForDedicatedServer(ctx, "xkazYeJ0", "oQeZzvep")
 
 	g.Expect(err).To(BeNil())
 }
 
-func TestDedicatedServerOperatingSystemReinstall(t *testing.T) {
+func TestHostsReinstallOperatingSystemForDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -403,7 +403,7 @@ func TestDedicatedServerOperatingSystemReinstall(t *testing.T) {
 
 	ctx := context.TODO()
 
-	dedicatedServer, err := client.Hosts.DedicatedServerOperatingSystemReinstall(ctx, "xkazYeJ0", input)
+	dedicatedServer, err := client.Hosts.ReinstallOperatingSystemForDedicatedServer(ctx, "xkazYeJ0", input)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())

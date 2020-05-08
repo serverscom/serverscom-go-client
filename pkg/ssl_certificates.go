@@ -13,8 +13,10 @@ const (
 // SSLCertificatesService is an interface to interfacing with the SSL Certificate endpoints
 // API documentation: https://developers.servers.com/api-documentation/v1/#tag/SSL-Certificate
 type SSLCertificatesService interface {
+	// Primary collection
 	Collection() SSLCertificatesCollection
 
+	// Generic operations
 	CreateCustom(ctx context.Context, input SSLCertificateCreateCustomInput) (*SSLCertificateCustom, error)
 	GetCustom(ctx context.Context, id string) (*SSLCertificateCustom, error)
 }

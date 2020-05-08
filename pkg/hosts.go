@@ -26,30 +26,29 @@ const (
 // https://developers.servers.com/api-documentation/v1/#tag/Hosts
 // https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server
 type HostsService interface {
+	// Primary collection
 	Collection() HostsCollection
 
-	DedicatedServerGet(ctx context.Context, id string) (*DedicatedServer, error)
-	DedicatedServersCreate(ctx context.Context, input DedicatedServerCreateInput) ([]DedicatedServer, error)
+	// Generic operations
+	GetDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
+	CreateDedicatedServers(ctx context.Context, input DedicatedServerCreateInput) ([]DedicatedServer, error)
 
-	DedicatedServerScheduleRelease(ctx context.Context, id string) (*DedicatedServer, error)
-	DedicatedServerAbortRelease(ctx context.Context, id string) (*DedicatedServer, error)
+	// Additional operations
+	ScheduleReleaseForDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
+	AbortReleaseForDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
+	PowerOnDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
+	PowerOffDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
+	PowerCycleDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
+	CreatePTRRecordForDedicatedServer(ctx context.Context, id string, input PTRRecordCreateInput) (*PTRRecord, error)
+	DeletePTRRecordForDedicatedServer(ctx context.Context, hostID string, ptrRecordID string) error
+	ReinstallOperatingSystemForDedicatedServer(ctx context.Context, id string, input OperatingSystemReinstallInput) (*DedicatedServer, error)
 
-	DedicatedServerPowerOn(ctx context.Context, id string) (*DedicatedServer, error)
-	DedicatedServerPowerOff(ctx context.Context, id string) (*DedicatedServer, error)
-	DedicatedServerPowerCycle(ctx context.Context, id string) (*DedicatedServer, error)
+	// Additional collections
 	DedicatedServerPowerFeeds(ctx context.Context, id string) ([]HostPowerFeed, error)
-
 	DedicatedServerConnections(ctx context.Context, id string) HostConnectionsCollection
-
 	DedicatedServerNetworks(ctx context.Context, id string) HostNetworksCollection
-
-	DedicatedServerPTRRecords(ctx context.Context, id string) HostPTRRecordsCollection
-	DedicatedServerPTRRecordCreate(ctx context.Context, id string, input PTRRecordCreateInput) (*PTRRecord, error)
-	DedicatedServerPTRRecordDelete(ctx context.Context, hostID string, ptrRecordID string) error
-
-	DedicatedServerOperatingSystemReinstall(ctx context.Context, id string, input OperatingSystemReinstallInput) (*DedicatedServer, error)
-
 	DedicatedServerDriveSlots(ctx context.Context, id string) HostDriveSlotsCollection
+	DedicatedServerPTRRecords(ctx context.Context, id string) HostPTRRecordsCollection
 }
 
 // HostsHandler handles operations around hosts
@@ -62,9 +61,9 @@ func (h *HostsHandler) Collection() HostsCollection {
 	return NewHostsCollection(h.client)
 }
 
-// DedicatedServerGet returns a dedicated server
+// GetDedicatedServer returns a dedicated server
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/RetrieveAnExistingDedicatedServer
-func (h *HostsHandler) DedicatedServerGet(ctx context.Context, id string) (*DedicatedServer, error) {
+func (h *HostsHandler) GetDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error) {
 	url := h.client.buildURL(dedicatedServerPath, []interface{}{id}...)
 
 	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
@@ -82,9 +81,9 @@ func (h *HostsHandler) DedicatedServerGet(ctx context.Context, id string) (*Dedi
 	return dedicatedServer, nil
 }
 
-// DedicatedServersCreate creates a dedicated servers
+// CreateDedicatedServers creates a dedicated servers
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/CreateANewDedicatedServer
-func (h *HostsHandler) DedicatedServersCreate(ctx context.Context, input DedicatedServerCreateInput) ([]DedicatedServer, error) {
+func (h *HostsHandler) CreateDedicatedServers(ctx context.Context, input DedicatedServerCreateInput) ([]DedicatedServer, error) {
 	payload, err := json.Marshal(input)
 
 	if err != nil {
@@ -108,9 +107,9 @@ func (h *HostsHandler) DedicatedServersCreate(ctx context.Context, input Dedicat
 	return dedicatedServers, nil
 }
 
-// DedicatedServerScheduleRelease schedules release for for the dedicated server
+// ScheduleReleaseForDedicatedServer schedules release for for the dedicated server
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ScheduleReleaseForAnExistingDedicatedServer
-func (h *HostsHandler) DedicatedServerScheduleRelease(ctx context.Context, id string) (*DedicatedServer, error) {
+func (h *HostsHandler) ScheduleReleaseForDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error) {
 	url := h.client.buildURL(dedicatedServerScheduleReleasePath, []interface{}{id}...)
 
 	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
@@ -128,9 +127,9 @@ func (h *HostsHandler) DedicatedServerScheduleRelease(ctx context.Context, id st
 	return dedicatedServer, nil
 }
 
-// DedicatedServerAbortRelease aborts scheduled release for the dedicated server
+// AbortReleaseForDedicatedServer aborts scheduled release for the dedicated server
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/AbortReleaseForAnExistingDedicatedServer
-func (h *HostsHandler) DedicatedServerAbortRelease(ctx context.Context, id string) (*DedicatedServer, error) {
+func (h *HostsHandler) AbortReleaseForDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error) {
 	url := h.client.buildURL(dedicatedServerAbortReleasePath, []interface{}{id}...)
 
 	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
@@ -148,9 +147,9 @@ func (h *HostsHandler) DedicatedServerAbortRelease(ctx context.Context, id strin
 	return dedicatedServer, nil
 }
 
-// DedicatedServerPowerOn sends power-on command to the dedicated server
+// PowerOnDedicatedServer sends power-on command to the dedicated server
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/SendPowerOnCommandToAnExistingDedicatedServer
-func (h *HostsHandler) DedicatedServerPowerOn(ctx context.Context, id string) (*DedicatedServer, error) {
+func (h *HostsHandler) PowerOnDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error) {
 	url := h.client.buildURL(dedicatedServerPowerOnPath, []interface{}{id}...)
 
 	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
@@ -168,9 +167,9 @@ func (h *HostsHandler) DedicatedServerPowerOn(ctx context.Context, id string) (*
 	return dedicatedServer, nil
 }
 
-// DedicatedServerPowerOff sends power-off command to the dedicated server
+// PowerOffDedicatedServer sends power-off command to the dedicated server
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/SendPowerOffCommandToAnExistingDedicatedServer
-func (h *HostsHandler) DedicatedServerPowerOff(ctx context.Context, id string) (*DedicatedServer, error) {
+func (h *HostsHandler) PowerOffDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error) {
 	url := h.client.buildURL(dedicatedServerPowerOffPath, []interface{}{id}...)
 
 	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
@@ -188,9 +187,9 @@ func (h *HostsHandler) DedicatedServerPowerOff(ctx context.Context, id string) (
 	return dedicatedServer, nil
 }
 
-// DedicatedServerPowerCycle sends power-cycle command to the dedicated server
+// PowerCycleDedicatedServer sends power-cycle command to the dedicated server
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/SendPowerCycleCommandToAnExistingDedicatedServer
-func (h *HostsHandler) DedicatedServerPowerCycle(ctx context.Context, id string) (*DedicatedServer, error) {
+func (h *HostsHandler) PowerCycleDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error) {
 	url := h.client.buildURL(dedicatedServerPowerCyclePath, []interface{}{id}...)
 
 	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
@@ -243,9 +242,9 @@ func (h *HostsHandler) DedicatedServerPTRRecords(ctx context.Context, id string)
 	return NewHostPTRRecordsCollection(h.client, dedicatedServerTypePrefix, id)
 }
 
-// DedicatedServerPTRRecordCreate creates ptr record for the dedicated server
+// CreatePTRRecordForDedicatedServer creates ptr record for the dedicated server
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/CreatePtrRecordForServerNetworks
-func (h *HostsHandler) DedicatedServerPTRRecordCreate(ctx context.Context, id string, input PTRRecordCreateInput) (*PTRRecord, error) {
+func (h *HostsHandler) CreatePTRRecordForDedicatedServer(ctx context.Context, id string, input PTRRecordCreateInput) (*PTRRecord, error) {
 	url := h.client.buildURL(dedicatedServerPTRRecordCreatePath, []interface{}{id}...)
 
 	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
@@ -263,9 +262,9 @@ func (h *HostsHandler) DedicatedServerPTRRecordCreate(ctx context.Context, id st
 	return ptrRecord, nil
 }
 
-// DedicatedServerPTRRecordDelete deleted ptr record for the dedicated server
+// DeletePTRRecordForDedicatedServer deleted ptr record for the dedicated server
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/DeleteAnExistingPtrRecord
-func (h *HostsHandler) DedicatedServerPTRRecordDelete(ctx context.Context, hostID string, ptrRecordID string) error {
+func (h *HostsHandler) DeletePTRRecordForDedicatedServer(ctx context.Context, hostID string, ptrRecordID string) error {
 	url := h.client.buildURL(dedicatedServerPTRRecordDeletePath, []interface{}{hostID, ptrRecordID}...)
 
 	_, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
@@ -273,9 +272,9 @@ func (h *HostsHandler) DedicatedServerPTRRecordDelete(ctx context.Context, hostI
 	return err
 }
 
-// DedicatedServerOperatingSystemReinstall performs operating system reinstallation
+// ReinstallOperatingSystemForDedicatedServer performs operating system reinstallation
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/StartOperatingSystemReinstallProcess
-func (h *HostsHandler) DedicatedServerOperatingSystemReinstall(ctx context.Context, id string, input OperatingSystemReinstallInput) (*DedicatedServer, error) {
+func (h *HostsHandler) ReinstallOperatingSystemForDedicatedServer(ctx context.Context, id string, input OperatingSystemReinstallInput) (*DedicatedServer, error) {
 	payload, err := json.Marshal(input)
 
 	if err != nil {

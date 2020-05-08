@@ -25,28 +25,29 @@ const (
 // CloudInstancesService is an interface to interfacing with the Cloud Instance endpoints
 // API documentation: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance
 type CloudInstancesService interface {
+	// Primary collection
 	Collection() CloudInstancesCollection
 
+	// Generic operations
 	Get(ctx context.Context, id string) (*CloudInstance, error)
 	Create(ctx context.Context, input CloudInstanceCreateInput) (*CloudInstance, error)
 	Update(ctx context.Context, id string, input CloudInstanceUpdateInput) (*CloudInstance, error)
 	Delete(ctx context.Context, id string) error
 
+	// Additional operations
 	Reinstall(ctx context.Context, id string, input CloudInstanceReinstallInput) (*CloudInstance, error)
-
 	Rescue(ctx context.Context, id string) (*CloudInstance, error)
 	Unrescue(ctx context.Context, id string) (*CloudInstance, error)
-
 	Upgrade(ctx context.Context, id string, input CloudInstanceUpgradeInput) (*CloudInstance, error)
 	RevertUpgrade(ctx context.Context, id string) (*CloudInstance, error)
 	ApproveUpgrade(ctx context.Context, id string) (*CloudInstance, error)
-
 	PowerOn(ctx context.Context, id string) (*CloudInstance, error)
 	PowerOff(ctx context.Context, id string) (*CloudInstance, error)
-
-	PTRRecords(id string) CloudInstancePTRRecordsCollection
 	CreatePTRRecord(ctx context.Context, cloudInstanceID string, input PTRRecordCreateInput) (*PTRRecord, error)
 	DeletePTRRecord(ctx context.Context, cloudInstanceID string, ptrRecordID string) error
+
+	// Additional collections
+	PTRRecords(id string) CloudInstancePTRRecordsCollection
 }
 
 // CloudInstancesHandler handles operations around cloud instances

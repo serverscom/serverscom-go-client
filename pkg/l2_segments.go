@@ -17,19 +17,24 @@ const (
 // API documentation:
 // https://developers.servers.com/api-documentation/v1/#tag/L2-Segment
 type L2SegmentsService interface {
+	// Primary collection
 	Collection() L2SegmentsCollection
 
+	// Extra collections
+	LocationGroupsCollection() L2LocationGroupsCollection
+
+	// Generic operations
 	Get(ctx context.Context, segmentID string) (*L2Segment, error)
 	Create(ctx context.Context, input L2SegmentCreateInput) (*L2Segment, error)
 	Update(ctx context.Context, segmentID string, input L2SegmentUpdateInput) (*L2Segment, error)
 	Delete(ctx context.Context, segmentID string) error
 
-	LocationGroupsCollection() L2LocationGroupsCollection
-
-	MembersCollection(segmentID string) L2MembersCollection
-
-	NetworksCollection(segmentID string) L2NetworksCollection
+	// Additional operations
 	ChangeNetworks(ctx context.Context, segmentID string, input L2SegmentChangeNetworksInput) (*L2Segment, error)
+
+	// Additional collections
+	MembersCollection(segmentID string) L2MembersCollection
+	NetworksCollection(segmentID string) L2NetworksCollection
 }
 
 // L2SegmentsHandler handles  operatings around l2 segments
