@@ -6,18 +6,20 @@ import (
 )
 
 const (
-	cloudInstanceCreatePath         = "/cloud_computing/instances"
-	cloudInstancePath               = "/cloud_computing/instances/%s"
-	cloudInstanceUpdatePath         = "/cloud_computing/instances/%s"
-	cloudInstanceDeletePath         = "/cloud_computing/instances/%s"
-	cloudInstanceReinstallPath      = "/cloud_computing/instances/%s/reinstall"
-	cloudInstanceRescuePath         = "/cloud_computing/instances/%s/rescue"
-	cloudInstanceUnrescuePath       = "/cloud_computing/instances/%s/unrescue"
-	cloudInstanceUpgradePath        = "/cloud_computing/instances/%s/upgrade"
-	cloudInstanceRevertUpgradePath  = "/cloud_computing/instances/%s/revert_upgrade"
-	cloudInstanceApproveUpgradePath = "/cloud_computing/instances/%s/approve_upgrade"
-	cloudInstancePowerOnPath        = "/cloud_computing/instances/%s/switch_power_on"
-	cloudInstancePowerOffPath       = "/cloud_computing/instances/%s/switch_power_off"
+	cloudInstanceCreatePath          = "/cloud_computing/instances"
+	cloudInstancePath                = "/cloud_computing/instances/%s"
+	cloudInstanceUpdatePath          = "/cloud_computing/instances/%s"
+	cloudInstanceDeletePath          = "/cloud_computing/instances/%s"
+	cloudInstanceReinstallPath       = "/cloud_computing/instances/%s/reinstall"
+	cloudInstanceRescuePath          = "/cloud_computing/instances/%s/rescue"
+	cloudInstanceUnrescuePath        = "/cloud_computing/instances/%s/unrescue"
+	cloudInstanceUpgradePath         = "/cloud_computing/instances/%s/upgrade"
+	cloudInstanceRevertUpgradePath   = "/cloud_computing/instances/%s/revert_upgrade"
+	cloudInstanceApproveUpgradePath  = "/cloud_computing/instances/%s/approve_upgrade"
+	cloudInstancePowerOnPath         = "/cloud_computing/instances/%s/switch_power_on"
+	cloudInstancePowerOffPath        = "/cloud_computing/instances/%s/switch_power_off"
+	cloudInstanceCreatePTRRecordPath = "/cloud_computing/instances/%s/ptr_records"
+	cloudInstanceDeletePTRRecordPath = "/cloud_computing/instances/%s/ptr_records/%s"
 )
 
 // CloudInstancesService is an interface to interfacing with the Cloud Instance endpoints
@@ -43,6 +45,8 @@ type CloudInstancesService interface {
 	PowerOff(ctx context.Context, id string) (*CloudInstance, error)
 
 	PTRRecords(id string) CloudInstancePTRRecordsCollection
+	CreatePTRRecord(ctx context.Context, cloudInstanceID string, input PTRRecordCreateInput) (*PTRRecord, error)
+	DeletePTRRecord(ctx context.Context, cloudInstanceID string, ptrRecordID string) error
 }
 
 // CloudInstancesHandler handles operations around cloud instances
@@ -312,4 +316,34 @@ func (ci *CloudInstancesHandler) PowerOff(ctx context.Context, id string) (*Clou
 // PTRRecords builds a new CloudInstancePTRRecordsCollection interface
 func (ci *CloudInstancesHandler) PTRRecords(id string) CloudInstancePTRRecordsCollection {
 	return NewCloudInstancePTRRecordsCollection(ci.client, id)
+}
+
+// CreatePTRRecord creates ptr record for the cloud instance
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/CreatePtrForInstance
+func (ci *CloudInstancesHandler) CreatePTRRecord(ctx context.Context, cloudInstanceID string, input PTRRecordCreateInput) (*PTRRecord, error) {
+	url := ci.client.buildURL(cloudInstanceCreatePTRRecordPath, []interface{}{cloudInstanceID}...)
+
+	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	ptrRecord := new(PTRRecord)
+
+	if err := json.Unmarshal(body, &ptrRecord); err != nil {
+		return nil, err
+	}
+
+	return ptrRecord, nil
+}
+
+// DeletePTRRecord deleted ptr record for the cloud instance
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/DetetePtrForInstance
+func (ci *CloudInstancesHandler) DeletePTRRecord(ctx context.Context, cloudInstanceID string, ptrRecordID string) error {
+	url := ci.client.buildURL(cloudInstanceDeletePTRRecordPath, []interface{}{cloudInstanceID, ptrRecordID}...)
+
+	_, err := ci.client.buildAndExecRequest(ctx, "DELETE", url, nil)
+
+	return err
 }

@@ -385,3 +385,57 @@ func TestCloudInstancesPowerOff(t *testing.T) {
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
+
+func TestCloudInstancesCreatePTRRecord(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/cloud_computing/instances/xkazYeJ0/ptr_records").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/cloud_instances/create_ptr_record_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	ttlValue := 60
+	priorityValue := 3
+
+	input := PTRRecordCreateInput{
+		IP:       "100.0.0.4",
+		Domain:   "ai.privateservergrid.com",
+		TTL:      &ttlValue,
+		Priority: &priorityValue,
+	}
+
+	ptrRecord, err := client.CloudInstances.CreatePTRRecord(ctx, "xkazYeJ0", input)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(ptrRecord).ToNot(BeNil())
+
+	g.Expect(ptrRecord.ID).To(Equal("oQeZzvep"))
+	g.Expect(ptrRecord.IP).To(Equal("100.0.0.4"))
+	g.Expect(ptrRecord.Domain).To(Equal("ai.privateservergrid.com"))
+	g.Expect(ptrRecord.Priority).To(Equal(3))
+	g.Expect(ptrRecord.TTL).To(Equal(60))
+}
+
+func TestCloudInstancesDeletePTRRecord(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/cloud_computing/instances/xkazYeJ0/ptr_records/oQeZzvep").
+		WithRequestMethod("DELETE").
+		WithResponseCode(204).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	err := client.CloudInstances.DeletePTRRecord(ctx, "xkazYeJ0", "oQeZzvep")
+
+	g.Expect(err).To(BeNil())
+}

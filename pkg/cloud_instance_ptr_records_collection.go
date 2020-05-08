@@ -42,7 +42,7 @@ type CloudInstancePTRRecordsCollection interface {
 type CloudInstancePTRRecordsCollectionHandler struct {
 	client *Client
 
-	cloudInstanceId string
+	cloudInstanceID string
 
 	params map[string]string
 
@@ -53,11 +53,11 @@ type CloudInstancePTRRecordsCollectionHandler struct {
 }
 
 // NewCloudInstancePTRRecordsCollection produces a new CloudInstancePTRRecordsCollectionHandler and represents this as an interface of CloudInstancePTRRecordsCollection
-func NewCloudInstancePTRRecordsCollection(client *Client, cloudInstanceId string) CloudInstancePTRRecordsCollection {
+func NewCloudInstancePTRRecordsCollection(client *Client, cloudInstanceID string) CloudInstancePTRRecordsCollection {
 	return &CloudInstancePTRRecordsCollectionHandler{
 		client: client,
 
-		cloudInstanceId: cloudInstanceId,
+		cloudInstanceID: cloudInstanceID,
 
 		params:     make(map[string]string),
 		rels:       make(map[string]string),
@@ -238,7 +238,7 @@ func (col *CloudInstancePTRRecordsCollectionHandler) Refresh(ctx context.Context
 func (col *CloudInstancePTRRecordsCollectionHandler) fireHTTPRequest(ctx context.Context) error {
 	var accumulatedCollectionElements []PTRRecord
 
-	initialURL := col.client.buildURL(cloudInstancePTRsListPath, col.cloudInstanceId)
+	initialURL := col.client.buildURL(cloudInstancePTRsListPath, col.cloudInstanceID)
 	url := col.client.applyParams(
 		initialURL,
 		col.params,

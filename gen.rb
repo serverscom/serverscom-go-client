@@ -157,5 +157,5 @@ CollectionGenerator.new(
   entity: 'PTRRecord',
   api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ReturnsInstancePtrRecords',
   var_prefix: 'cloudInstancePTRs',
-  args: {cloudInstanceId: 'string'}
+  args: {cloudInstanceID: 'string'}
 ).render_to_file('pkg/cloud_instance_ptr_records_collection.go')
