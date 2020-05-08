@@ -273,6 +273,11 @@ type CloudInstanceReinstallInput struct {
 	ImageID string `json:"image_id"`
 }
 
+// CloudInstanceUpgradeInput represents cloud instance upgrade input
+type CloudInstanceUpgradeInput struct {
+	FlavorID string `json:"flavor_id"`
+}
+
 // L2Segment represents l2 segment
 type L2Segment struct {
 	ID              string    `json:"id"`

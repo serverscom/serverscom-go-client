@@ -13,6 +13,7 @@ const (
 	cloudInstanceReinstallPath = "/cloud_computing/instances/%s/reinstall"
 	cloudInstanceRescuePath    = "/cloud_computing/instances/%s/rescue"
 	cloudInstanceUnrescuePath  = "/cloud_computing/instances/%s/unrescue"
+	cloudInstanceUpgradePath   = "/cloud_computing/instances/%s/upgrade"
 )
 
 // CloudInstancesService is an interface to interfacing with the Cloud Instance endpoints
@@ -29,6 +30,8 @@ type CloudInstancesService interface {
 
 	Rescue(ctx context.Context, id string) (*CloudInstance, error)
 	Unrescue(ctx context.Context, id string) (*CloudInstance, error)
+
+	Upgrade(ctx context.Context, id string, input CloudInstanceUpgradeInput) (*CloudInstance, error)
 }
 
 // CloudInstancesHandler handles operations around cloud instances
@@ -175,6 +178,32 @@ func (ci *CloudInstancesHandler) Unrescue(ctx context.Context, id string) (*Clou
 	url := ci.client.buildURL(cloudInstanceUnrescuePath, []interface{}{id}...)
 
 	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var cloudInstance *CloudInstance
+
+	if err := json.Unmarshal(body, &cloudInstance); err != nil {
+		return nil, err
+	}
+
+	return cloudInstance, nil
+}
+
+// Upgrade cloud instance
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/UpgradeInstance
+func (ci *CloudInstancesHandler) Upgrade(ctx context.Context, id string, input CloudInstanceUpgradeInput) (*CloudInstance, error) {
+	payload, err := json.Marshal(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	url := ci.client.buildURL(cloudInstanceUpgradePath, []interface{}{id}...)
+
+	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, payload)
 
 	if err != nil {
 		return nil, err
