@@ -16,6 +16,8 @@ const (
 	cloudInstanceUpgradePath        = "/cloud_computing/instances/%s/upgrade"
 	cloudInstanceRevertUpgradePath  = "/cloud_computing/instances/%s/revert_upgrade"
 	cloudInstanceApproveUpgradePath = "/cloud_computing/instances/%s/approve_upgrade"
+	cloudInstancePowerOnPath        = "/cloud_computing/instances/%s/switch_power_on"
+	cloudInstancePowerOffPath       = "/cloud_computing/instances/%s/switch_power_off"
 )
 
 // CloudInstancesService is an interface to interfacing with the Cloud Instance endpoints
@@ -36,6 +38,9 @@ type CloudInstancesService interface {
 	Upgrade(ctx context.Context, id string, input CloudInstanceUpgradeInput) (*CloudInstance, error)
 	RevertUpgrade(ctx context.Context, id string) (*CloudInstance, error)
 	ApproveUpgrade(ctx context.Context, id string) (*CloudInstance, error)
+
+	PowerOn(ctx context.Context, id string) (*CloudInstance, error)
+	PowerOff(ctx context.Context, id string) (*CloudInstance, error)
 }
 
 // CloudInstancesHandler handles operations around cloud instances
@@ -246,6 +251,46 @@ func (ci *CloudInstancesHandler) RevertUpgrade(ctx context.Context, id string) (
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ApproveInstanceUpgrade
 func (ci *CloudInstancesHandler) ApproveUpgrade(ctx context.Context, id string) (*CloudInstance, error) {
 	url := ci.client.buildURL(cloudInstanceApproveUpgradePath, []interface{}{id}...)
+
+	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var cloudInstance *CloudInstance
+
+	if err := json.Unmarshal(body, &cloudInstance); err != nil {
+		return nil, err
+	}
+
+	return cloudInstance, nil
+}
+
+// PowerOn cloud instance
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/SwitchPowerOn
+func (ci *CloudInstancesHandler) PowerOn(ctx context.Context, id string) (*CloudInstance, error) {
+	url := ci.client.buildURL(cloudInstancePowerOnPath, []interface{}{id}...)
+
+	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var cloudInstance *CloudInstance
+
+	if err := json.Unmarshal(body, &cloudInstance); err != nil {
+		return nil, err
+	}
+
+	return cloudInstance, nil
+}
+
+// PowerOff cloud instance
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/SwitchPowerOff
+func (ci *CloudInstancesHandler) PowerOff(ctx context.Context, id string) (*CloudInstance, error) {
+	url := ci.client.buildURL(cloudInstancePowerOffPath, []interface{}{id}...)
 
 	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, nil)
 
