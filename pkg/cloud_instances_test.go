@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestCloudInstanceCreate(t *testing.T) {
+func TestCloudInstancesCreate(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -46,7 +46,7 @@ func TestCloudInstanceCreate(t *testing.T) {
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:28 +0000 UTC"))
 }
 
-func TestCloudInstanceGet(t *testing.T) {
+func TestCloudInstancesGet(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -78,7 +78,7 @@ func TestCloudInstanceGet(t *testing.T) {
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
 
-func TestCloudInstanceUpdate(t *testing.T) {
+func TestCloudInstancesUpdate(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -112,7 +112,7 @@ func TestCloudInstanceUpdate(t *testing.T) {
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
 
-func TestCloudInstanceDelete(t *testing.T) {
+func TestCloudInstancesDelete(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
