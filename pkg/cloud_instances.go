@@ -41,6 +41,8 @@ type CloudInstancesService interface {
 
 	PowerOn(ctx context.Context, id string) (*CloudInstance, error)
 	PowerOff(ctx context.Context, id string) (*CloudInstance, error)
+
+	PTRRecords(id string) CloudInstancePTRRecordsCollection
 }
 
 // CloudInstancesHandler handles operations around cloud instances
@@ -305,4 +307,9 @@ func (ci *CloudInstancesHandler) PowerOff(ctx context.Context, id string) (*Clou
 	}
 
 	return cloudInstance, nil
+}
+
+// PTRRecords builds a new CloudInstancePTRRecordsCollection interface
+func (ci *CloudInstancesHandler) PTRRecords(id string) CloudInstancePTRRecordsCollection {
+	return NewCloudInstancePTRRecordsCollection(ci.client, id)
 }
