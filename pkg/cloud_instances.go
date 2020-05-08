@@ -6,14 +6,15 @@ import (
 )
 
 const (
-	cloudInstanceCreatePath    = "/cloud_computing/instances"
-	cloudInstancePath          = "/cloud_computing/instances/%s"
-	cloudInstanceUpdatePath    = "/cloud_computing/instances/%s"
-	cloudInstanceDeletePath    = "/cloud_computing/instances/%s"
-	cloudInstanceReinstallPath = "/cloud_computing/instances/%s/reinstall"
-	cloudInstanceRescuePath    = "/cloud_computing/instances/%s/rescue"
-	cloudInstanceUnrescuePath  = "/cloud_computing/instances/%s/unrescue"
-	cloudInstanceUpgradePath   = "/cloud_computing/instances/%s/upgrade"
+	cloudInstanceCreatePath        = "/cloud_computing/instances"
+	cloudInstancePath              = "/cloud_computing/instances/%s"
+	cloudInstanceUpdatePath        = "/cloud_computing/instances/%s"
+	cloudInstanceDeletePath        = "/cloud_computing/instances/%s"
+	cloudInstanceReinstallPath     = "/cloud_computing/instances/%s/reinstall"
+	cloudInstanceRescuePath        = "/cloud_computing/instances/%s/rescue"
+	cloudInstanceUnrescuePath      = "/cloud_computing/instances/%s/unrescue"
+	cloudInstanceUpgradePath       = "/cloud_computing/instances/%s/upgrade"
+	cloudInstanceRevertUpgradePath = "/cloud_computing/instances/%s/revert_upgrade"
 )
 
 // CloudInstancesService is an interface to interfacing with the Cloud Instance endpoints
@@ -32,6 +33,7 @@ type CloudInstancesService interface {
 	Unrescue(ctx context.Context, id string) (*CloudInstance, error)
 
 	Upgrade(ctx context.Context, id string, input CloudInstanceUpgradeInput) (*CloudInstance, error)
+	RevertUpgrade(ctx context.Context, id string) (*CloudInstance, error)
 }
 
 // CloudInstancesHandler handles operations around cloud instances
@@ -204,6 +206,26 @@ func (ci *CloudInstancesHandler) Upgrade(ctx context.Context, id string, input C
 	url := ci.client.buildURL(cloudInstanceUpgradePath, []interface{}{id}...)
 
 	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, payload)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var cloudInstance *CloudInstance
+
+	if err := json.Unmarshal(body, &cloudInstance); err != nil {
+		return nil, err
+	}
+
+	return cloudInstance, nil
+}
+
+// RevertUpgrade cloud instance
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/RevertInstanceUpgrade
+func (ci *CloudInstancesHandler) RevertUpgrade(ctx context.Context, id string) (*CloudInstance, error) {
+	url := ci.client.buildURL(cloudInstanceRevertUpgradePath, []interface{}{id}...)
+
+	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, nil)
 
 	if err != nil {
 		return nil, err
