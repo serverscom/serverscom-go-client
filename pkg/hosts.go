@@ -45,10 +45,10 @@ type HostsService interface {
 
 	// Additional collections
 	DedicatedServerPowerFeeds(ctx context.Context, id string) ([]HostPowerFeed, error)
-	DedicatedServerConnections(ctx context.Context, id string) HostConnectionsCollection
-	DedicatedServerNetworks(ctx context.Context, id string) HostNetworksCollection
-	DedicatedServerDriveSlots(ctx context.Context, id string) HostDriveSlotsCollection
-	DedicatedServerPTRRecords(ctx context.Context, id string) HostPTRRecordsCollection
+	DedicatedServerConnections(id string) HostConnectionsCollection
+	DedicatedServerNetworks(id string) HostNetworksCollection
+	DedicatedServerDriveSlots(id string) HostDriveSlotsCollection
+	DedicatedServerPTRRecords(id string) HostPTRRecordsCollection
 }
 
 // HostsHandler handles operations around hosts
@@ -228,17 +228,17 @@ func (h *HostsHandler) DedicatedServerPowerFeeds(ctx context.Context, id string)
 }
 
 // DedicatedServerConnections builds a new HostConnectionsCollection interface
-func (h *HostsHandler) DedicatedServerConnections(ctx context.Context, id string) HostConnectionsCollection {
+func (h *HostsHandler) DedicatedServerConnections(id string) HostConnectionsCollection {
 	return NewHostConnectionsCollection(h.client, dedicatedServerTypePrefix, id)
 }
 
 // DedicatedServerNetworks builds a new HostNetworksCollection interface
-func (h *HostsHandler) DedicatedServerNetworks(ctx context.Context, id string) HostNetworksCollection {
+func (h *HostsHandler) DedicatedServerNetworks(id string) HostNetworksCollection {
 	return NewHostNetworksCollection(h.client, dedicatedServerTypePrefix, id)
 }
 
 // DedicatedServerPTRRecords builds a new HostPTRRecordsCollection interface
-func (h *HostsHandler) DedicatedServerPTRRecords(ctx context.Context, id string) HostPTRRecordsCollection {
+func (h *HostsHandler) DedicatedServerPTRRecords(id string) HostPTRRecordsCollection {
 	return NewHostPTRRecordsCollection(h.client, dedicatedServerTypePrefix, id)
 }
 
@@ -299,6 +299,6 @@ func (h *HostsHandler) ReinstallOperatingSystemForDedicatedServer(ctx context.Co
 }
 
 // DedicatedServerDriveSlots builds a new HostConnectionsCollection interface
-func (h *HostsHandler) DedicatedServerDriveSlots(ctx context.Context, id string) HostDriveSlotsCollection {
+func (h *HostsHandler) DedicatedServerDriveSlots(id string) HostDriveSlotsCollection {
 	return NewHostDriveSlotsCollection(h.client, dedicatedServerTypePrefix, id)
 }

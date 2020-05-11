@@ -21,7 +21,7 @@ type L2SegmentsService interface {
 	Collection() L2SegmentsCollection
 
 	// Extra collections
-	LocationGroupsCollection() L2LocationGroupsCollection
+	LocationGroups() L2LocationGroupsCollection
 
 	// Generic operations
 	Get(ctx context.Context, segmentID string) (*L2Segment, error)
@@ -33,8 +33,8 @@ type L2SegmentsService interface {
 	ChangeNetworks(ctx context.Context, segmentID string, input L2SegmentChangeNetworksInput) (*L2Segment, error)
 
 	// Additional collections
-	MembersCollection(segmentID string) L2MembersCollection
-	NetworksCollection(segmentID string) L2NetworksCollection
+	Members(segmentID string) L2MembersCollection
+	Networks(segmentID string) L2NetworksCollection
 }
 
 // L2SegmentsHandler handles  operatings around l2 segments
@@ -130,17 +130,17 @@ func (l2 *L2SegmentsHandler) Delete(ctx context.Context, segmentID string) error
 }
 
 // LocationGroupsCollection builds a new L2LocationGroupsCollection interface
-func (l2 *L2SegmentsHandler) LocationGroupsCollection() L2LocationGroupsCollection {
+func (l2 *L2SegmentsHandler) LocationGroups() L2LocationGroupsCollection {
 	return NewL2LocationGroupsCollection(l2.client)
 }
 
 // MembersCollection builds a new L2MembersCollection interface
-func (l2 *L2SegmentsHandler) MembersCollection(segmentID string) L2MembersCollection {
+func (l2 *L2SegmentsHandler) Members(segmentID string) L2MembersCollection {
 	return NewL2MembersCollection(l2.client, segmentID)
 }
 
 // NetworksCollection builds a new L2NetworksCollection interface
-func (l2 *L2SegmentsHandler) NetworksCollection(segmentID string) L2NetworksCollection {
+func (l2 *L2SegmentsHandler) Networks(segmentID string) L2NetworksCollection {
 	return NewL2NetworksCollection(l2.client, segmentID)
 }
 
