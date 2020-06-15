@@ -11,12 +11,12 @@ import (
 )
 
 const (
-	cloudInstanceListPath = "/cloud_computing/instances"
+	cloudComputingRegionListPath = "/cloud_computing/regions"
 )
 
-// CloudInstancesCollection is an interface for interfacing with the collection of CloudInstance
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ListCloudInstances
-type CloudInstancesCollection interface {
+// CloudComputingRegionsCollection is an interface for interfacing with the collection of CloudComputingRegion
+// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ListCloudRegions
+type CloudComputingRegionsCollection interface {
 	IsClean() bool
 
 	HasPreviousPage() bool
@@ -24,22 +24,22 @@ type CloudInstancesCollection interface {
 	HasFirstPage() bool
 	HasLastPage() bool
 
-	NextPage(ctx context.Context) ([]CloudInstance, error)
-	PreviousPage(ctx context.Context) ([]CloudInstance, error)
-	FirstPage(ctx context.Context) ([]CloudInstance, error)
-	LastPage(ctx context.Context) ([]CloudInstance, error)
+	NextPage(ctx context.Context) ([]CloudComputingRegion, error)
+	PreviousPage(ctx context.Context) ([]CloudComputingRegion, error)
+	FirstPage(ctx context.Context) ([]CloudComputingRegion, error)
+	LastPage(ctx context.Context) ([]CloudComputingRegion, error)
 
-	Collect(ctx context.Context) ([]CloudInstance, error)
-	List(ctx context.Context) ([]CloudInstance, error)
+	Collect(ctx context.Context) ([]CloudComputingRegion, error)
+	List(ctx context.Context) ([]CloudComputingRegion, error)
 
-	SetPage(page int) CloudInstancesCollection
-	SetPerPage(perPage int) CloudInstancesCollection
+	SetPage(page int) CloudComputingRegionsCollection
+	SetPerPage(perPage int) CloudComputingRegionsCollection
 
 	Refresh(ctx context.Context) error
 }
 
-// CloudInstancesCollectionHandler handles opertations aroud collection
-type CloudInstancesCollectionHandler struct {
+// CloudComputingRegionsCollectionHandler handles opertations aroud collection
+type CloudComputingRegionsCollectionHandler struct {
 	client *Client
 
 	params map[string]string
@@ -47,23 +47,23 @@ type CloudInstancesCollectionHandler struct {
 	clean bool
 
 	rels       map[string]string
-	collection []CloudInstance
+	collection []CloudComputingRegion
 }
 
-// NewCloudInstancesCollection produces a new CloudInstancesCollectionHandler and represents this as an interface of CloudInstancesCollection
-func NewCloudInstancesCollection(client *Client) CloudInstancesCollection {
-	return &CloudInstancesCollectionHandler{
+// NewCloudComputingRegionsCollection produces a new CloudComputingRegionsCollectionHandler and represents this as an interface of CloudComputingRegionsCollection
+func NewCloudComputingRegionsCollection(client *Client) CloudComputingRegionsCollection {
+	return &CloudComputingRegionsCollectionHandler{
 		client: client,
 
 		params:     make(map[string]string),
 		rels:       make(map[string]string),
 		clean:      true,
-		collection: make([]CloudInstance, 0),
+		collection: make([]CloudComputingRegion, 0),
 	}
 }
 
 // IsClean returns a bool value where true is means, this collection not used yet and doesn't contain any state.
-func (col *CloudInstancesCollectionHandler) IsClean() bool {
+func (col *CloudComputingRegionsCollectionHandler) IsClean() bool {
 	return col.clean
 }
 
@@ -73,7 +73,7 @@ func (col *CloudInstancesCollectionHandler) IsClean() bool {
 // were made and collection doesn't have metadata to know about pagination.
 //
 // First metadata will come with the first called methods such: NextPage, PreviousPage, LastPage, FirstPage, List, Refresh, Collect.
-func (col *CloudInstancesCollectionHandler) HasPreviousPage() bool {
+func (col *CloudComputingRegionsCollectionHandler) HasPreviousPage() bool {
 	return col.hasRel("prev")
 }
 
@@ -83,7 +83,7 @@ func (col *CloudInstancesCollectionHandler) HasPreviousPage() bool {
 // were made and collection doesn't have metadata to know about pagination.
 //
 // First metadata will come with the first called methods such: NextPage, PreviousPage, LastPage, FirstPage, List, Refresh, Collect.
-func (col *CloudInstancesCollectionHandler) HasNextPage() bool {
+func (col *CloudComputingRegionsCollectionHandler) HasNextPage() bool {
 	return col.hasRel("next")
 }
 
@@ -93,7 +93,7 @@ func (col *CloudInstancesCollectionHandler) HasNextPage() bool {
 // were made and collection doesn't have metadata to know about pagination.
 //
 // First metadata will come with the first called methods such: NextPage, PreviousPage, LastPage, FirstPage, List, Refresh, Collect.
-func (col *CloudInstancesCollectionHandler) HasFirstPage() bool {
+func (col *CloudComputingRegionsCollectionHandler) HasFirstPage() bool {
 	return col.hasRel("first")
 }
 
@@ -103,51 +103,51 @@ func (col *CloudInstancesCollectionHandler) HasFirstPage() bool {
 // were made and collection doesn't have metadata to know about pagination.
 //
 // First metadata will come with the first called methods such: NextPage, PreviousPage, LastPage, FirstPage, List, Refresh, Collect.
-func (col *CloudInstancesCollectionHandler) HasLastPage() bool {
+func (col *CloudComputingRegionsCollectionHandler) HasLastPage() bool {
 	return col.hasRel("last")
 }
 
-// NextPage navigates to the next page returns a []CloudInstance, produces an error, when a
+// NextPage navigates to the next page returns a []CloudComputingRegion, produces an error, when a
 // collection has no next page.
 //
 // Before using this method please ensure IsClean returns false and HasNextPage returns true.
 // You can force to load pagination metadata by calling Refresh or List methods.
-func (col *CloudInstancesCollectionHandler) NextPage(ctx context.Context) ([]CloudInstance, error) {
+func (col *CloudComputingRegionsCollectionHandler) NextPage(ctx context.Context) ([]CloudComputingRegion, error) {
 	return col.navigate(ctx, "next")
 }
 
-// PreviousPage navigates to the previous page returns a []CloudInstance, produces an error, when a
+// PreviousPage navigates to the previous page returns a []CloudComputingRegion, produces an error, when a
 // collection has no previous page.
 //
 // Before using this method please ensure IsClean returns false and HasPreviousPage returns true.
 // You can force to load pagination metadata by calling Refresh or List methods.
-func (col *CloudInstancesCollectionHandler) PreviousPage(ctx context.Context) ([]CloudInstance, error) {
+func (col *CloudComputingRegionsCollectionHandler) PreviousPage(ctx context.Context) ([]CloudComputingRegion, error) {
 	return col.navigate(ctx, "prev")
 }
 
-// FirstPage navigates to the first page returns a []CloudInstance, produces an error, when a
+// FirstPage navigates to the first page returns a []CloudComputingRegion, produces an error, when a
 // collection has no first page.
 //
 // Before using this method please ensure IsClean returns false and HasFirstPage returns true.
 // You can force to load pagination metadata by calling Refresh or List methods.
-func (col *CloudInstancesCollectionHandler) FirstPage(ctx context.Context) ([]CloudInstance, error) {
+func (col *CloudComputingRegionsCollectionHandler) FirstPage(ctx context.Context) ([]CloudComputingRegion, error) {
 	return col.navigate(ctx, "first")
 }
 
-// LastPage navigates to the last page returns a []CloudInstance, produces an error, when a
+// LastPage navigates to the last page returns a []CloudComputingRegion, produces an error, when a
 // collection has no last page.
 //
 // Before using this method please ensure IsClean returns false and HasLastPage returns true.
 // You can force to load pagination metadata by calling Refresh or List methods.
-func (col *CloudInstancesCollectionHandler) LastPage(ctx context.Context) ([]CloudInstance, error) {
+func (col *CloudComputingRegionsCollectionHandler) LastPage(ctx context.Context) ([]CloudComputingRegion, error) {
 	return col.navigate(ctx, "last")
 }
 
 // Collect navigates by pages until the last page is reached will be reached and returns accumulated data between pages.
 //
 // This method uses NextPage.
-func (col *CloudInstancesCollectionHandler) Collect(ctx context.Context) ([]CloudInstance, error) {
-	var accumulatedCollectionElements []CloudInstance
+func (col *CloudComputingRegionsCollectionHandler) Collect(ctx context.Context) ([]CloudComputingRegion, error) {
+	var accumulatedCollectionElements []CloudComputingRegion
 
 	currentCollectionElements, err := col.List(ctx)
 
@@ -180,7 +180,7 @@ func (col *CloudInstancesCollectionHandler) Collect(ctx context.Context) ([]Clou
 // perform request when such methods were called before: NextPage, PreviousPage, LastPage, FirstPage, Refresh, Collect.
 //
 // In the case when previously called method is Collect, this method returns data from the last page.
-func (col *CloudInstancesCollectionHandler) List(ctx context.Context) ([]CloudInstance, error) {
+func (col *CloudComputingRegionsCollectionHandler) List(ctx context.Context) ([]CloudComputingRegion, error) {
 	if col.IsClean() {
 		if err := col.Refresh(ctx); err != nil {
 			return nil, err
@@ -191,7 +191,7 @@ func (col *CloudInstancesCollectionHandler) List(ctx context.Context) ([]CloudIn
 }
 
 // SetPage sets current page param.
-func (col *CloudInstancesCollectionHandler) SetPage(page int) CloudInstancesCollection {
+func (col *CloudComputingRegionsCollectionHandler) SetPage(page int) CloudComputingRegionsCollection {
 	var currentPage string
 
 	if page > 1 {
@@ -206,7 +206,7 @@ func (col *CloudInstancesCollectionHandler) SetPage(page int) CloudInstancesColl
 }
 
 // SetPerPage sets current per page param.
-func (col *CloudInstancesCollectionHandler) SetPerPage(perPage int) CloudInstancesCollection {
+func (col *CloudComputingRegionsCollectionHandler) SetPerPage(perPage int) CloudComputingRegionsCollection {
 	var currentPerPage string
 
 	if perPage > 0 {
@@ -223,7 +223,7 @@ func (col *CloudInstancesCollectionHandler) SetPerPage(perPage int) CloudInstanc
 // Refresh performs the request and then updates accumulated data limited by pagination.
 //
 // After calling this method accumulated data can be extracted by List method.
-func (col *CloudInstancesCollectionHandler) Refresh(ctx context.Context) error {
+func (col *CloudComputingRegionsCollectionHandler) Refresh(ctx context.Context) error {
 	if err := col.fireHTTPRequest(ctx); err != nil {
 		return err
 	}
@@ -231,10 +231,10 @@ func (col *CloudInstancesCollectionHandler) Refresh(ctx context.Context) error {
 	return nil
 }
 
-func (col *CloudInstancesCollectionHandler) fireHTTPRequest(ctx context.Context) error {
-	var accumulatedCollectionElements []CloudInstance
+func (col *CloudComputingRegionsCollectionHandler) fireHTTPRequest(ctx context.Context) error {
+	var accumulatedCollectionElements []CloudComputingRegion
 
-	initialURL := col.client.buildURL(cloudInstanceListPath)
+	initialURL := col.client.buildURL(cloudComputingRegionListPath)
 	url := col.client.applyParams(
 		initialURL,
 		col.params,
@@ -256,7 +256,7 @@ func (col *CloudInstancesCollectionHandler) fireHTTPRequest(ctx context.Context)
 	return nil
 }
 
-func (col *CloudInstancesCollectionHandler) navigate(ctx context.Context, name string) ([]CloudInstance, error) {
+func (col *CloudComputingRegionsCollectionHandler) navigate(ctx context.Context, name string) ([]CloudComputingRegion, error) {
 	if col.IsClean() {
 		if err := col.Refresh(ctx); err != nil {
 			return nil, err
@@ -274,7 +274,7 @@ func (col *CloudInstancesCollectionHandler) navigate(ctx context.Context, name s
 	return col.collection, nil
 }
 
-func (col *CloudInstancesCollectionHandler) applyParam(name, value string) {
+func (col *CloudComputingRegionsCollectionHandler) applyParam(name, value string) {
 	if value == "" {
 		delete(col.params, name)
 	} else {
@@ -282,7 +282,7 @@ func (col *CloudInstancesCollectionHandler) applyParam(name, value string) {
 	}
 }
 
-func (col *CloudInstancesCollectionHandler) applyRel(name string) error {
+func (col *CloudComputingRegionsCollectionHandler) applyRel(name string) error {
 	if !col.hasRel(name) {
 		return fmt.Errorf("No rel for: %s", name)
 	}
@@ -299,7 +299,7 @@ func (col *CloudInstancesCollectionHandler) applyRel(name string) error {
 	return nil
 }
 
-func (col *CloudInstancesCollectionHandler) hasRel(name string) bool {
+func (col *CloudComputingRegionsCollectionHandler) hasRel(name string) bool {
 	if _, ok := col.rels[name]; ok {
 		return true
 	}

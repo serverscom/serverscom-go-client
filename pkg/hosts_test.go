@@ -21,7 +21,6 @@ func TestHostsCreateDedicatedServers(t *testing.T) {
 
 	driveModelID := int64(1)
 	osUbuntuServerID := int64(1)
-	bandwidthID := int64(1)
 	rootFilesystem := "ext4"
 	raidLevel := 0
 
@@ -30,7 +29,7 @@ func TestHostsCreateDedicatedServers(t *testing.T) {
 		LocationID:    int64(1),
 		RAMSize:       32,
 		UplinkModels: DedicatedServerUplinkModelsInput{
-			Public:  &DedicatedServerPublicUplinkInput{ID: int64(1), BandwidthModelID: &bandwidthID},
+			Public:  &DedicatedServerPublicUplinkInput{ID: int64(1), BandwidthModelID: int64(1)},
 			Private: DedicatedServerPrivateUplinkInput{ID: int64(2)},
 		},
 		Drives: DedicatedServerDrivesInput{
