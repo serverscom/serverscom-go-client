@@ -129,17 +129,17 @@ func (l2 *L2SegmentsHandler) Delete(ctx context.Context, segmentID string) error
 	return err
 }
 
-// LocationGroupsCollection builds a new L2LocationGroupsCollection interface
+// LocationGroups builds a new L2LocationGroupsCollection interface
 func (l2 *L2SegmentsHandler) LocationGroups() L2LocationGroupsCollection {
 	return NewL2LocationGroupsCollection(l2.client)
 }
 
-// MembersCollection builds a new L2MembersCollection interface
+// Members builds a new L2MembersCollection interface
 func (l2 *L2SegmentsHandler) Members(segmentID string) L2MembersCollection {
 	return NewL2MembersCollection(l2.client, segmentID)
 }
 
-// NetworksCollection builds a new L2NetworksCollection interface
+// Networks builds a new L2NetworksCollection interface
 func (l2 *L2SegmentsHandler) Networks(segmentID string) L2NetworksCollection {
 	return NewL2NetworksCollection(l2.client, segmentID)
 }

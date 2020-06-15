@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestCloudInstancesEmptyCollection(t *testing.T) {
+func TestCloudComputingInstancesEmptyCollection(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -19,7 +19,7 @@ func TestCloudInstancesEmptyCollection(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewCloudInstancesCollection(client)
+	collection := NewCloudComputingInstancesCollection(client)
 
 	ctx := context.TODO()
 
@@ -33,7 +33,7 @@ func TestCloudInstancesEmptyCollection(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestCloudInstancesCollectionList(t *testing.T) {
+func TestCloudComputingInstancesCollectionList(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -45,7 +45,7 @@ func TestCloudInstancesCollectionList(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewCloudInstancesCollection(client)
+	collection := NewCloudComputingInstancesCollection(client)
 
 	ctx := context.TODO()
 
@@ -59,7 +59,7 @@ func TestCloudInstancesCollectionList(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestCloudInstancesCollectionHasNext(t *testing.T) {
+func TestCloudComputingInstancesCollectionHasNext(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -74,7 +74,7 @@ func TestCloudInstancesCollectionHasNext(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewCloudInstancesCollection(client)
+	collection := NewCloudComputingInstancesCollection(client)
 
 	ctx := context.TODO()
 
@@ -88,7 +88,7 @@ func TestCloudInstancesCollectionHasNext(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestCloudInstancesCollectionHasPrevious(t *testing.T) {
+func TestCloudComputingInstancesCollectionHasPrevious(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -103,7 +103,7 @@ func TestCloudInstancesCollectionHasPrevious(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewCloudInstancesCollection(client)
+	collection := NewCloudComputingInstancesCollection(client)
 
 	ctx := context.TODO()
 
@@ -117,7 +117,7 @@ func TestCloudInstancesCollectionHasPrevious(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestCloudInstancesCollectionHasFirst(t *testing.T) {
+func TestCloudComputingInstancesCollectionHasFirst(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -132,7 +132,7 @@ func TestCloudInstancesCollectionHasFirst(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewCloudInstancesCollection(client)
+	collection := NewCloudComputingInstancesCollection(client)
 
 	ctx := context.TODO()
 
@@ -146,7 +146,7 @@ func TestCloudInstancesCollectionHasFirst(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestCloudInstancesCollectionHasLast(t *testing.T) {
+func TestCloudComputingInstancesCollectionHasLast(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -161,7 +161,7 @@ func TestCloudInstancesCollectionHasLast(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewCloudInstancesCollection(client)
+	collection := NewCloudComputingInstancesCollection(client)
 
 	ctx := context.TODO()
 
@@ -175,7 +175,7 @@ func TestCloudInstancesCollectionHasLast(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(true))
 }
 
-func TestCloudInstancesCollectionHasRelations(t *testing.T) {
+func TestCloudComputingInstancesCollectionHasRelations(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -190,7 +190,7 @@ func TestCloudInstancesCollectionHasRelations(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewCloudInstancesCollection(client)
+	collection := NewCloudComputingInstancesCollection(client)
 
 	ctx := context.TODO()
 
@@ -204,7 +204,7 @@ func TestCloudInstancesCollectionHasRelations(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(true))
 }
 
-func TestCloudInstancesCollectionNext(t *testing.T) {
+func TestCloudComputingInstancesCollectionNext(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -225,11 +225,11 @@ func TestCloudInstancesCollectionNext(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewCloudInstancesCollection(client)
+	collection := NewCloudComputingInstancesCollection(client)
 
 	ctx := context.TODO()
 
-	var list []CloudInstance
+	var list []CloudComputingInstance
 	var err error
 
 	list, err = collection.List(ctx)
@@ -245,7 +245,7 @@ func TestCloudInstancesCollectionNext(t *testing.T) {
 	g.Expect(collection.HasNextPage()).To(Equal(false))
 }
 
-func TestCloudInstancesCollectionPrevious(t *testing.T) {
+func TestCloudComputingInstancesCollectionPrevious(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -267,11 +267,11 @@ func TestCloudInstancesCollectionPrevious(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewCloudInstancesCollection(client).SetPage(2).SetPerPage(2)
+	collection := NewCloudComputingInstancesCollection(client).SetPage(2).SetPerPage(2)
 
 	ctx := context.TODO()
 
-	var list []CloudInstance
+	var list []CloudComputingInstance
 	var err error
 
 	list, err = collection.List(ctx)
@@ -287,7 +287,7 @@ func TestCloudInstancesCollectionPrevious(t *testing.T) {
 	g.Expect(collection.HasPreviousPage()).To(Equal(false))
 }
 
-func TestCloudInstancesCollectionFirst(t *testing.T) {
+func TestCloudComputingInstancesCollectionFirst(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -309,11 +309,11 @@ func TestCloudInstancesCollectionFirst(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewCloudInstancesCollection(client).SetPage(2).SetPerPage(2)
+	collection := NewCloudComputingInstancesCollection(client).SetPage(2).SetPerPage(2)
 
 	ctx := context.TODO()
 
-	var list []CloudInstance
+	var list []CloudComputingInstance
 	var err error
 
 	list, err = collection.List(ctx)
@@ -329,7 +329,7 @@ func TestCloudInstancesCollectionFirst(t *testing.T) {
 	g.Expect(collection.HasFirstPage()).To(Equal(false))
 }
 
-func TestCloudInstancesCollectionLast(t *testing.T) {
+func TestCloudComputingInstancesCollectionLast(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -350,11 +350,11 @@ func TestCloudInstancesCollectionLast(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewCloudInstancesCollection(client)
+	collection := NewCloudComputingInstancesCollection(client)
 
 	ctx := context.TODO()
 
-	var list []CloudInstance
+	var list []CloudComputingInstance
 	var err error
 
 	list, err = collection.List(ctx)
@@ -370,7 +370,7 @@ func TestCloudInstancesCollectionLast(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestCloudInstancesCollectionCollect(t *testing.T) {
+func TestCloudComputingInstancesCollectionCollect(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -400,7 +400,7 @@ func TestCloudInstancesCollectionCollect(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewCloudInstancesCollection(client)
+	collection := NewCloudComputingInstancesCollection(client)
 
 	ctx := context.TODO()
 

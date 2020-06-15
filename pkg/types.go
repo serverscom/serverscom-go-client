@@ -8,6 +8,7 @@ import (
 type Location struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
+	Code string `json:"code"`
 }
 
 // SSLCertificate represents ssl certificate
@@ -43,6 +44,7 @@ type Host struct {
 	ID                 string     `json:"id"`
 	Title              string     `json:"title"`
 	LocationID         int64      `json:"location_id"`
+	LocationCode       string     `json:"location_code"`
 	Status             string     `json:"status"`
 	Configuration      string     `json:"configuration"`
 	PrivateIPv4Address *string    `json:"private_ipv4_address"`
@@ -52,18 +54,35 @@ type Host struct {
 	Updated            time.Time  `json:"updated_at"`
 }
 
+// ConfigurationDetails represents host configuration details
+type ConfigurationDetails struct {
+	RAMSize                 int     `json:"ram_size"`
+	ServerModelID           *int64  `json:"server_model_id"`
+	ServerModelName         *string `json:"server_model_name"`
+	PublicUplinkID          *int64  `json:"public_uplink_id"`
+	PublicUplinkName        *string `json:"public_uplink_name"`
+	PrivateUplinkID         *int64  `json:"private_uplink_id"`
+	PrivateUplinkName       *string `json:"private_uplink_name"`
+	BandwidthID             *int64  `json:"bandwidth_id"`
+	BandwidthName           *string `json:"bandwidth_name"`
+	OperatingSystemID       *int64  `json:"operating_system_id"`
+	OperatingSystemFullName *string `json:"operating_system_name"`
+}
+
 // DedicatedServer represents dedicated server
 type DedicatedServer struct {
-	ID                 string     `json:"id"`
-	Title              string     `json:"title"`
-	LocationID         int64      `json:"location_id"`
-	Status             string     `json:"status"`
-	Configuration      string     `json:"configuration"`
-	PrivateIPv4Address *string    `json:"private_ipv4_address"`
-	PublicIPv4Address  *string    `json:"public_ipv4_address"`
-	ScheduledRelease   *time.Time `json:"scheduled_release_at"`
-	Created            time.Time  `json:"created_at"`
-	Updated            time.Time  `json:"updated_at"`
+	ID                   string               `json:"id"`
+	Title                string               `json:"title"`
+	LocationID           int64                `json:"location_id"`
+	LocationCode         string               `json:"location_code"`
+	Status               string               `json:"status"`
+	Configuration        string               `json:"configuration"`
+	PrivateIPv4Address   *string              `json:"private_ipv4_address"`
+	PublicIPv4Address    *string              `json:"public_ipv4_address"`
+	ScheduledRelease     *time.Time           `json:"scheduled_release_at"`
+	ConfigurationDetails ConfigurationDetails `json:"configuration_details"`
+	Created              time.Time            `json:"created_at"`
+	Updated              time.Time            `json:"updated_at"`
 }
 
 // DedicatedServerLayoutPartitionInput represents partition for DedicatedServerLayoutInput
@@ -95,8 +114,8 @@ type DedicatedServerDrivesInput struct {
 
 // DedicatedServerPublicUplinkInput represents public uplink for DedicatedServerUplinkModelsInput
 type DedicatedServerPublicUplinkInput struct {
-	ID               int64  `json:"id"`
-	BandwidthModelID *int64 `json:"bandwidth_model_id,omitempty"`
+	ID               int64 `json:"id"`
+	BandwidthModelID int64 `json:"bandwidth_model_id"`
 }
 
 // DedicatedServerPrivateUplinkInput represents private uplink for DedicatedServerUplinkModelsInput
@@ -172,6 +191,7 @@ type DedicatedServerCreateInput struct {
 type ServerModelOption struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
+	RAM  int    `json:"ram"`
 }
 
 // RAMOption represents ram option
@@ -183,6 +203,7 @@ type RAMOption struct {
 // OperatingSystemOption represents operating system option
 type OperatingSystemOption struct {
 	ID          int64    `json:"id"`
+	FullName    string   `json:"full_name"`
 	Name        string   `json:"name"`
 	Version     string   `json:"version"`
 	Arch        string   `json:"arch"`
@@ -192,6 +213,7 @@ type OperatingSystemOption struct {
 // UplinkOption represents uplink option
 type UplinkOption struct {
 	ID         int64  `json:"id"`
+	Name       string `json:"name"`
 	Type       string `json:"type"`
 	Speed      int    `json:"speed"`
 	Redundancy bool   `json:"redundancy"`
@@ -200,6 +222,7 @@ type UplinkOption struct {
 // BandwidthOption represents bandwidth option
 type BandwidthOption struct {
 	ID     int64  `json:"id"`
+	Name   string `json:"name"`
 	Type   string `json:"type"`
 	Commit *int64 `json:"commit,omitempty"`
 }
@@ -233,60 +256,84 @@ type SSHKeyUpdateInput struct {
 	Name string `json:"name"`
 }
 
-// CloudInstance represents cloud instance
-type CloudInstance struct {
+// CloudComputingInstance represents cloud instance
+type CloudComputingInstance struct {
 	Name               string    `json:"name"`
 	ID                 string    `json:"id"`
 	OpenstackUUID      string    `json:"openstack_uuid"`
 	Status             string    `json:"status"`
 	FlavorID           string    `json:"flavor_id"`
+	FlavorName         string    `json:"flavor_name"`
 	ImageID            string    `json:"image_id"`
+	ImageName          *string   `json:"image_name"`
 	PublicIPv4Address  *string   `json:"public_ipv4_address"`
 	PrivateIPv4Address *string   `json:"private_ipv4_address"`
-	PublicIpv6Address  *string   `json:"public_ipv6_address"`
+	PublicIPv6Address  *string   `json:"public_ipv6_address"`
+	GPNEnabled         bool      `json:"gpn_enabled"`
+	IPv6Enabled        bool      `json:"ipv6_enabled"`
 	Created            time.Time `json:"created_at"`
 	Updated            time.Time `json:"updated_at"`
 }
 
-// CloudInstanceCreateInput represents cloud instance create input
-type CloudInstanceCreateInput struct {
+// CloudComputingInstanceCreateInput represents cloud instance create input
+type CloudComputingInstanceCreateInput struct {
 	Name              string  `json:"name"`
-	RegionID          int     `json:"region_id"`
+	RegionID          int64   `json:"region_id"`
 	FlavorID          string  `json:"flavor_id"`
 	ImageID           string  `json:"image_id"`
-	GpnEnabled        *bool   `json:"gpn_enabled,omitempty"`
-	Ipv6Enabled       *bool   `json:"ipv6_enabled,omitempty"`
+	GPNEnabled        *bool   `json:"gpn_enabled,omitempty"`
+	IPv6Enabled       *bool   `json:"ipv6_enabled,omitempty"`
 	SSHKeyFingerprint *string `json:"ssh_key_fingerprint,omitempty"`
 	BackupCopies      *int    `json:"backup_copies,omitempty"`
 }
 
-// CloudInstanceUpdateInput represents cloud instance update input
-type CloudInstanceUpdateInput struct {
-	Name         *string `json:"name"`
-	BackupCopies *int    `json:"backup_copies"`
-	GpnEnabled   *bool   `json:"gpn_enabled,omitempty"`
-	Ipv6Enabled  *bool   `json:"ipv6_enabled,omitempty"`
+// CloudComputingInstanceUpdateInput represents cloud instance update input
+type CloudComputingInstanceUpdateInput struct {
+	Name         *string `json:"name,omitempty"`
+	BackupCopies *int    `json:"backup_copies,omitempty"`
+	GPNEnabled   *bool   `json:"gpn_enabled,omitempty"`
+	IPv6Enabled  *bool   `json:"ipv6_enabled,omitempty"`
 }
 
-// CloudInstanceReinstallInput represents cloud instance reinstall input
-type CloudInstanceReinstallInput struct {
+// CloudComputingInstanceReinstallInput represents cloud instance reinstall input
+type CloudComputingInstanceReinstallInput struct {
 	ImageID string `json:"image_id"`
 }
 
-// CloudInstanceUpgradeInput represents cloud instance upgrade input
-type CloudInstanceUpgradeInput struct {
+// CloudComputingInstanceUpgradeInput represents cloud instance upgrade input
+type CloudComputingInstanceUpgradeInput struct {
 	FlavorID string `json:"flavor_id"`
+}
+
+// CloudComputingRegion represents cloud computing region
+type CloudComputingRegion struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+	Code string `json:"code"`
+}
+
+// CloudComputingImage represents cloud computing image
+type CloudComputingImage struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// CloudComputingFlavor represents cloud computing flavor
+type CloudComputingFlavor struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 // L2Segment represents l2 segment
 type L2Segment struct {
-	ID              string    `json:"id"`
-	Name            string    `json:"name"`
-	Type            string    `json:"type"`
-	Status          string    `json:"status"`
-	LocationGroupID int64     `json:"location_group_id"`
-	Created         time.Time `json:"created_at"`
-	Updated         time.Time `json:"updated_at"`
+	ID                string    `json:"id"`
+	Name              string    `json:"name"`
+	Type              string    `json:"type"`
+	Status            string    `json:"status"`
+	LocationGroupID   int64     `json:"location_group_id"`
+	LocationGroupCode string    `json:"location_group_code"`
+	Created           time.Time `json:"created_at"`
+	Updated           time.Time `json:"updated_at"`
 }
 
 // L2SegmentMemberInput represents l2 segment member input for L2SegmentCreateInput and L2SegmentUpdateInput
@@ -353,6 +400,7 @@ type Network struct {
 type L2LocationGroup struct {
 	ID          int64   `json:"id"`
 	Name        string  `json:"name"`
+	Code        string  `json:"code"`
 	GroupType   string  `json:"group_type"`
 	LocationIDs []int64 `json:"location_ids"`
 }

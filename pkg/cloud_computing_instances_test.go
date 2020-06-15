@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestCloudInstancesCreate(t *testing.T) {
+func TestCloudComputingInstancesCreate(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -19,7 +19,7 @@ func TestCloudInstancesCreate(t *testing.T) {
 
 	defer ts.Close()
 
-	input := CloudInstanceCreateInput{
+	input := CloudComputingInstanceCreateInput{
 		Name:     "test-instance-2",
 		FlavorID: "102",
 		ImageID:  "76effbf9-76e5-46d2-a21d-ee2a72cc8757",
@@ -28,7 +28,7 @@ func TestCloudInstancesCreate(t *testing.T) {
 
 	ctx := context.TODO()
 
-	cloudInstance, err := client.CloudInstances.Create(ctx, input)
+	cloudInstance, err := client.CloudComputingInstances.Create(ctx, input)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(cloudInstance).ToNot(BeNil())
@@ -41,12 +41,12 @@ func TestCloudInstancesCreate(t *testing.T) {
 	g.Expect(cloudInstance.ImageID).To(Equal("76effbf9-76e5-46d2-a21d-ee2a72cc8757"))
 	g.Expect(cloudInstance.PublicIPv4Address).To(BeNil())
 	g.Expect(cloudInstance.PrivateIPv4Address).To(BeNil())
-	g.Expect(cloudInstance.PublicIpv6Address).To(BeNil())
+	g.Expect(cloudInstance.PublicIPv6Address).To(BeNil())
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:28 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:28 +0000 UTC"))
 }
 
-func TestCloudInstancesGet(t *testing.T) {
+func TestCloudComputingInstancesGet(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -60,7 +60,7 @@ func TestCloudInstancesGet(t *testing.T) {
 
 	ctx := context.TODO()
 
-	cloudInstance, err := client.CloudInstances.Get(ctx, "BDbDxbl2")
+	cloudInstance, err := client.CloudComputingInstances.Get(ctx, "BDbDxbl2")
 
 	g.Expect(err).To(BeNil())
 	g.Expect(cloudInstance).ToNot(BeNil())
@@ -73,12 +73,12 @@ func TestCloudInstancesGet(t *testing.T) {
 	g.Expect(cloudInstance.ImageID).To(Equal("f6c9c585-627a-4113-af8c-a475f5f73a21"))
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
-	g.Expect(*cloudInstance.PublicIpv6Address).To(Equal("::1"))
+	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
 
-func TestCloudInstancesUpdate(t *testing.T) {
+func TestCloudComputingInstancesUpdate(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -94,7 +94,7 @@ func TestCloudInstancesUpdate(t *testing.T) {
 
 	newName := "some"
 
-	cloudInstance, err := client.CloudInstances.Update(ctx, "BDbDxbl2", CloudInstanceUpdateInput{Name: &newName})
+	cloudInstance, err := client.CloudComputingInstances.Update(ctx, "BDbDxbl2", CloudComputingInstanceUpdateInput{Name: &newName})
 
 	g.Expect(err).To(BeNil())
 	g.Expect(cloudInstance).ToNot(BeNil())
@@ -107,12 +107,12 @@ func TestCloudInstancesUpdate(t *testing.T) {
 	g.Expect(cloudInstance.ImageID).To(Equal("f6c9c585-627a-4113-af8c-a475f5f73a21"))
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
-	g.Expect(*cloudInstance.PublicIpv6Address).To(Equal("::1"))
+	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
 
-func TestCloudInstancesDelete(t *testing.T) {
+func TestCloudComputingInstancesDelete(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -125,12 +125,12 @@ func TestCloudInstancesDelete(t *testing.T) {
 
 	ctx := context.TODO()
 
-	err := client.CloudInstances.Delete(ctx, "BDbDxbl2")
+	err := client.CloudComputingInstances.Delete(ctx, "BDbDxbl2")
 
 	g.Expect(err).To(BeNil())
 }
 
-func TestCloudInstancesReinstall(t *testing.T) {
+func TestCloudComputingInstancesReinstall(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -144,7 +144,7 @@ func TestCloudInstancesReinstall(t *testing.T) {
 
 	ctx := context.TODO()
 
-	cloudInstance, err := client.CloudInstances.Reinstall(ctx, "BDbDxbl2", CloudInstanceReinstallInput{ImageID: "18e1cc16-b380-4c37-8ec1-b9d306961aae"})
+	cloudInstance, err := client.CloudComputingInstances.Reinstall(ctx, "BDbDxbl2", CloudComputingInstanceReinstallInput{ImageID: "18e1cc16-b380-4c37-8ec1-b9d306961aae"})
 
 	g.Expect(err).To(BeNil())
 	g.Expect(cloudInstance).ToNot(BeNil())
@@ -157,12 +157,12 @@ func TestCloudInstancesReinstall(t *testing.T) {
 	g.Expect(cloudInstance.ImageID).To(Equal("18e1cc16-b380-4c37-8ec1-b9d306961aae"))
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
-	g.Expect(*cloudInstance.PublicIpv6Address).To(Equal("::1"))
+	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
 
-func TestCloudInstancesRescue(t *testing.T) {
+func TestCloudComputingInstancesRescue(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -176,7 +176,7 @@ func TestCloudInstancesRescue(t *testing.T) {
 
 	ctx := context.TODO()
 
-	cloudInstance, err := client.CloudInstances.Rescue(ctx, "BDbDxbl2")
+	cloudInstance, err := client.CloudComputingInstances.Rescue(ctx, "BDbDxbl2")
 
 	g.Expect(err).To(BeNil())
 	g.Expect(cloudInstance).ToNot(BeNil())
@@ -189,12 +189,12 @@ func TestCloudInstancesRescue(t *testing.T) {
 	g.Expect(cloudInstance.ImageID).To(Equal("18e1cc16-b380-4c37-8ec1-b9d306961aae"))
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
-	g.Expect(*cloudInstance.PublicIpv6Address).To(Equal("::1"))
+	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
 
-func TestCloudInstancesUnrescue(t *testing.T) {
+func TestCloudComputingInstancesUnrescue(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -208,7 +208,7 @@ func TestCloudInstancesUnrescue(t *testing.T) {
 
 	ctx := context.TODO()
 
-	cloudInstance, err := client.CloudInstances.Unrescue(ctx, "BDbDxbl2")
+	cloudInstance, err := client.CloudComputingInstances.Unrescue(ctx, "BDbDxbl2")
 
 	g.Expect(err).To(BeNil())
 	g.Expect(cloudInstance).ToNot(BeNil())
@@ -221,12 +221,12 @@ func TestCloudInstancesUnrescue(t *testing.T) {
 	g.Expect(cloudInstance.ImageID).To(Equal("18e1cc16-b380-4c37-8ec1-b9d306961aae"))
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
-	g.Expect(*cloudInstance.PublicIpv6Address).To(Equal("::1"))
+	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
 
-func TestCloudInstancesUpgrade(t *testing.T) {
+func TestCloudComputingInstancesUpgrade(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -240,7 +240,7 @@ func TestCloudInstancesUpgrade(t *testing.T) {
 
 	ctx := context.TODO()
 
-	cloudInstance, err := client.CloudInstances.Upgrade(ctx, "BDbDxbl2", CloudInstanceUpgradeInput{FlavorID: "103"})
+	cloudInstance, err := client.CloudComputingInstances.Upgrade(ctx, "BDbDxbl2", CloudComputingInstanceUpgradeInput{FlavorID: "103"})
 
 	g.Expect(err).To(BeNil())
 	g.Expect(cloudInstance).ToNot(BeNil())
@@ -253,12 +253,12 @@ func TestCloudInstancesUpgrade(t *testing.T) {
 	g.Expect(cloudInstance.ImageID).To(Equal("18e1cc16-b380-4c37-8ec1-b9d306961aae"))
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
-	g.Expect(*cloudInstance.PublicIpv6Address).To(Equal("::1"))
+	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
 
-func TestCloudInstancesRevertUpgrade(t *testing.T) {
+func TestCloudComputingInstancesRevertUpgrade(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -272,7 +272,7 @@ func TestCloudInstancesRevertUpgrade(t *testing.T) {
 
 	ctx := context.TODO()
 
-	cloudInstance, err := client.CloudInstances.RevertUpgrade(ctx, "BDbDxbl2")
+	cloudInstance, err := client.CloudComputingInstances.RevertUpgrade(ctx, "BDbDxbl2")
 
 	g.Expect(err).To(BeNil())
 	g.Expect(cloudInstance).ToNot(BeNil())
@@ -285,12 +285,12 @@ func TestCloudInstancesRevertUpgrade(t *testing.T) {
 	g.Expect(cloudInstance.ImageID).To(Equal("18e1cc16-b380-4c37-8ec1-b9d306961aae"))
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
-	g.Expect(*cloudInstance.PublicIpv6Address).To(Equal("::1"))
+	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
 
-func TestCloudInstancesApproveUpgrade(t *testing.T) {
+func TestCloudComputingInstancesApproveUpgrade(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -304,7 +304,7 @@ func TestCloudInstancesApproveUpgrade(t *testing.T) {
 
 	ctx := context.TODO()
 
-	cloudInstance, err := client.CloudInstances.ApproveUpgrade(ctx, "BDbDxbl2")
+	cloudInstance, err := client.CloudComputingInstances.ApproveUpgrade(ctx, "BDbDxbl2")
 
 	g.Expect(err).To(BeNil())
 	g.Expect(cloudInstance).ToNot(BeNil())
@@ -317,12 +317,12 @@ func TestCloudInstancesApproveUpgrade(t *testing.T) {
 	g.Expect(cloudInstance.ImageID).To(Equal("18e1cc16-b380-4c37-8ec1-b9d306961aae"))
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
-	g.Expect(*cloudInstance.PublicIpv6Address).To(Equal("::1"))
+	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
 
-func TestCloudInstancesPowerOn(t *testing.T) {
+func TestCloudComputingInstancesPowerOn(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -336,7 +336,7 @@ func TestCloudInstancesPowerOn(t *testing.T) {
 
 	ctx := context.TODO()
 
-	cloudInstance, err := client.CloudInstances.PowerOn(ctx, "BDbDxbl2")
+	cloudInstance, err := client.CloudComputingInstances.PowerOn(ctx, "BDbDxbl2")
 
 	g.Expect(err).To(BeNil())
 	g.Expect(cloudInstance).ToNot(BeNil())
@@ -349,12 +349,12 @@ func TestCloudInstancesPowerOn(t *testing.T) {
 	g.Expect(cloudInstance.ImageID).To(Equal("18e1cc16-b380-4c37-8ec1-b9d306961aae"))
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
-	g.Expect(*cloudInstance.PublicIpv6Address).To(Equal("::1"))
+	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
 
-func TestCloudInstancesPowerOff(t *testing.T) {
+func TestCloudComputingInstancesPowerOff(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -368,7 +368,7 @@ func TestCloudInstancesPowerOff(t *testing.T) {
 
 	ctx := context.TODO()
 
-	cloudInstance, err := client.CloudInstances.PowerOff(ctx, "BDbDxbl2")
+	cloudInstance, err := client.CloudComputingInstances.PowerOff(ctx, "BDbDxbl2")
 
 	g.Expect(err).To(BeNil())
 	g.Expect(cloudInstance).ToNot(BeNil())
@@ -381,12 +381,12 @@ func TestCloudInstancesPowerOff(t *testing.T) {
 	g.Expect(cloudInstance.ImageID).To(Equal("18e1cc16-b380-4c37-8ec1-b9d306961aae"))
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
-	g.Expect(*cloudInstance.PublicIpv6Address).To(Equal("::1"))
+	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
 
-func TestCloudInstancesCreatePTRRecord(t *testing.T) {
+func TestCloudComputingInstancesCreatePTRRecord(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -410,7 +410,7 @@ func TestCloudInstancesCreatePTRRecord(t *testing.T) {
 		Priority: &priorityValue,
 	}
 
-	ptrRecord, err := client.CloudInstances.CreatePTRRecord(ctx, "xkazYeJ0", input)
+	ptrRecord, err := client.CloudComputingInstances.CreatePTRRecord(ctx, "xkazYeJ0", input)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(ptrRecord).ToNot(BeNil())
@@ -422,7 +422,7 @@ func TestCloudInstancesCreatePTRRecord(t *testing.T) {
 	g.Expect(ptrRecord.TTL).To(Equal(60))
 }
 
-func TestCloudInstancesDeletePTRRecord(t *testing.T) {
+func TestCloudComputingInstancesDeletePTRRecord(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
@@ -435,7 +435,7 @@ func TestCloudInstancesDeletePTRRecord(t *testing.T) {
 
 	ctx := context.TODO()
 
-	err := client.CloudInstances.DeletePTRRecord(ctx, "xkazYeJ0", "oQeZzvep")
+	err := client.CloudComputingInstances.DeletePTRRecord(ctx, "xkazYeJ0", "oQeZzvep")
 
 	g.Expect(err).To(BeNil())
 }

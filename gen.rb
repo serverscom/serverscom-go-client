@@ -79,11 +79,11 @@ CollectionGenerator.new(
 ).render_to_file('pkg/ssh_keys_collection.go')
 
 CollectionGenerator.new(
-  name: 'CloudInstance',
+  name: 'CloudComputingInstance',
   path: '/cloud_computing/instances',
-  entity: 'CloudInstance',
-  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListCloudInstances'
-).render_to_file('pkg/cloud_instances_collection.go')
+  entity: 'CloudComputingInstance',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListCloudComputingInstances'
+).render_to_file('pkg/cloud_computing_instances_collection.go')
 
 CollectionGenerator.new(
   name: 'L2Segment',
@@ -152,10 +152,33 @@ CollectionGenerator.new(
 ).render_to_file('pkg/host_drive_slots_collection.go')
 
 CollectionGenerator.new(
-  name: 'CloudInstancePTRRecord',
+  name: 'CloudComputingInstancePTRRecord',
   path: '/cloud_computing/instances/%s/ptr_records',
   entity: 'PTRRecord',
   api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ReturnsInstancePtrRecords',
   var_prefix: 'cloudInstancePTRs',
   args: {cloudInstanceID: 'string'}
-).render_to_file('pkg/cloud_instance_ptr_records_collection.go')
+).render_to_file('pkg/cloud_computing_instance_ptr_records_collection.go')
+
+CollectionGenerator.new(
+  name: 'CloudComputingRegion',
+  path: '/cloud_computing/regions',
+  entity: 'CloudComputingRegion',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListCloudRegions'
+).render_to_file('pkg/cloud_computing_regions_collection.go')
+
+CollectionGenerator.new(
+  name: 'CloudComputingImage',
+  path: '/cloud_computing/regions/%d/images',
+  entity: 'CloudComputingImage',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListCloudImages',
+  args: {regionID: 'int64'}
+).render_to_file('pkg/cloud_computing_images_collection.go')
+
+CollectionGenerator.new(
+  name: 'CloudComputingFlavor',
+  path: '/cloud_computing/regions/%d/flavors',
+  entity: 'CloudComputingFlavor',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListCloudFlavors',
+  args: {regionID: 'int64'}
+).render_to_file('pkg/cloud_computing_flavors_collection.go')
