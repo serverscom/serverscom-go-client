@@ -66,7 +66,7 @@ type ConfigurationDetails struct {
 	BandwidthID             *int64  `json:"bandwidth_id"`
 	BandwidthName           *string `json:"bandwidth_name"`
 	OperatingSystemID       *int64  `json:"operating_system_id"`
-	OperatingSystemFullName *string `json:"operating_system_name"`
+	OperatingSystemFullName *string `json:"operating_system_full_name"`
 }
 
 // DedicatedServer represents dedicated server
