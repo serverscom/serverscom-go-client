@@ -27,6 +27,8 @@ type Client struct {
 	SSHKeys               SSHKeysService
 	SSLCertificates       SSLCertificatesService
 
+	NetworkPools NetworkPoolsService
+
 	token string
 
 	client *http.Client
@@ -70,6 +72,7 @@ func (cli *Client) configureResources() {
 	cli.CloudComputingRegions = &CloudComputingRegionsHandler{cli}
 	cli.SSHKeys = &SSHKeysHandler{cli}
 	cli.SSLCertificates = &SSLCertificatesHandler{cli}
+	cli.NetworkPools = &NetworkPoolsHandler{cli}
 }
 
 func (cli *Client) buildURL(path string, values ...interface{}) string {

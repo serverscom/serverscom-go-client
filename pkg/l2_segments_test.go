@@ -26,8 +26,8 @@ func TestL2SegmentsCreate(t *testing.T) {
 		Type:            "public",
 		LocationGroupID: int64(1),
 		Members: []L2SegmentMemberInput{
-			L2SegmentMemberInput{ID: "a", Mode: "native"},
-			L2SegmentMemberInput{ID: "b", Mode: "trunk"},
+			{ID: "a", Mode: "native"},
+			{ID: "b", Mode: "trunk"},
 		},
 	}
 
@@ -173,7 +173,7 @@ func TestL2SegmentsChangeNetworksCreateOnly(t *testing.T) {
 
 	input := L2SegmentChangeNetworksInput{
 		Create: []L2SegmentCreateNetworksInput{
-			L2SegmentCreateNetworksInput{Mask: 32, DistributionMethod: "route"},
+			{Mask: 32, DistributionMethod: "route"},
 		},
 	}
 

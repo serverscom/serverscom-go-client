@@ -1,0 +1,10 @@
+{
+  "id": "b",
+  "network_pool_id": "a",
+  "title": "Public",
+  "cidr": "100.10.32.0/29",
+  "attached": true,
+  "interface_type": "public",
+  "updated_at": "2021-03-24T11:46:53Z",
+  "created_at": "2021-03-24T11:46:53Z"
+}
