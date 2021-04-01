@@ -131,7 +131,9 @@ type DedicatedServerUplinkModelsInput struct {
 
 // DedicatedServerHostInput represents hosts for DedicatedServerCreateInput
 type DedicatedServerHostInput struct {
-	Hostname string `json:"hostname"`
+	Hostname             string  `json:"hostname"`
+	PublicIPv4NetworkID  *string `json:"public_ipv4_network_id,omitempty"`
+	PrivateIPv4NetworkID *string `json:"private_ipv4_network_id,omitempty"`
 }
 
 // DedicatedServerCreateInput represents dedicated server create input, example:

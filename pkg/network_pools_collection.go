@@ -35,6 +35,8 @@ type NetworkPoolsCollection interface {
 	SetPage(page int) NetworkPoolsCollection
 	SetPerPage(perPage int) NetworkPoolsCollection
 
+	SetSearchPattern(searchPattern string) NetworkPoolsCollection
+
 	Refresh(ctx context.Context) error
 }
 
@@ -216,6 +218,13 @@ func (col *NetworkPoolsCollectionHandler) SetPerPage(perPage int) NetworkPoolsCo
 	}
 
 	col.applyParam("per_page", currentPerPage)
+
+	return col
+}
+
+// SetSearchPattern sets "search_pattern" param
+func (col *NetworkPoolsCollectionHandler) SetSearchPattern(searchPattern string) NetworkPoolsCollection {
+	col.applyParam("search_pattern", searchPattern)
 
 	return col
 }

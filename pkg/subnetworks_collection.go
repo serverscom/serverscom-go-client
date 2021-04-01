@@ -35,6 +35,8 @@ type SubnetworksCollection interface {
 	SetPage(page int) SubnetworksCollection
 	SetPerPage(perPage int) SubnetworksCollection
 
+	SetSearchPattern(searchPattern string) SubnetworksCollection
+
 	Refresh(ctx context.Context) error
 }
 
@@ -220,6 +222,13 @@ func (col *SubnetworksCollectionHandler) SetPerPage(perPage int) SubnetworksColl
 	}
 
 	col.applyParam("per_page", currentPerPage)
+
+	return col
+}
+
+// SetSearchPattern sets "search_pattern" param
+func (col *SubnetworksCollectionHandler) SetSearchPattern(searchPattern string) SubnetworksCollection {
+	col.applyParam("search_pattern", searchPattern)
 
 	return col
 }
