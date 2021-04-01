@@ -34,16 +34,16 @@ func TestHostsCreateDedicatedServers(t *testing.T) {
 		},
 		Drives: DedicatedServerDrivesInput{
 			Slots: []DedicatedServerSlotInput{
-				DedicatedServerSlotInput{Position: 0, DriveModelID: &driveModelID},
-				DedicatedServerSlotInput{Position: 1, DriveModelID: &driveModelID},
+				{Position: 0, DriveModelID: &driveModelID},
+				{Position: 1, DriveModelID: &driveModelID},
 			},
 			Layout: []DedicatedServerLayoutInput{
-				DedicatedServerLayoutInput{
+				{
 					SlotPositions: []int{0, 1},
 					Raid:          &raidLevel,
 					Partitions: []DedicatedServerLayoutPartitionInput{
-						DedicatedServerLayoutPartitionInput{Target: "swap", Size: 4096, Fill: false},
-						DedicatedServerLayoutPartitionInput{Target: "/", Fs: &rootFilesystem, Size: 100000, Fill: true},
+						{Target: "swap", Size: 4096, Fill: false},
+						{Target: "/", Fs: &rootFilesystem, Size: 100000, Fill: true},
 					},
 				},
 			},
@@ -54,8 +54,8 @@ func TestHostsCreateDedicatedServers(t *testing.T) {
 			"48:81:0c:43:99:12:71:5e:ba:fd:e7:2f:20:d7:95:e8",
 		},
 		Hosts: []DedicatedServerHostInput{
-			DedicatedServerHostInput{Hostname: "example.aa"},
-			DedicatedServerHostInput{Hostname: "example.bb"},
+			{Hostname: "example.aa"},
+			{Hostname: "example.bb"},
 		},
 	}
 
@@ -386,12 +386,12 @@ func TestHostsReinstallOperatingSystemForDedicatedServer(t *testing.T) {
 		Hostname: "new-hostname",
 		Drives: OperatingSystemReinstallDrivesInput{
 			Layout: []OperatingSystemReinstallLayoutInput{
-				OperatingSystemReinstallLayoutInput{
+				{
 					SlotPositions: []int{0, 1},
 					Raid:          &raidLevel,
 					Partitions: []OperatingSystemReinstallPartitionInput{
-						OperatingSystemReinstallPartitionInput{Target: "swap", Size: 4096, Fill: false},
-						OperatingSystemReinstallPartitionInput{Target: "/", Fs: &rootFilesystem, Size: 100000, Fill: true},
+						{Target: "swap", Size: 4096, Fill: false},
+						{Target: "/", Fs: &rootFilesystem, Size: 100000, Fill: true},
 					},
 				},
 			},

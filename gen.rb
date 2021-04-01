@@ -182,3 +182,20 @@ CollectionGenerator.new(
   api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListCloudFlavors',
   args: {regionID: 'int64'}
 ).render_to_file('pkg/cloud_computing_flavors_collection.go')
+
+CollectionGenerator.new(
+  name: 'NetworkPool',
+  path: '/network_pools',
+  entity: 'NetworkPool',
+  params: {search_pattern: 'string'},
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListNetworkPools',
+).render_to_file('pkg/network_pools_collection.go')
+
+CollectionGenerator.new(
+  name: 'Subnetwork',
+  path: '/network_pools/%s/subnetworks',
+  entity: 'Subnetwork',
+  args: {networkPoolID: 'string'},
+  params: {search_pattern: 'string'},
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllSubnetworks',
+).render_to_file('pkg/subnetworks_collection.go')

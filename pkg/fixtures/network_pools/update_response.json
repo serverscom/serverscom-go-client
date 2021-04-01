@@ -1,0 +1,11 @@
+{
+  "id": "a",
+  "title": "some",
+  "cidr": "10.0.0.0/20",
+  "type": "private",
+  "location_ids": [
+    551
+  ],
+  "updated_at": "2021-03-24T11:46:38Z",
+  "created_at": "2021-03-24T11:46:37Z"
+}

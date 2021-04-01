@@ -131,7 +131,9 @@ type DedicatedServerUplinkModelsInput struct {
 
 // DedicatedServerHostInput represents hosts for DedicatedServerCreateInput
 type DedicatedServerHostInput struct {
-	Hostname string `json:"hostname"`
+	Hostname             string  `json:"hostname"`
+	PublicIPv4NetworkID  *string `json:"public_ipv4_network_id,omitempty"`
+	PrivateIPv4NetworkID *string `json:"private_ipv4_network_id,omitempty"`
 }
 
 // DedicatedServerCreateInput represents dedicated server create input, example:
@@ -470,4 +472,44 @@ type HostDriveSlot struct {
 	Interface  string      `json:"interface"`
 	FormFactor string      `json:"form_factor"`
 	DriveModel *DriveModel `json:"drive_model"`
+}
+
+// NetworkPool represents network pool
+type NetworkPool struct {
+	ID          string    `json:"id"`
+	Title       *string   `json:"title"`
+	CIDR        string    `json:"cidr"`
+	Type        string    `json:"type"`
+	LocationIDs []int     `json:"location_ids"`
+	Created     time.Time `json:"created_at"`
+	Updated     time.Time `json:"updated_at"`
+}
+
+// NetworkPoolInput represents network pool input
+type NetworkPoolInput struct {
+	Title *string `json:"title"`
+}
+
+// Subnetwork represents subnetwork
+type Subnetwork struct {
+	ID            string    `json:"id"`
+	NetworkPoolID string    `json:"network_pool_id"`
+	Title         *string   `json:"title"`
+	CIDR          string    `json:"cidr"`
+	Attached      bool      `json:"attached"`
+	InterfaceType string    `json:"interface_type"`
+	Created       time.Time `json:"created_at"`
+	Updated       time.Time `json:"updated_at"`
+}
+
+// SubnetworkUpdateInput respresents subnetwork update input
+type SubnetworkUpdateInput struct {
+	Title *string `json:"title"`
+}
+
+// SubnetworkCreateInput represents subnetwork create input
+type SubnetworkCreateInput struct {
+	Title *string `json:"title"`
+	CIDR  *string `json:"cidr,omitempty"`
+	Mask  *int    `json:"mask,omitempty"`
 }
