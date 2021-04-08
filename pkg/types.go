@@ -187,6 +187,7 @@ type DedicatedServerCreateInput struct {
 	Hosts              []DedicatedServerHostInput       `json:"hosts"`
 	OperatingSystemID  *int64                           `json:"operating_system_id"`
 	SSHKeyFingerprints []string                         `json:"ssh_key_fingerprints,omitempty"`
+	UserData           *string                          `json:"user_data,omitempty"`
 }
 
 // ServerModelOption represents server model option
