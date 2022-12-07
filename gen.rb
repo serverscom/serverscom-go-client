@@ -13,7 +13,8 @@ CollectionGenerator.new(
   name: 'Host',
   path: '/hosts',
   entity: 'Host',
-  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllHosts'
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllHosts',
+  params: {search_pattern: 'string'}
 ).render_to_file('pkg/hosts_collection.go')
 
 CollectionGenerator.new(
@@ -82,7 +83,8 @@ CollectionGenerator.new(
   name: 'CloudComputingInstance',
   path: '/cloud_computing/instances',
   entity: 'CloudComputingInstance',
-  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListCloudComputingInstances'
+  api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListCloudComputingInstances',
+  params: {search_pattern: 'string'}
 ).render_to_file('pkg/cloud_computing_instances_collection.go')
 
 CollectionGenerator.new(
@@ -199,3 +201,11 @@ CollectionGenerator.new(
   params: {search_pattern: 'string'},
   api_url: 'https://developers.servers.com/api-documentation/v1/#operation/ListAllSubnetworks',
 ).render_to_file('pkg/subnetworks_collection.go')
+
+CollectionGenerator.new(
+  name: 'LoadBalancer',
+  path: '/load_balancers',
+  entity: 'LoadBalancer',
+  api_url: 'https://developers.servers.com/api-documentation/v1/#tag/Load-Balancer/operation/ListAllLoadBalancers',
+  params: {search_pattern: 'string', type: 'string'}
+).render_to_file('pkg/load_balancers_collection.go')

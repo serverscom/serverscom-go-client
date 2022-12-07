@@ -19,6 +19,8 @@ const (
 	dedicatedServerPTRRecordCreatePath = "/hosts/dedicated_servers/%s/ptr_records"
 	dedicatedServerPTRRecordDeletePath = "/hosts/dedicated_servers/%s/ptr_records/%s"
 	dedicatedServerReinstallPath       = "/hosts/dedicated_servers/%s/reinstall"
+
+	kubernetesBaremetalNodePath = "/hosts/kubernetes_baremetal_nodes/%s"
 )
 
 // HostsService is an interface for interfacing with Host, Dedicated Server endpoints
@@ -31,6 +33,7 @@ type HostsService interface {
 
 	// Generic operations
 	GetDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
+	GetKubernetesBaremetalNode(ctx context.Context, id string) (*KubernetesBaremetalNode, error)
 	CreateDedicatedServers(ctx context.Context, input DedicatedServerCreateInput) ([]DedicatedServer, error)
 
 	// Additional operations
@@ -79,6 +82,25 @@ func (h *HostsHandler) GetDedicatedServer(ctx context.Context, id string) (*Dedi
 	}
 
 	return dedicatedServer, nil
+}
+
+// GetKubernetesBaremetalNode returns a kubernetes baremetal node
+func (h *HostsHandler) GetKubernetesBaremetalNode(ctx context.Context, id string) (*KubernetesBaremetalNode, error) {
+	url := h.client.buildURL(kubernetesBaremetalNodePath, []interface{}{id}...)
+
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	kubernetesBaremetalNode := new(KubernetesBaremetalNode)
+
+	if err := json.Unmarshal(body, &kubernetesBaremetalNode); err != nil {
+		return nil, err
+	}
+
+	return kubernetesBaremetalNode, nil
 }
 
 // CreateDedicatedServers creates a dedicated servers

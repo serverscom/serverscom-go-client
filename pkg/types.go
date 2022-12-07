@@ -42,10 +42,13 @@ type SSLCertificateCreateCustomInput struct {
 // Host represents host
 type Host struct {
 	ID                 string     `json:"id"`
+	Type               string     `json:"type"`
 	Title              string     `json:"title"`
 	LocationID         int64      `json:"location_id"`
 	LocationCode       string     `json:"location_code"`
 	Status             string     `json:"status"`
+	OperationalStatus  string     `json:"operational_status"`
+	PowerStatus        string     `json:"power_status"`
 	Configuration      string     `json:"configuration"`
 	PrivateIPv4Address *string    `json:"private_ipv4_address"`
 	PublicIPv4Address  *string    `json:"public_ipv4_address"`
@@ -72,10 +75,32 @@ type ConfigurationDetails struct {
 // DedicatedServer represents dedicated server
 type DedicatedServer struct {
 	ID                   string               `json:"id"`
+	Type                 string               `json:"type"`
 	Title                string               `json:"title"`
 	LocationID           int64                `json:"location_id"`
 	LocationCode         string               `json:"location_code"`
 	Status               string               `json:"status"`
+	OperationalStatus    string               `json:"operational_status"`
+	PowerStatus          string               `json:"power_status"`
+	Configuration        string               `json:"configuration"`
+	PrivateIPv4Address   *string              `json:"private_ipv4_address"`
+	PublicIPv4Address    *string              `json:"public_ipv4_address"`
+	ScheduledRelease     *time.Time           `json:"scheduled_release_at"`
+	ConfigurationDetails ConfigurationDetails `json:"configuration_details"`
+	Created              time.Time            `json:"created_at"`
+	Updated              time.Time            `json:"updated_at"`
+}
+
+// KubernetesBaremetalNode represents kubernetes baremetal node
+type KubernetesBaremetalNode struct {
+	ID                   string               `json:"id"`
+	Type                 string               `json:"type"`
+	Title                string               `json:"title"`
+	LocationID           int64                `json:"location_id"`
+	LocationCode         string               `json:"location_code"`
+	Status               string               `json:"status"`
+	OperationalStatus    string               `json:"operational_status"`
+	PowerStatus          string               `json:"power_status"`
 	Configuration        string               `json:"configuration"`
 	PrivateIPv4Address   *string              `json:"private_ipv4_address"`
 	PublicIPv4Address    *string              `json:"public_ipv4_address"`
@@ -138,44 +163,44 @@ type DedicatedServerHostInput struct {
 
 // DedicatedServerCreateInput represents dedicated server create input, example:
 //
-//  driveModelID := int64(1)
-//  osUbuntuServerID := int64(1)
-//  rootFilesystem := "ext4"
-//  raidLevel := 0
+//	driveModelID := int64(1)
+//	osUbuntuServerID := int64(1)
+//	rootFilesystem := "ext4"
+//	raidLevel := 0
 //
-//  input := DedicatedServerCreateInput{
-//    ServerModelID: int64(1),
-//    LocationID: int64(1),
-//    RAMSize: 32,
-//    UplinkModels: DedicatedServerUplinkModelInput{
-//      PublicUplink &DedicatedServerPublicUplinkInput{ID: int64(1), BandwidthModelID: int64(1)},
-//      PrivateUplink: DedicatedServerPrivateUplinkInput{ID: int64(2)},
-//    },
-//    Drives: DedicatedServerDrivesInput{
-//      Slots: []DedicatedServerSlotInput{
-//        DedicatedServerSlotInput{Position: 0, DriveModelID: &driveModelID},
-//        DedicatedServerSlotInput{Position: 1, DriveModelID: &driveModelID},
-//      },
-//      Layout: []DedicatedServerLayoutInput{
-//        DedicatedServerLayoutInput{
-//          SlotPositions: []int{0, 1},
-//          Riad:          &raidLevel,
-//          Partitions:    []DedicatedServerLayoutPartitionInput{
-//            DedicatedServerLayoutPartitionInput{Target: "swap", Size: 4096, Fill: false},
-//            DedicatedServerLayoutPartitionInput{Target: "/", Fs: &rootFilesystem, Size: 100000, Fill: true},
-//          },
-//        },
-//      },
-//    },
-//    IPv6: true,
-//    OperatingSystemID: &osUbuntuServerID,
-//    SSHKeyFingerprints: []string{
-//      "48:81:0c:43:99:12:71:5e:ba:fd:e7:2f:20:d7:95:e8"
-//    },
-//    Hosts: []DedicatedServerHostInput{
-//      Hostname: "example-host",
-//    },
-//  }
+//	input := DedicatedServerCreateInput{
+//	  ServerModelID: int64(1),
+//	  LocationID: int64(1),
+//	  RAMSize: 32,
+//	  UplinkModels: DedicatedServerUplinkModelInput{
+//	    PublicUplink &DedicatedServerPublicUplinkInput{ID: int64(1), BandwidthModelID: int64(1)},
+//	    PrivateUplink: DedicatedServerPrivateUplinkInput{ID: int64(2)},
+//	  },
+//	  Drives: DedicatedServerDrivesInput{
+//	    Slots: []DedicatedServerSlotInput{
+//	      DedicatedServerSlotInput{Position: 0, DriveModelID: &driveModelID},
+//	      DedicatedServerSlotInput{Position: 1, DriveModelID: &driveModelID},
+//	    },
+//	    Layout: []DedicatedServerLayoutInput{
+//	      DedicatedServerLayoutInput{
+//	        SlotPositions: []int{0, 1},
+//	        Riad:          &raidLevel,
+//	        Partitions:    []DedicatedServerLayoutPartitionInput{
+//	          DedicatedServerLayoutPartitionInput{Target: "swap", Size: 4096, Fill: false},
+//	          DedicatedServerLayoutPartitionInput{Target: "/", Fs: &rootFilesystem, Size: 100000, Fill: true},
+//	        },
+//	      },
+//	    },
+//	  },
+//	  IPv6: true,
+//	  OperatingSystemID: &osUbuntuServerID,
+//	  SSHKeyFingerprints: []string{
+//	    "48:81:0c:43:99:12:71:5e:ba:fd:e7:2f:20:d7:95:e8"
+//	  },
+//	  Hosts: []DedicatedServerHostInput{
+//	    Hostname: "example-host",
+//	  },
+//	}
 type DedicatedServerCreateInput struct {
 	ServerModelID      int64                            `json:"server_model_id"`
 	LocationID         int64                            `json:"location_id"`
@@ -263,6 +288,8 @@ type SSHKeyUpdateInput struct {
 type CloudComputingInstance struct {
 	Name               string    `json:"name"`
 	ID                 string    `json:"id"`
+	RegionID           int64     `json:"region_id"`
+	RegionCode         string    `json:"region_cod"`
 	OpenstackUUID      string    `json:"openstack_uuid"`
 	Status             string    `json:"status"`
 	FlavorID           string    `json:"flavor_id"`
@@ -513,4 +540,72 @@ type SubnetworkCreateInput struct {
 	Title *string `json:"title"`
 	CIDR  *string `json:"cidr,omitempty"`
 	Mask  *int    `json:"mask,omitempty"`
+}
+
+// / LoadBalancer represents load balancer
+type LoadBalancer struct {
+	ID                string    `json:"id"`
+	Name              string    `json:"name"`
+	Type              string    `json:"type"`
+	Status            string    `json:"status"`
+	ExternalAddresses []string  `json:"external_addresses"`
+	LocationID        int64     `json:"location_id"`
+	Created           time.Time `json:"created_at"`
+	Updated           time.Time `json:"updated_at"`
+}
+
+// L4LoadBalancer represents l4 load balancer
+type L4LoadBalancer struct {
+	ID                string    `json:"id"`
+	Name              string    `json:"name"`
+	Type              string    `json:"type"`
+	Status            string    `json:"status"`
+	ExternalAddresses []string  `json:"external_addresses"`
+	LocationID        int64     `json:"location_id"`
+	SotreLogs         bool      `json:"store_logs"`
+	Created           time.Time `json:"created_at"`
+	Updated           time.Time `json:"updated_at"`
+}
+
+// L4VHostZoneInput represents l4 vhost zone input
+type L4VHostZoneInput struct {
+	ID                   string  `json:"id"`
+	UDP                  bool    `json:"udp"`
+	ProxyProtocolEnabled bool    `json:"proxy_protocol_enabled"`
+	Ports                []int32 `json:"ports"`
+	Description          *string `json:"description"`
+	UpstreamID           string  `json:"upstream_id"`
+}
+
+// L4UpstreamInput represents l4 upstream input
+type L4UpstreamInput struct {
+	IP     string `json:"ip"`
+	Port   int32  `json:"port"`
+	Weight int32  `json:"weight"`
+}
+
+// L4UpstreamZoneInput represents l4 upstream zone input
+type L4UpstreamZoneInput struct {
+	ID         string            `json:"id"`
+	Method     *string           `json:"method,omitempty"`
+	UDP        bool              `json:"udp"`
+	HCInterval *int              `json:"hc_interval,omitempty"`
+	HCJitter   *int              `json:"hc_jitter,omitempty"`
+	Upstreams  []L4UpstreamInput `json:"upstreams"`
+}
+
+// L4LoadBalancerUpdateInput represents l4 load balancer update input
+type L4LoadBalancerUpdateInput struct {
+	Name          string                `json:"name"`
+	StoreLogs     *bool                 `json:"store_logs,omitempty"`
+	VHostZones    []L4VHostZoneInput    `json:"vhost_zones"`
+	UpstreamZones []L4UpstreamZoneInput `json:"upstream_zones"`
+}
+
+type L4LoadBalancerCreateInput struct {
+	Name          string                `json:"name"`
+	LocationID    int64                 `json:"location_id"`
+	StoreLogs     *bool                 `json:"store_logs,omitempty"`
+	VHostZones    []L4VHostZoneInput    `json:"vhost_zones"`
+	UpstreamZones []L4UpstreamZoneInput `json:"upstream_zones"`
 }

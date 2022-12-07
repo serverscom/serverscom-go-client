@@ -35,6 +35,8 @@ type CloudComputingInstancesCollection interface {
 	SetPage(page int) CloudComputingInstancesCollection
 	SetPerPage(perPage int) CloudComputingInstancesCollection
 
+	SetSearchPattern(searchPattern string) CloudComputingInstancesCollection
+
 	Refresh(ctx context.Context) error
 }
 
@@ -216,6 +218,13 @@ func (col *CloudComputingInstancesCollectionHandler) SetPerPage(perPage int) Clo
 	}
 
 	col.applyParam("per_page", currentPerPage)
+
+	return col
+}
+
+// SetSearchPattern sets "search_pattern" param
+func (col *CloudComputingInstancesCollectionHandler) SetSearchPattern(searchPattern string) CloudComputingInstancesCollection {
+	col.applyParam("search_pattern", searchPattern)
 
 	return col
 }
