@@ -142,7 +142,7 @@ func (fs *fakeServer) Build() (*fakeServer, *Client) {
 
 		if len(fs.Requests) == 0 {
 			w.WriteHeader(http.StatusTeapot)
-			_, err := w.Write([]byte(fmt.Sprintf("End of scenario was reached")))
+			_, err := w.Write([]byte("End of scenario was reached"))
 			crashIfErrorPresent(err)
 			return
 		}
