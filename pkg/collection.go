@@ -25,9 +25,9 @@ type Collection[K any] interface {
 	Collect(ctx context.Context) ([]K, error)
 	List(ctx context.Context) ([]K, error)
 
-	SetPage(page int) *CollectionHandler[K]
-	SetPerPage(perPage int) *CollectionHandler[K]
-	SetParam(name, value string) *CollectionHandler[K]
+	SetPage(page int) Collection[K]
+	SetPerPage(perPage int) Collection[K]
+	SetParam(name, value string) Collection[K]
 
 	Refresh(ctx context.Context) error
 }
@@ -185,7 +185,7 @@ func (col *CollectionHandler[K]) List(ctx context.Context) ([]K, error) {
 }
 
 // SetPage sets current page param.
-func (col *CollectionHandler[K]) SetPage(page int) *CollectionHandler[K] {
+func (col *CollectionHandler[K]) SetPage(page int) Collection[K] {
 	var currentPage string
 
 	if page > 1 {
@@ -200,7 +200,7 @@ func (col *CollectionHandler[K]) SetPage(page int) *CollectionHandler[K] {
 }
 
 // SetPerPage sets current per page param.
-func (col *CollectionHandler[K]) SetPerPage(perPage int) *CollectionHandler[K] {
+func (col *CollectionHandler[K]) SetPerPage(perPage int) Collection[K] {
 	var currentPerPage string
 
 	if perPage > 0 {
@@ -215,7 +215,7 @@ func (col *CollectionHandler[K]) SetPerPage(perPage int) *CollectionHandler[K] {
 }
 
 // SetParam sets param.
-func (col *CollectionHandler[K]) SetParam(name, value string) *CollectionHandler[K] {
+func (col *CollectionHandler[K]) SetParam(name, value string) Collection[K] {
 	col.applyParam(name, value)
 
 	return col
