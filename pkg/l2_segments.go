@@ -6,11 +6,18 @@ import (
 )
 
 const (
+	l2SegmentListPath           = "/l2_segments"
 	l2SegmentPath               = "/l2_segments/%s"
 	l2SegmentCreatePath         = "/l2_segments"
 	l2SegmentUpdatePath         = "/l2_segments/%s"
-	l2SegemntDeletePath         = "/l2_segments/%s"
+	l2SegmentDeletePath         = "/l2_segments/%s"
 	l2SegmentChangeNetworksPath = "/l2_segments/%s/networks"
+
+	l2MemberListPath = "/l2_segments/%s/members"
+
+	l2NetworksListPath = "/l2_segments/%s/networks"
+
+	l2LocationGroupListPath = "/l2_segments/location_groups"
 )
 
 // L2SegmentsService is an interface for interfacing with Host, Dedicated Server endpoints
@@ -18,10 +25,10 @@ const (
 // https://developers.servers.com/api-documentation/v1/#tag/L2-Segment
 type L2SegmentsService interface {
 	// Primary collection
-	Collection() L2SegmentsCollection
+	Collection() Collection[L2Segment]
 
 	// Extra collections
-	LocationGroups() L2LocationGroupsCollection
+	LocationGroups() Collection[L2LocationGroup]
 
 	// Generic operations
 	Get(ctx context.Context, segmentID string) (*L2Segment, error)
@@ -33,8 +40,8 @@ type L2SegmentsService interface {
 	ChangeNetworks(ctx context.Context, segmentID string, input L2SegmentChangeNetworksInput) (*L2Segment, error)
 
 	// Additional collections
-	Members(segmentID string) L2MembersCollection
-	Networks(segmentID string) L2NetworksCollection
+	Members(segmentID string) Collection[L2Member]
+	Networks(segmentID string) Collection[Network]
 }
 
 // L2SegmentsHandler handles  operatings around l2 segments
@@ -42,17 +49,17 @@ type L2SegmentsHandler struct {
 	client *Client
 }
 
-// Collection builds a new L2SegmentsCollection interface
-func (l2 *L2SegmentsHandler) Collection() L2SegmentsCollection {
-	return NewL2SegmentsCollection(l2.client)
+// Collection builds a new Collection[L2Segment] interface
+func (h *L2SegmentsHandler) Collection() Collection[L2Segment] {
+	return NewCollection[L2Segment](h.client, l2SegmentListPath)
 }
 
 // Get l2 segment
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/RetrieveAnExistingL2Segment
-func (l2 *L2SegmentsHandler) Get(ctx context.Context, segmentID string) (*L2Segment, error) {
-	url := l2.client.buildURL(l2SegmentPath, []interface{}{segmentID}...)
+func (h *L2SegmentsHandler) Get(ctx context.Context, segmentID string) (*L2Segment, error) {
+	url := h.client.buildURL(l2SegmentPath, []interface{}{segmentID}...)
 
-	body, err := l2.client.buildAndExecRequest(ctx, "GET", url, nil)
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
 
 	if err != nil {
 		return nil, err
@@ -69,16 +76,16 @@ func (l2 *L2SegmentsHandler) Get(ctx context.Context, segmentID string) (*L2Segm
 
 // Create l2 segment
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/CreateANewL2Segment
-func (l2 *L2SegmentsHandler) Create(ctx context.Context, input L2SegmentCreateInput) (*L2Segment, error) {
+func (h *L2SegmentsHandler) Create(ctx context.Context, input L2SegmentCreateInput) (*L2Segment, error) {
 	payload, err := json.Marshal(input)
 
 	if err != nil {
 		return nil, err
 	}
 
-	url := l2.client.buildURL(l2SegmentCreatePath)
+	url := h.client.buildURL(l2SegmentCreatePath)
 
-	body, err := l2.client.buildAndExecRequest(ctx, "POST", url, payload)
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, payload)
 
 	if err != nil {
 		return nil, err
@@ -95,16 +102,16 @@ func (l2 *L2SegmentsHandler) Create(ctx context.Context, input L2SegmentCreateIn
 
 // Update l2 segment
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/UpdateAnExistingL2Segment
-func (l2 *L2SegmentsHandler) Update(ctx context.Context, segmentID string, input L2SegmentUpdateInput) (*L2Segment, error) {
+func (h *L2SegmentsHandler) Update(ctx context.Context, segmentID string, input L2SegmentUpdateInput) (*L2Segment, error) {
 	payload, err := json.Marshal(input)
 
 	if err != nil {
 		return nil, err
 	}
 
-	url := l2.client.buildURL(l2SegmentUpdatePath, []interface{}{segmentID}...)
+	url := h.client.buildURL(l2SegmentUpdatePath, []interface{}{segmentID}...)
 
-	body, err := l2.client.buildAndExecRequest(ctx, "PUT", url, payload)
+	body, err := h.client.buildAndExecRequest(ctx, "PUT", url, payload)
 
 	if err != nil {
 		return nil, err
@@ -121,41 +128,45 @@ func (l2 *L2SegmentsHandler) Update(ctx context.Context, segmentID string, input
 
 // Delete l2 segment
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/DeleteAnExistingL2Segment
-func (l2 *L2SegmentsHandler) Delete(ctx context.Context, segmentID string) error {
-	url := l2.client.buildURL(l2SegemntDeletePath, []interface{}{segmentID}...)
+func (h *L2SegmentsHandler) Delete(ctx context.Context, segmentID string) error {
+	url := h.client.buildURL(l2SegmentDeletePath, []interface{}{segmentID}...)
 
-	_, err := l2.client.buildAndExecRequest(ctx, "DELETE", url, nil)
+	_, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
 
 	return err
 }
 
-// LocationGroups builds a new L2LocationGroupsCollection interface
-func (l2 *L2SegmentsHandler) LocationGroups() L2LocationGroupsCollection {
-	return NewL2LocationGroupsCollection(l2.client)
+// LocationGroups builds a new Collection[L2LocationGroup] interface
+func (h *L2SegmentsHandler) LocationGroups() Collection[L2LocationGroup] {
+	return NewCollection[L2LocationGroup](h.client, l2LocationGroupListPath)
 }
 
-// Members builds a new L2MembersCollection interface
-func (l2 *L2SegmentsHandler) Members(segmentID string) L2MembersCollection {
-	return NewL2MembersCollection(l2.client, segmentID)
+// Members builds a new Collection[L2Member] interface
+func (h *L2SegmentsHandler) Members(segmentID string) Collection[L2Member] {
+	path := h.client.buildPath(l2MemberListPath, []interface{}{segmentID}...)
+
+	return NewCollection[L2Member](h.client, path)
 }
 
 // Networks builds a new L2NetworksCollection interface
-func (l2 *L2SegmentsHandler) Networks(segmentID string) L2NetworksCollection {
-	return NewL2NetworksCollection(l2.client, segmentID)
+func (h *L2SegmentsHandler) Networks(segmentID string) Collection[Network] {
+	path := h.client.buildPath(l2NetworksListPath, []interface{}{segmentID}...)
+
+	return NewCollection[Network](h.client, path)
 }
 
 // ChangeNetworks changes networks set
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/UpdateAnExistingL2SegmentNetworks
-func (l2 *L2SegmentsHandler) ChangeNetworks(ctx context.Context, segmentID string, input L2SegmentChangeNetworksInput) (*L2Segment, error) {
+func (h *L2SegmentsHandler) ChangeNetworks(ctx context.Context, segmentID string, input L2SegmentChangeNetworksInput) (*L2Segment, error) {
 	payload, err := json.Marshal(input)
 
 	if err != nil {
 		return nil, err
 	}
 
-	url := l2.client.buildURL(l2SegmentChangeNetworksPath, []interface{}{segmentID}...)
+	url := h.client.buildURL(l2SegmentChangeNetworksPath, []interface{}{segmentID}...)
 
-	body, err := l2.client.buildAndExecRequest(ctx, "PUT", url, payload)
+	body, err := h.client.buildAndExecRequest(ctx, "PUT", url, payload)
 
 	if err != nil {
 		return nil, err

@@ -1,4 +1,5 @@
 # github.com/onsi/gomega v1.5.0
+## explicit
 github.com/onsi/gomega
 github.com/onsi/gomega/format
 github.com/onsi/gomega/internal/assertion
@@ -12,10 +13,14 @@ github.com/onsi/gomega/matchers/support/goraph/node
 github.com/onsi/gomega/matchers/support/goraph/util
 github.com/onsi/gomega/types
 # golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
+## explicit; go 1.11
 golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/html/charset
+# golang.org/x/sys v0.0.0-20190412213103-97732733099d
+## explicit; go 1.12
 # golang.org/x/text v0.3.0
+## explicit
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
 golang.org/x/text/encoding/htmlindex
@@ -32,4 +37,5 @@ golang.org/x/text/language
 golang.org/x/text/runes
 golang.org/x/text/transform
 # gopkg.in/yaml.v2 v2.2.1
+## explicit
 gopkg.in/yaml.v2

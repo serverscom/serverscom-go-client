@@ -7,6 +7,32 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func TestHostsEmptyCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.Hosts.Collection()
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
 func TestHostsCreateDedicatedServers(t *testing.T) {
 	g := NewGomegaWithT(t)
 
@@ -417,4 +443,108 @@ func TestHostsReinstallOperatingSystemForDedicatedServer(t *testing.T) {
 	g.Expect(dedicatedServer.ScheduledRelease).To(BeNil())
 	g.Expect(dedicatedServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}
+
+func TestDedicatedServerConnectionsCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/a/connections").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.Hosts.DedicatedServerConnections("a")
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
+func TestDedicatedServerNetworksCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/a/networks").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.Hosts.DedicatedServerNetworks("a")
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
+func TestDedicatedServerDriveSlotsCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/a/drive_slots").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.Hosts.DedicatedServerDriveSlots("a")
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
+func TestDedicatedServerPTRRecordsCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/a/ptr_records").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.Hosts.DedicatedServerPTRRecords("a")
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
 }

@@ -29,6 +29,8 @@ type Client struct {
 
 	NetworkPools NetworkPoolsService
 
+	LoadBalancers LoadBalancersService
+
 	token string
 
 	client *http.Client
@@ -73,6 +75,7 @@ func (cli *Client) configureResources() {
 	cli.SSHKeys = &SSHKeysHandler{cli}
 	cli.SSLCertificates = &SSLCertificatesHandler{cli}
 	cli.NetworkPools = &NetworkPoolsHandler{cli}
+	cli.LoadBalancers = &LoadBalancersHandler{cli}
 }
 
 func (cli *Client) buildURL(path string, values ...interface{}) string {

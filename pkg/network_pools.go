@@ -6,8 +6,10 @@ import (
 )
 
 const (
-	networkPoolPath = "/network_pools/%s"
+	networkPoolListPath = "/network_pools"
+	networkPoolPath     = "/network_pools/%s"
 
+	subnetworkListPath   = "/network_pools/%s/subnetworks"
 	subnetworkCreatePath = "/network_pools/%s/subnetworks"
 	subnetworkPath       = "/network_pools/%s/subnetworks/%s"
 )
@@ -17,7 +19,7 @@ const (
 // https://developers.servers.com/api-documentation/v1/#tag/Network-Pool
 type NetworkPoolsService interface {
 	// Primary collection
-	Collection() NetworkPoolsCollection
+	Collection() Collection[NetworkPool]
 
 	// Generic operations
 	Get(ctx context.Context, id string) (*NetworkPool, error)
@@ -29,7 +31,7 @@ type NetworkPoolsService interface {
 	DeleteSubnetwork(ctx context.Context, networkPoolID, subnetworkID string) error
 
 	// Additional collections
-	Subnetworks(networkPoolID string) SubnetworksCollection
+	Subnetworks(networkPoolID string) Collection[Subnetwork]
 }
 
 // NetworkPoolsHandler handles operations around network pools
@@ -37,17 +39,17 @@ type NetworkPoolsHandler struct {
 	client *Client
 }
 
-// Collection builds a new NetworkPoolsCollection interface
-func (resource *NetworkPoolsHandler) Collection() NetworkPoolsCollection {
-	return NewNetworkPoolsCollection(resource.client)
+// Collection builds a new Collection[NetworkPool] interface
+func (h *NetworkPoolsHandler) Collection() Collection[NetworkPool] {
+	return NewCollection[NetworkPool](h.client, networkPoolListPath)
 }
 
 // Get returns a network pool
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/RetrieveAnExistingNetworkPool
-func (resource *NetworkPoolsHandler) Get(ctx context.Context, id string) (*NetworkPool, error) {
-	url := resource.client.buildURL(networkPoolPath, []interface{}{id}...)
+func (h *NetworkPoolsHandler) Get(ctx context.Context, id string) (*NetworkPool, error) {
+	url := h.client.buildURL(networkPoolPath, []interface{}{id}...)
 
-	body, err := resource.client.buildAndExecRequest(ctx, "GET", url, nil)
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -63,15 +65,15 @@ func (resource *NetworkPoolsHandler) Get(ctx context.Context, id string) (*Netwo
 
 // Update returns updated network pool
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/UpdateAnExistingNetworkPool
-func (resource *NetworkPoolsHandler) Update(ctx context.Context, id string, input NetworkPoolInput) (*NetworkPool, error) {
+func (h *NetworkPoolsHandler) Update(ctx context.Context, id string, input NetworkPoolInput) (*NetworkPool, error) {
 	payload, err := json.Marshal(input)
 	if err != nil {
 		return nil, err
 	}
 
-	url := resource.client.buildURL(networkPoolPath, []interface{}{id}...)
+	url := h.client.buildURL(networkPoolPath, []interface{}{id}...)
 
-	body, err := resource.client.buildAndExecRequest(ctx, "PUT", url, payload)
+	body, err := h.client.buildAndExecRequest(ctx, "PUT", url, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -87,15 +89,15 @@ func (resource *NetworkPoolsHandler) Update(ctx context.Context, id string, inpu
 
 // CreateSubnetwork returns created subnetwork from the pool
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/CreateOrAllocateSubnetworkFromTheNetworkPool
-func (resource *NetworkPoolsHandler) CreateSubnetwork(ctx context.Context, networkPoolID string, input SubnetworkCreateInput) (*Subnetwork, error) {
+func (h *NetworkPoolsHandler) CreateSubnetwork(ctx context.Context, networkPoolID string, input SubnetworkCreateInput) (*Subnetwork, error) {
 	payload, err := json.Marshal(input)
 	if err != nil {
 		return nil, err
 	}
 
-	url := resource.client.buildURL(subnetworkCreatePath, []interface{}{networkPoolID}...)
+	url := h.client.buildURL(subnetworkCreatePath, []interface{}{networkPoolID}...)
 
-	body, err := resource.client.buildAndExecRequest(ctx, "POST", url, payload)
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -111,10 +113,10 @@ func (resource *NetworkPoolsHandler) CreateSubnetwork(ctx context.Context, netwo
 
 // GetSubnetwork returns subnetwork from the pool
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/RetrieveAnExistingSubnetwork
-func (resource *NetworkPoolsHandler) GetSubnetwork(ctx context.Context, networkPoolID, subnetworkID string) (*Subnetwork, error) {
-	url := resource.client.buildURL(subnetworkPath, []interface{}{networkPoolID, subnetworkID}...)
+func (h *NetworkPoolsHandler) GetSubnetwork(ctx context.Context, networkPoolID, subnetworkID string) (*Subnetwork, error) {
+	url := h.client.buildURL(subnetworkPath, []interface{}{networkPoolID, subnetworkID}...)
 
-	body, err := resource.client.buildAndExecRequest(ctx, "GET", url, nil)
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -130,15 +132,15 @@ func (resource *NetworkPoolsHandler) GetSubnetwork(ctx context.Context, networkP
 
 // UpdateSubnetwork returns subnetwork from the pool
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/UpdateAnExistingSubnetwork
-func (resource *NetworkPoolsHandler) UpdateSubnetwork(ctx context.Context, networkPoolID, subnetworkID string, input SubnetworkUpdateInput) (*Subnetwork, error) {
+func (h *NetworkPoolsHandler) UpdateSubnetwork(ctx context.Context, networkPoolID, subnetworkID string, input SubnetworkUpdateInput) (*Subnetwork, error) {
 	payload, err := json.Marshal(input)
 	if err != nil {
 		return nil, err
 	}
 
-	url := resource.client.buildURL(subnetworkPath, []interface{}{networkPoolID, subnetworkID}...)
+	url := h.client.buildURL(subnetworkPath, []interface{}{networkPoolID, subnetworkID}...)
 
-	body, err := resource.client.buildAndExecRequest(ctx, "PUT", url, payload)
+	body, err := h.client.buildAndExecRequest(ctx, "PUT", url, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -154,15 +156,17 @@ func (resource *NetworkPoolsHandler) UpdateSubnetwork(ctx context.Context, netwo
 
 // DeleteSubnetwork delete subnetwork
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/DeleteAnExistingSubnetwork
-func (resource *NetworkPoolsHandler) DeleteSubnetwork(ctx context.Context, networkPoolID, subnetworkID string) error {
-	url := resource.client.buildURL(subnetworkPath, []interface{}{networkPoolID, subnetworkID}...)
+func (h *NetworkPoolsHandler) DeleteSubnetwork(ctx context.Context, networkPoolID, subnetworkID string) error {
+	url := h.client.buildURL(subnetworkPath, []interface{}{networkPoolID, subnetworkID}...)
 
-	_, err := resource.client.buildAndExecRequest(ctx, "DELETE", url, nil)
+	_, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
 
 	return err
 }
 
-// Subnetworks builds a new SubnetworksCollection interface
-func (resource *NetworkPoolsHandler) Subnetworks(networkPoolID string) SubnetworksCollection {
-	return NewSubnetworksCollection(resource.client, networkPoolID)
+// Subnetworks builds a new Collection[Subnetwork] interface
+func (h *NetworkPoolsHandler) Subnetworks(networkPoolID string) Collection[Subnetwork] {
+	path := h.client.buildPath(subnetworkListPath, []interface{}{networkPoolID}...)
+
+	return NewCollection[Subnetwork](h.client, path)
 }

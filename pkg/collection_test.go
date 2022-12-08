@@ -7,11 +7,11 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestSSHKeysEmptyCollection(t *testing.T) {
+func TestEmptyCollection(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithResponseBodyStubInline(`[]`).
 		WithResponseCode(200).
@@ -19,7 +19,7 @@ func TestSSHKeysEmptyCollection(t *testing.T) {
 
 	defer ts.Close()
 
-	collection := NewSSHKeysCollection(client)
+	collection := NewCollection[Host](client, "/hosts")
 
 	ctx := context.TODO()
 
@@ -33,19 +33,19 @@ func TestSSHKeysEmptyCollection(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestSSHKeysCollectionList(t *testing.T) {
+func TestCollectionList(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
-		WithResponseBodyStubInline(`[{"fingerprint": "a"}, {"fingerprint": "b"}]`).
+		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewSSHKeysCollection(client)
+	collection := NewCollection[Host](client, "/hosts")
 
 	ctx := context.TODO()
 
@@ -59,22 +59,22 @@ func TestSSHKeysCollectionList(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestSSHKeysCollectionHasNext(t *testing.T) {
+func TestCollectionHasNext(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/ssh_keys?page=2&per_page=2>; rel="next"`,
+			"Link": `<https://dummy.api.com/hosts?page=2&per_page=2>; rel="next"`,
 		}).
-		WithResponseBodyStubInline(`[{"fingerprint": "a"}, {"fingerprint": "b"}]`).
+		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewSSHKeysCollection(client)
+	collection := NewCollection[Host](client, "/hosts")
 
 	ctx := context.TODO()
 
@@ -88,22 +88,22 @@ func TestSSHKeysCollectionHasNext(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestSSHKeysCollectionHasPrevious(t *testing.T) {
+func TestHostNetworksCollectionHasPrevious(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/ssh_keys?page=1&per_page=2>; rel="prev"`,
+			"Link": `<https://dummy.api.com/hosts?page=1&per_page=2>; rel="prev"`,
 		}).
-		WithResponseBodyStubInline(`[{"fingerprint": "a"}, {"fingerprint": "b"}]`).
+		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewSSHKeysCollection(client)
+	collection := NewCollection[Host](client, "/hosts")
 
 	ctx := context.TODO()
 
@@ -117,22 +117,22 @@ func TestSSHKeysCollectionHasPrevious(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestSSHKeysCollectionHasFirst(t *testing.T) {
+func TestHostNetworksCollectionHasFirst(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/ssh_keys?page=1&per_page=2>; rel="first"`,
+			"Link": `<https://dummy.api.com/hosts?page=1&per_page=2>; rel="first"`,
 		}).
-		WithResponseBodyStubInline(`[{"fingerprint": "a"}, {"fingerprint": "b"}]`).
+		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewSSHKeysCollection(client)
+	collection := NewCollection[Host](client, "/hosts")
 
 	ctx := context.TODO()
 
@@ -146,22 +146,22 @@ func TestSSHKeysCollectionHasFirst(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestSSHKeysCollectionHasLast(t *testing.T) {
+func TestHostNetworksCollectionHasLast(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/ssh_keys?page=2&per_page=2>; rel="last"`,
+			"Link": `<https://dummy.api.com/hosts?page=2&per_page=2>; rel="last"`,
 		}).
-		WithResponseBodyStubInline(`[{"fingerprint": "a"}, {"fingerprint": "b"}]`).
+		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewSSHKeysCollection(client)
+	collection := NewCollection[Host](client, "/hosts")
 
 	ctx := context.TODO()
 
@@ -175,22 +175,22 @@ func TestSSHKeysCollectionHasLast(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(true))
 }
 
-func TestSSHKeysCollectionHasRelations(t *testing.T) {
+func TestHostNetworksCollectionHasRelations(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/ssh_keys?page=3&per_page=2>; rel="next",<https://dummy.api.com/ssh_keys?page=1&per_page=2>; rel="prev",<https://dummy.api.com/ssh_keys?page=1&per_page=2>; rel="first",<https://dummy.api.com/ssh_keys?page=3&per_page=2>; rel="last"`,
+			"Link": `<https://dummy.api.com/hosts?page=3&per_page=2>; rel="next",<https://dummy.api.com/hosts/dedicated_servers/a/networks?page=1&per_page=2>; rel="prev",<https://dummy.api.com/hosts/dedicated_servers/a/networks?page=1&per_page=2>; rel="first",<https://dummy.api.com/hosts/dedicated_servers/a/networks?page=3&per_page=2>; rel="last"`,
 		}).
-		WithResponseBodyStubInline(`[{"fingerprint": "a"}, {"fingerprint": "b"}]`).
+		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewSSHKeysCollection(client)
+	collection := NewCollection[Host](client, "/hosts")
 
 	ctx := context.TODO()
 
@@ -204,32 +204,32 @@ func TestSSHKeysCollectionHasRelations(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(true))
 }
 
-func TestSSHKeysCollectionNext(t *testing.T) {
+func TestHostNetworksCollectionNext(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/ssh_keys?page=2&per_page=2>; rel="next"`,
+			"Link": `<https://dummy.api.com/hosts?page=2&per_page=2>; rel="next"`,
 		}).
-		WithResponseBodyStubInline(`[{"fingerprint": "a"}, {"fingerprint": "b"}]`).
+		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=2&per_page=2`).
-		WithResponseBodyStubInline(`[{"fingerprint": "c"}, {"fingerprint": "d"}]`).
+		WithResponseBodyStubInline(`[{"id": "c"}, {"id": "d"}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewSSHKeysCollection(client)
+	collection := NewCollection[Host](client, "/hosts")
 
 	ctx := context.TODO()
 
-	var list []SSHKey
+	var list []Host
 	var err error
 
 	list, err = collection.List(ctx)
@@ -245,33 +245,33 @@ func TestSSHKeysCollectionNext(t *testing.T) {
 	g.Expect(collection.HasNextPage()).To(Equal(false))
 }
 
-func TestSSHKeysCollectionPrevious(t *testing.T) {
+func TestHostNetworksCollectionPrevious(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=2&per_page=2`).
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/ssh_keys?page=1&per_page=2>; rel="prev"`,
+			"Link": `<https://dummy.api.com/hosts?page=1&per_page=2>; rel="prev"`,
 		}).
-		WithResponseBodyStubInline(`[{"fingerprint": "c"}, {"fingerprint": "d"}]`).
+		WithResponseBodyStubInline(`[{"id": "c"}, {"id": "d"}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=1&per_page=2`).
-		WithResponseBodyStubInline(`[{"fingerprint": "a"}, {"fingerprint": "b"}]`).
+		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewSSHKeysCollection(client).SetPage(2).SetPerPage(2)
+	collection := NewCollection[Host](client, "/hosts").SetPage(2).SetPerPage(2)
 
 	ctx := context.TODO()
 
-	var list []SSHKey
+	var list []Host
 	var err error
 
 	list, err = collection.List(ctx)
@@ -287,33 +287,33 @@ func TestSSHKeysCollectionPrevious(t *testing.T) {
 	g.Expect(collection.HasPreviousPage()).To(Equal(false))
 }
 
-func TestSSHKeysCollectionFirst(t *testing.T) {
+func TestHostNetworksCollectionFirst(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=2&per_page=2`).
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/ssh_keys?page=1&per_page=2>; rel="first"`,
+			"Link": `<https://dummy.api.com/hosts?page=1&per_page=2>; rel="first"`,
 		}).
-		WithResponseBodyStubInline(`[{"fingerprint": "c"}, {"fingerprint": "d"}]`).
+		WithResponseBodyStubInline(`[{"id": "c"}, {"id": "d"}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=1&per_page=2`).
-		WithResponseBodyStubInline(`[{"fingerprint": "a"}, {"fingerprint": "b"}]`).
+		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewSSHKeysCollection(client).SetPage(2).SetPerPage(2)
+	collection := NewCollection[Host](client, "/hosts").SetPage(2).SetPerPage(2)
 
 	ctx := context.TODO()
 
-	var list []SSHKey
+	var list []Host
 	var err error
 
 	list, err = collection.List(ctx)
@@ -329,32 +329,32 @@ func TestSSHKeysCollectionFirst(t *testing.T) {
 	g.Expect(collection.HasFirstPage()).To(Equal(false))
 }
 
-func TestSSHKeysCollectionLast(t *testing.T) {
+func TestHostNetworksCollectionLast(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/ssh_keys?page=2&per_page=2>; rel="last"`,
+			"Link": `<https://dummy.api.com/hosts?page=2&per_page=2>; rel="last"`,
 		}).
-		WithResponseBodyStubInline(`[{"fingerprint": "a"}, {"fingerprint": "b"}]`).
+		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=2&per_page=2`).
-		WithResponseBodyStubInline(`[{"fingerprint": "c"}, {"fingerprint": "d"}]`).
+		WithResponseBodyStubInline(`[{"id": "c"}, {"id": "d"}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewSSHKeysCollection(client)
+	collection := NewCollection[Host](client, "/hosts")
 
 	ctx := context.TODO()
 
-	var list []SSHKey
+	var list []Host
 	var err error
 
 	list, err = collection.List(ctx)
@@ -370,37 +370,37 @@ func TestSSHKeysCollectionLast(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
-func TestSSHKeysCollectionCollect(t *testing.T) {
+func TestHostNetworksCollectionCollect(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/ssh_keys?page=2&per_page=2>; rel="next"`,
+			"Link": `<https://dummy.api.com/hosts?page=2&per_page=2>; rel="next"`,
 		}).
-		WithResponseBodyStubInline(`[{"fingerprint": "a"}, {"fingerprint": "b"}]`).
+		WithResponseBodyStubInline(`[{"id": "a"}, {"id": "b"}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=2&per_page=2`).
 		WithResponseHeaders(map[string]string{
-			"Link": `<https://dummy.api.com/ssh_keys?page=3&per_page=2>; rel="next"`,
+			"Link": `<https://dummy.api.com/hosts?page=3&per_page=2>; rel="next"`,
 		}).
-		WithResponseBodyStubInline(`[{"fingerprint": "c"}, {"fingerprint": "d"}]`).
+		WithResponseBodyStubInline(`[{"id": "c"}, {"id": "d"}]`).
 		WithResponseCode(200).
 		Next().
-		WithRequestPath("/ssh_keys").
+		WithRequestPath("/hosts").
 		WithRequestMethod("GET").
 		WithRequestParams(`page=3&per_page=2`).
-		WithResponseBodyStubInline(`[{"fingerprint": "e"}, {"fingerprint": "f"}]`).
+		WithResponseBodyStubInline(`[{"id": "e"}, {"id": "f"}]`).
 		WithResponseCode(200).
 		Build()
 
 	defer ts.Close()
 
-	collection := NewSSHKeysCollection(client)
+	collection := NewCollection[Host](client, "/hosts")
 
 	ctx := context.TODO()
 
