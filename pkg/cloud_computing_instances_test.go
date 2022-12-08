@@ -7,6 +7,32 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func TestCloudComputingInstancesCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/cloud_computing/instances").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.CloudComputingInstances.Collection()
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
 func TestCloudComputingInstancesCreate(t *testing.T) {
 	g := NewGomegaWithT(t)
 
@@ -438,4 +464,30 @@ func TestCloudComputingInstancesDeletePTRRecord(t *testing.T) {
 	err := client.CloudComputingInstances.DeletePTRRecord(ctx, "xkazYeJ0", "oQeZzvep")
 
 	g.Expect(err).To(BeNil())
+}
+
+func TestCloudComputingInstancePTRRecordsCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/cloud_computing/instances/a/ptr_records").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.CloudComputingInstances.PTRRecords("a")
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
 }

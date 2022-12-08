@@ -6,6 +6,7 @@ import (
 )
 
 const (
+	sshKeyListPath   = "/ssh_keys"
 	sshKetCreatePath = "/ssh_keys"
 	sshKeyPath       = "/ssh_keys/%s"
 )
@@ -14,7 +15,7 @@ const (
 // API documentation: https://developers.servers.com/api-documentation/v1/#tag/SSH-Key
 type SSHKeysService interface {
 	// Primary collection
-	Collection() SSHKeysCollection
+	Collection() Collection[SSHKey]
 
 	// Generic operations
 	Get(ctx context.Context, fingerprint string) (*SSHKey, error)
@@ -28,17 +29,17 @@ type SSHKeysHandler struct {
 	client *Client
 }
 
-// Collection builds a new SSHKeysCollection interface
-func (s *SSHKeysHandler) Collection() SSHKeysCollection {
-	return NewSSHKeysCollection(s.client)
+// Collection builds a new Collection[SSHKey] interface
+func (h *SSHKeysHandler) Collection() Collection[SSHKey] {
+	return NewCollection[SSHKey](h.client, sshKeyListPath)
 }
 
 // Get ssh key
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ShowSshKey
-func (s *SSHKeysHandler) Get(ctx context.Context, fingerprint string) (*SSHKey, error) {
-	url := s.client.buildURL(sshKeyPath, []interface{}{fingerprint}...)
+func (h *SSHKeysHandler) Get(ctx context.Context, fingerprint string) (*SSHKey, error) {
+	url := h.client.buildURL(sshKeyPath, []interface{}{fingerprint}...)
 
-	body, err := s.client.buildAndExecRequest(ctx, "GET", url, nil)
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
 
 	if err != nil {
 		return nil, err
@@ -55,16 +56,16 @@ func (s *SSHKeysHandler) Get(ctx context.Context, fingerprint string) (*SSHKey, 
 
 // Create ssh key
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/AddNewSshKey
-func (s *SSHKeysHandler) Create(ctx context.Context, input SSHKeyCreateInput) (*SSHKey, error) {
+func (h *SSHKeysHandler) Create(ctx context.Context, input SSHKeyCreateInput) (*SSHKey, error) {
 	payload, err := json.Marshal(input)
 
 	if err != nil {
 		return nil, err
 	}
 
-	url := s.client.buildURL(sshKetCreatePath)
+	url := h.client.buildURL(sshKetCreatePath)
 
-	body, err := s.client.buildAndExecRequest(ctx, "POST", url, payload)
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, payload)
 
 	if err != nil {
 		return nil, err
@@ -81,16 +82,16 @@ func (s *SSHKeysHandler) Create(ctx context.Context, input SSHKeyCreateInput) (*
 
 // Update ssh key
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/UpdateTheNameOfSshKey
-func (s *SSHKeysHandler) Update(ctx context.Context, fingerprint string, input SSHKeyUpdateInput) (*SSHKey, error) {
+func (h *SSHKeysHandler) Update(ctx context.Context, fingerprint string, input SSHKeyUpdateInput) (*SSHKey, error) {
 	payload, err := json.Marshal(input)
 
 	if err != nil {
 		return nil, err
 	}
 
-	url := s.client.buildURL(sshKeyPath, []interface{}{fingerprint}...)
+	url := h.client.buildURL(sshKeyPath, []interface{}{fingerprint}...)
 
-	body, err := s.client.buildAndExecRequest(ctx, "PUT", url, payload)
+	body, err := h.client.buildAndExecRequest(ctx, "PUT", url, payload)
 
 	if err != nil {
 		return nil, err
@@ -107,10 +108,10 @@ func (s *SSHKeysHandler) Update(ctx context.Context, fingerprint string, input S
 
 // Delete ssh key
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/DeleteSshKey
-func (s *SSHKeysHandler) Delete(ctx context.Context, fingerprint string) error {
-	url := s.client.buildURL(sshKeyPath, []interface{}{fingerprint}...)
+func (h *SSHKeysHandler) Delete(ctx context.Context, fingerprint string) error {
+	url := h.client.buildURL(sshKeyPath, []interface{}{fingerprint}...)
 
-	_, err := s.client.buildAndExecRequest(ctx, "DELETE", url, nil)
+	_, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
 
 	return err
 }

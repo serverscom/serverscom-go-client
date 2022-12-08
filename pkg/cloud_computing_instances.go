@@ -6,6 +6,7 @@ import (
 )
 
 const (
+	cloudInstanceListPath            = "/cloud_computing/instances"
 	cloudInstanceCreatePath          = "/cloud_computing/instances"
 	cloudInstancePath                = "/cloud_computing/instances/%s"
 	cloudInstanceUpdatePath          = "/cloud_computing/instances/%s"
@@ -20,13 +21,15 @@ const (
 	cloudInstancePowerOffPath        = "/cloud_computing/instances/%s/switch_power_off"
 	cloudInstanceCreatePTRRecordPath = "/cloud_computing/instances/%s/ptr_records"
 	cloudInstanceDeletePTRRecordPath = "/cloud_computing/instances/%s/ptr_records/%s"
+
+	cloudInstancePTRsListPath = "/cloud_computing/instances/%s/ptr_records"
 )
 
 // CloudComputingInstancesService is an interface to interfacing with the Cloud Instance endpoints
 // API documentation: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance
 type CloudComputingInstancesService interface {
 	// Primary collection
-	Collection() CloudComputingInstancesCollection
+	Collection() Collection[CloudComputingInstance]
 
 	// Generic operations
 	Get(ctx context.Context, id string) (*CloudComputingInstance, error)
@@ -47,7 +50,7 @@ type CloudComputingInstancesService interface {
 	DeletePTRRecord(ctx context.Context, cloudInstanceID string, ptrRecordID string) error
 
 	// Additional collections
-	PTRRecords(id string) CloudComputingInstancePTRRecordsCollection
+	PTRRecords(id string) Collection[PTRRecord]
 }
 
 // CloudComputingInstancesHandler handles operations around cloud instances
@@ -55,17 +58,17 @@ type CloudComputingInstancesHandler struct {
 	client *Client
 }
 
-// Collection builds a new CloudComputingInstancesCollection interface
-func (ci *CloudComputingInstancesHandler) Collection() CloudComputingInstancesCollection {
-	return NewCloudComputingInstancesCollection(ci.client)
+// Collection builds a new Collection[CloudComputingInstance] interface
+func (h *CloudComputingInstancesHandler) Collection() Collection[CloudComputingInstance] {
+	return NewCollection[CloudComputingInstance](h.client, cloudInstanceListPath)
 }
 
 // Get cloud instance
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ShowCloudComputingInstance
-func (ci *CloudComputingInstancesHandler) Get(ctx context.Context, id string) (*CloudComputingInstance, error) {
-	url := ci.client.buildURL(cloudInstancePath, []interface{}{id}...)
+func (h *CloudComputingInstancesHandler) Get(ctx context.Context, id string) (*CloudComputingInstance, error) {
+	url := h.client.buildURL(cloudInstancePath, []interface{}{id}...)
 
-	body, err := ci.client.buildAndExecRequest(ctx, "GET", url, nil)
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
 
 	if err != nil {
 		return nil, err
@@ -82,16 +85,16 @@ func (ci *CloudComputingInstancesHandler) Get(ctx context.Context, id string) (*
 
 // Create cloud instace
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/CreateANewCloudComputingInstance
-func (ci *CloudComputingInstancesHandler) Create(ctx context.Context, input CloudComputingInstanceCreateInput) (*CloudComputingInstance, error) {
+func (h *CloudComputingInstancesHandler) Create(ctx context.Context, input CloudComputingInstanceCreateInput) (*CloudComputingInstance, error) {
 	payload, err := json.Marshal(input)
 
 	if err != nil {
 		return nil, err
 	}
 
-	url := ci.client.buildURL(cloudInstanceCreatePath)
+	url := h.client.buildURL(cloudInstanceCreatePath)
 
-	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, payload)
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, payload)
 
 	if err != nil {
 		return nil, err
@@ -108,16 +111,16 @@ func (ci *CloudComputingInstancesHandler) Create(ctx context.Context, input Clou
 
 // Update cloud instance
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/UpdateCloudComputingInstance
-func (ci *CloudComputingInstancesHandler) Update(ctx context.Context, id string, input CloudComputingInstanceUpdateInput) (*CloudComputingInstance, error) {
+func (h *CloudComputingInstancesHandler) Update(ctx context.Context, id string, input CloudComputingInstanceUpdateInput) (*CloudComputingInstance, error) {
 	payload, err := json.Marshal(input)
 
 	if err != nil {
 		return nil, err
 	}
 
-	url := ci.client.buildURL(cloudInstanceUpdatePath, []interface{}{id}...)
+	url := h.client.buildURL(cloudInstanceUpdatePath, []interface{}{id}...)
 
-	body, err := ci.client.buildAndExecRequest(ctx, "PUT", url, payload)
+	body, err := h.client.buildAndExecRequest(ctx, "PUT", url, payload)
 
 	if err != nil {
 		return nil, err
@@ -134,26 +137,26 @@ func (ci *CloudComputingInstancesHandler) Update(ctx context.Context, id string,
 
 // Delete cloud instance
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/DeleteInstance
-func (ci *CloudComputingInstancesHandler) Delete(ctx context.Context, id string) error {
-	url := ci.client.buildURL(cloudInstanceDeletePath, []interface{}{id}...)
+func (h *CloudComputingInstancesHandler) Delete(ctx context.Context, id string) error {
+	url := h.client.buildURL(cloudInstanceDeletePath, []interface{}{id}...)
 
-	_, err := ci.client.buildAndExecRequest(ctx, "DELETE", url, nil)
+	_, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
 
 	return err
 }
 
 // Reinstall cloud instance
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ReinstallInstanceWithImage
-func (ci *CloudComputingInstancesHandler) Reinstall(ctx context.Context, id string, input CloudComputingInstanceReinstallInput) (*CloudComputingInstance, error) {
+func (h *CloudComputingInstancesHandler) Reinstall(ctx context.Context, id string, input CloudComputingInstanceReinstallInput) (*CloudComputingInstance, error) {
 	payload, err := json.Marshal(input)
 
 	if err != nil {
 		return nil, err
 	}
 
-	url := ci.client.buildURL(cloudInstanceReinstallPath, []interface{}{id}...)
+	url := h.client.buildURL(cloudInstanceReinstallPath, []interface{}{id}...)
 
-	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, payload)
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, payload)
 
 	if err != nil {
 		return nil, err
@@ -170,10 +173,10 @@ func (ci *CloudComputingInstancesHandler) Reinstall(ctx context.Context, id stri
 
 // Rescue cloud instance
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/MoveInstanceToRescueState
-func (ci *CloudComputingInstancesHandler) Rescue(ctx context.Context, id string) (*CloudComputingInstance, error) {
-	url := ci.client.buildURL(cloudInstanceRescuePath, []interface{}{id}...)
+func (h *CloudComputingInstancesHandler) Rescue(ctx context.Context, id string) (*CloudComputingInstance, error) {
+	url := h.client.buildURL(cloudInstanceRescuePath, []interface{}{id}...)
 
-	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, nil)
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
 
 	if err != nil {
 		return nil, err
@@ -190,10 +193,10 @@ func (ci *CloudComputingInstancesHandler) Rescue(ctx context.Context, id string)
 
 // Unrescue cloud instance
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ExitFromRescueState
-func (ci *CloudComputingInstancesHandler) Unrescue(ctx context.Context, id string) (*CloudComputingInstance, error) {
-	url := ci.client.buildURL(cloudInstanceUnrescuePath, []interface{}{id}...)
+func (h *CloudComputingInstancesHandler) Unrescue(ctx context.Context, id string) (*CloudComputingInstance, error) {
+	url := h.client.buildURL(cloudInstanceUnrescuePath, []interface{}{id}...)
 
-	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, nil)
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
 
 	if err != nil {
 		return nil, err
@@ -210,16 +213,16 @@ func (ci *CloudComputingInstancesHandler) Unrescue(ctx context.Context, id strin
 
 // Upgrade cloud instance
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/UpgradeInstance
-func (ci *CloudComputingInstancesHandler) Upgrade(ctx context.Context, id string, input CloudComputingInstanceUpgradeInput) (*CloudComputingInstance, error) {
+func (h *CloudComputingInstancesHandler) Upgrade(ctx context.Context, id string, input CloudComputingInstanceUpgradeInput) (*CloudComputingInstance, error) {
 	payload, err := json.Marshal(input)
 
 	if err != nil {
 		return nil, err
 	}
 
-	url := ci.client.buildURL(cloudInstanceUpgradePath, []interface{}{id}...)
+	url := h.client.buildURL(cloudInstanceUpgradePath, []interface{}{id}...)
 
-	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, payload)
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, payload)
 
 	if err != nil {
 		return nil, err
@@ -236,10 +239,10 @@ func (ci *CloudComputingInstancesHandler) Upgrade(ctx context.Context, id string
 
 // RevertUpgrade cloud instance
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/RevertInstanceUpgrade
-func (ci *CloudComputingInstancesHandler) RevertUpgrade(ctx context.Context, id string) (*CloudComputingInstance, error) {
-	url := ci.client.buildURL(cloudInstanceRevertUpgradePath, []interface{}{id}...)
+func (h *CloudComputingInstancesHandler) RevertUpgrade(ctx context.Context, id string) (*CloudComputingInstance, error) {
+	url := h.client.buildURL(cloudInstanceRevertUpgradePath, []interface{}{id}...)
 
-	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, nil)
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
 
 	if err != nil {
 		return nil, err
@@ -256,10 +259,10 @@ func (ci *CloudComputingInstancesHandler) RevertUpgrade(ctx context.Context, id 
 
 // ApproveUpgrade cloud instance
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ApproveInstanceUpgrade
-func (ci *CloudComputingInstancesHandler) ApproveUpgrade(ctx context.Context, id string) (*CloudComputingInstance, error) {
-	url := ci.client.buildURL(cloudInstanceApproveUpgradePath, []interface{}{id}...)
+func (h *CloudComputingInstancesHandler) ApproveUpgrade(ctx context.Context, id string) (*CloudComputingInstance, error) {
+	url := h.client.buildURL(cloudInstanceApproveUpgradePath, []interface{}{id}...)
 
-	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, nil)
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
 
 	if err != nil {
 		return nil, err
@@ -276,10 +279,10 @@ func (ci *CloudComputingInstancesHandler) ApproveUpgrade(ctx context.Context, id
 
 // PowerOn cloud instance
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/SwitchPowerOn
-func (ci *CloudComputingInstancesHandler) PowerOn(ctx context.Context, id string) (*CloudComputingInstance, error) {
-	url := ci.client.buildURL(cloudInstancePowerOnPath, []interface{}{id}...)
+func (h *CloudComputingInstancesHandler) PowerOn(ctx context.Context, id string) (*CloudComputingInstance, error) {
+	url := h.client.buildURL(cloudInstancePowerOnPath, []interface{}{id}...)
 
-	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, nil)
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
 
 	if err != nil {
 		return nil, err
@@ -296,10 +299,10 @@ func (ci *CloudComputingInstancesHandler) PowerOn(ctx context.Context, id string
 
 // PowerOff cloud instance
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/SwitchPowerOff
-func (ci *CloudComputingInstancesHandler) PowerOff(ctx context.Context, id string) (*CloudComputingInstance, error) {
-	url := ci.client.buildURL(cloudInstancePowerOffPath, []interface{}{id}...)
+func (h *CloudComputingInstancesHandler) PowerOff(ctx context.Context, id string) (*CloudComputingInstance, error) {
+	url := h.client.buildURL(cloudInstancePowerOffPath, []interface{}{id}...)
 
-	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, nil)
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
 
 	if err != nil {
 		return nil, err
@@ -314,17 +317,19 @@ func (ci *CloudComputingInstancesHandler) PowerOff(ctx context.Context, id strin
 	return cloudInstance, nil
 }
 
-// PTRRecords builds a new CloudComputingInstancePTRRecordsCollection interface
-func (ci *CloudComputingInstancesHandler) PTRRecords(id string) CloudComputingInstancePTRRecordsCollection {
-	return NewCloudComputingInstancePTRRecordsCollection(ci.client, id)
+// PTRRecords builds a new Collection[PTRRecord] interface
+func (h *CloudComputingInstancesHandler) PTRRecords(id string) Collection[PTRRecord] {
+	path := h.client.buildPath(cloudInstancePTRsListPath, []interface{}{id}...)
+
+	return NewCollection[PTRRecord](h.client, path)
 }
 
 // CreatePTRRecord creates ptr record for the cloud instance
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/CreatePtrForInstance
-func (ci *CloudComputingInstancesHandler) CreatePTRRecord(ctx context.Context, cloudInstanceID string, input PTRRecordCreateInput) (*PTRRecord, error) {
-	url := ci.client.buildURL(cloudInstanceCreatePTRRecordPath, []interface{}{cloudInstanceID}...)
+func (h *CloudComputingInstancesHandler) CreatePTRRecord(ctx context.Context, cloudInstanceID string, input PTRRecordCreateInput) (*PTRRecord, error) {
+	url := h.client.buildURL(cloudInstanceCreatePTRRecordPath, []interface{}{cloudInstanceID}...)
 
-	body, err := ci.client.buildAndExecRequest(ctx, "POST", url, nil)
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
 
 	if err != nil {
 		return nil, err
@@ -341,10 +346,10 @@ func (ci *CloudComputingInstancesHandler) CreatePTRRecord(ctx context.Context, c
 
 // DeletePTRRecord deleted ptr record for the cloud instance
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/DetetePtrForInstance
-func (ci *CloudComputingInstancesHandler) DeletePTRRecord(ctx context.Context, cloudInstanceID string, ptrRecordID string) error {
-	url := ci.client.buildURL(cloudInstanceDeletePTRRecordPath, []interface{}{cloudInstanceID, ptrRecordID}...)
+func (h *CloudComputingInstancesHandler) DeletePTRRecord(ctx context.Context, cloudInstanceID string, ptrRecordID string) error {
+	url := h.client.buildURL(cloudInstanceDeletePTRRecordPath, []interface{}{cloudInstanceID, ptrRecordID}...)
 
-	_, err := ci.client.buildAndExecRequest(ctx, "DELETE", url, nil)
+	_, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
 
 	return err
 }

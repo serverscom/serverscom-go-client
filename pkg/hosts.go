@@ -6,6 +6,12 @@ import (
 )
 
 const (
+	hostListPath           = "/hosts"
+	hostConnectionListPath = "/hosts/%s/%s/connections"
+	hostNetworksListPath   = "/hosts/%s/%s/networks"
+	hostDriveSlotListPath  = "/hosts/%s/%s/drive_slots"
+	hostPTRsListPath       = "/hosts/%s/%s/ptr_records"
+
 	dedicatedServerTypePrefix = "dedicated_servers"
 
 	dedicatedServerCreatePath          = "/hosts/dedicated_servers"
@@ -29,7 +35,7 @@ const (
 // https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server
 type HostsService interface {
 	// Primary collection
-	Collection() HostsCollection
+	Collection() Collection[Host]
 
 	// Generic operations
 	GetDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
@@ -48,10 +54,10 @@ type HostsService interface {
 
 	// Additional collections
 	DedicatedServerPowerFeeds(ctx context.Context, id string) ([]HostPowerFeed, error)
-	DedicatedServerConnections(id string) HostConnectionsCollection
-	DedicatedServerNetworks(id string) HostNetworksCollection
-	DedicatedServerDriveSlots(id string) HostDriveSlotsCollection
-	DedicatedServerPTRRecords(id string) HostPTRRecordsCollection
+	DedicatedServerConnections(id string) Collection[HostConnection]
+	DedicatedServerNetworks(id string) Collection[Network]
+	DedicatedServerDriveSlots(id string) Collection[HostDriveSlot]
+	DedicatedServerPTRRecords(id string) Collection[PTRRecord]
 }
 
 // HostsHandler handles operations around hosts
@@ -59,9 +65,9 @@ type HostsHandler struct {
 	client *Client
 }
 
-// Collection builds a new HostsCollection interface
-func (h *HostsHandler) Collection() HostsCollection {
-	return NewHostsCollection(h.client)
+// Collection builds a new Collection[Host] interface
+func (h *HostsHandler) Collection() Collection[Host] {
+	return NewCollection[Host](h.client, hostListPath)
 }
 
 // GetDedicatedServer returns a dedicated server
@@ -249,21 +255,6 @@ func (h *HostsHandler) DedicatedServerPowerFeeds(ctx context.Context, id string)
 	return powerFeeds, nil
 }
 
-// DedicatedServerConnections builds a new HostConnectionsCollection interface
-func (h *HostsHandler) DedicatedServerConnections(id string) HostConnectionsCollection {
-	return NewHostConnectionsCollection(h.client, dedicatedServerTypePrefix, id)
-}
-
-// DedicatedServerNetworks builds a new HostNetworksCollection interface
-func (h *HostsHandler) DedicatedServerNetworks(id string) HostNetworksCollection {
-	return NewHostNetworksCollection(h.client, dedicatedServerTypePrefix, id)
-}
-
-// DedicatedServerPTRRecords builds a new HostPTRRecordsCollection interface
-func (h *HostsHandler) DedicatedServerPTRRecords(id string) HostPTRRecordsCollection {
-	return NewHostPTRRecordsCollection(h.client, dedicatedServerTypePrefix, id)
-}
-
 // CreatePTRRecordForDedicatedServer creates ptr record for the dedicated server
 // Endpoint: https://developers.servers.com/api-documentation/v1/#operation/CreatePtrRecordForServerNetworks
 func (h *HostsHandler) CreatePTRRecordForDedicatedServer(ctx context.Context, id string, input PTRRecordCreateInput) (*PTRRecord, error) {
@@ -320,7 +311,30 @@ func (h *HostsHandler) ReinstallOperatingSystemForDedicatedServer(ctx context.Co
 	return dedicatedServer, nil
 }
 
-// DedicatedServerDriveSlots builds a new HostConnectionsCollection interface
-func (h *HostsHandler) DedicatedServerDriveSlots(id string) HostDriveSlotsCollection {
-	return NewHostDriveSlotsCollection(h.client, dedicatedServerTypePrefix, id)
+// DedicatedServerConnections builds a new Collection[HostConnection] interface
+func (h *HostsHandler) DedicatedServerConnections(id string) Collection[HostConnection] {
+	path := h.client.buildPath(hostConnectionListPath, []interface{}{dedicatedServerTypePrefix, id}...)
+
+	return NewCollection[HostConnection](h.client, path)
+}
+
+// DedicatedServerNetworks builds a new Collection[Network] interface
+func (h *HostsHandler) DedicatedServerNetworks(id string) Collection[Network] {
+	path := h.client.buildPath(hostNetworksListPath, []interface{}{dedicatedServerTypePrefix, id}...)
+
+	return NewCollection[Network](h.client, path)
+}
+
+// DedicatedServerDriveSlots builds a new Collection[HostDriveSlot] interface
+func (h *HostsHandler) DedicatedServerDriveSlots(id string) Collection[HostDriveSlot] {
+	path := h.client.buildPath(hostDriveSlotListPath, []interface{}{dedicatedServerTypePrefix, id}...)
+
+	return NewCollection[HostDriveSlot](h.client, path)
+}
+
+// DedicatedServerPTRRecords builds a new Collection[PTRRecord] interface
+func (h *HostsHandler) DedicatedServerPTRRecords(id string) Collection[PTRRecord] {
+	path := h.client.buildPath(hostPTRsListPath, []interface{}{dedicatedServerTypePrefix, id}...)
+
+	return NewCollection[PTRRecord](h.client, path)
 }

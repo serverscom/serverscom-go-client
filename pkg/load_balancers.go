@@ -6,6 +6,8 @@ import (
 )
 
 const (
+	loadBalancerListPath = "/load_balancers"
+
 	l4LoadBalancerCreatePath = "/load_balancers/l4"
 	l4LoadBalancerPath       = "/load_balancers/l4/%s"
 	l4LoadBalancerUpdatePath = "/load_balancers/l4/%s"
@@ -17,7 +19,7 @@ const (
 // https://developers.servers.com/api-documentation/v1/#tag/LoadBalancers
 type LoadBalancersService interface {
 	// Primary collection
-	Collection() LoadBalancersCollection
+	Collection() Collection[LoadBalancer]
 
 	// Generic operations
 	GetL4LoadBalancer(ctx context.Context, id string) (*L4LoadBalancer, error)
@@ -31,9 +33,9 @@ type LoadBalancersHandler struct {
 	client *Client
 }
 
-// Collection builds a new HostsCollection interface
-func (h *LoadBalancersHandler) Collection() LoadBalancersCollection {
-	return NewLoadBalancersCollection(h.client)
+// Collection builds a new Collection[LoadBalancer] interface
+func (h *LoadBalancersHandler) Collection() Collection[LoadBalancer] {
+	return NewCollection[LoadBalancer](h.client, loadBalancerListPath)
 }
 
 // GetL4LoadBalancer returns a l4 load balancer

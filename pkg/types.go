@@ -596,10 +596,10 @@ type L4UpstreamZoneInput struct {
 
 // L4LoadBalancerUpdateInput represents l4 load balancer update input
 type L4LoadBalancerUpdateInput struct {
-	Name          string                `json:"name"`
+	Name          *string               `json:"name,omitempty"`
 	StoreLogs     *bool                 `json:"store_logs,omitempty"`
-	VHostZones    []L4VHostZoneInput    `json:"vhost_zones"`
-	UpstreamZones []L4UpstreamZoneInput `json:"upstream_zones"`
+	VHostZones    []L4VHostZoneInput    `json:"vhost_zones,omitempty"`
+	UpstreamZones []L4UpstreamZoneInput `json:"upstream_zones,omitempty"`
 }
 
 type L4LoadBalancerCreateInput struct {

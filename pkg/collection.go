@@ -1,5 +1,3 @@
-// This code generated automatically
-
 package serverscom
 
 import (
@@ -10,13 +8,8 @@ import (
 	"strconv"
 )
 
-const (
-	sshKeyListPath = "/ssh_keys"
-)
-
-// SSHKeysCollection is an interface for interfacing with the collection of SSHKey
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ListAllSshKeys
-type SSHKeysCollection interface {
+// Collection is an interface for interfacing with the collection
+type Collection[K any] interface {
 	IsClean() bool
 
 	HasPreviousPage() bool
@@ -24,46 +17,51 @@ type SSHKeysCollection interface {
 	HasFirstPage() bool
 	HasLastPage() bool
 
-	NextPage(ctx context.Context) ([]SSHKey, error)
-	PreviousPage(ctx context.Context) ([]SSHKey, error)
-	FirstPage(ctx context.Context) ([]SSHKey, error)
-	LastPage(ctx context.Context) ([]SSHKey, error)
+	NextPage(ctx context.Context) ([]K, error)
+	PreviousPage(ctx context.Context) ([]K, error)
+	FirstPage(ctx context.Context) ([]K, error)
+	LastPage(ctx context.Context) ([]K, error)
 
-	Collect(ctx context.Context) ([]SSHKey, error)
-	List(ctx context.Context) ([]SSHKey, error)
+	Collect(ctx context.Context) ([]K, error)
+	List(ctx context.Context) ([]K, error)
 
-	SetPage(page int) SSHKeysCollection
-	SetPerPage(perPage int) SSHKeysCollection
+	SetPage(page int) *CollectionHandler[K]
+	SetPerPage(perPage int) *CollectionHandler[K]
+	SetParam(name, value string) *CollectionHandler[K]
 
 	Refresh(ctx context.Context) error
 }
 
-// SSHKeysCollectionHandler handles opertations aroud collection
-type SSHKeysCollectionHandler struct {
+// CollectionHandler handles operations around collection
+type CollectionHandler[K any] struct {
 	client *Client
+
+	path string
 
 	params map[string]string
 
 	clean bool
 
 	rels       map[string]string
-	collection []SSHKey
+	collection []K
 }
 
-// NewSSHKeysCollection produces a new SSHKeysCollectionHandler and represents this as an interface of SSHKeysCollection
-func NewSSHKeysCollection(client *Client) SSHKeysCollection {
-	return &SSHKeysCollectionHandler{
+// NewCollection produces a new CollectionHandler and represents this as an interface of Collection
+func NewCollection[K any](client *Client, path string) *CollectionHandler[K] {
+	return &CollectionHandler[K]{
 		client: client,
+
+		path: path,
 
 		params:     make(map[string]string),
 		rels:       make(map[string]string),
 		clean:      true,
-		collection: make([]SSHKey, 0),
+		collection: make([]K, 0),
 	}
 }
 
 // IsClean returns a bool value where true is means, this collection not used yet and doesn't contain any state.
-func (col *SSHKeysCollectionHandler) IsClean() bool {
+func (col *CollectionHandler[K]) IsClean() bool {
 	return col.clean
 }
 
@@ -73,7 +71,7 @@ func (col *SSHKeysCollectionHandler) IsClean() bool {
 // were made and collection doesn't have metadata to know about pagination.
 //
 // First metadata will come with the first called methods such: NextPage, PreviousPage, LastPage, FirstPage, List, Refresh, Collect.
-func (col *SSHKeysCollectionHandler) HasPreviousPage() bool {
+func (col *CollectionHandler[K]) HasPreviousPage() bool {
 	return col.hasRel("prev")
 }
 
@@ -83,7 +81,7 @@ func (col *SSHKeysCollectionHandler) HasPreviousPage() bool {
 // were made and collection doesn't have metadata to know about pagination.
 //
 // First metadata will come with the first called methods such: NextPage, PreviousPage, LastPage, FirstPage, List, Refresh, Collect.
-func (col *SSHKeysCollectionHandler) HasNextPage() bool {
+func (col *CollectionHandler[K]) HasNextPage() bool {
 	return col.hasRel("next")
 }
 
@@ -93,7 +91,7 @@ func (col *SSHKeysCollectionHandler) HasNextPage() bool {
 // were made and collection doesn't have metadata to know about pagination.
 //
 // First metadata will come with the first called methods such: NextPage, PreviousPage, LastPage, FirstPage, List, Refresh, Collect.
-func (col *SSHKeysCollectionHandler) HasFirstPage() bool {
+func (col *CollectionHandler[K]) HasFirstPage() bool {
 	return col.hasRel("first")
 }
 
@@ -103,51 +101,51 @@ func (col *SSHKeysCollectionHandler) HasFirstPage() bool {
 // were made and collection doesn't have metadata to know about pagination.
 //
 // First metadata will come with the first called methods such: NextPage, PreviousPage, LastPage, FirstPage, List, Refresh, Collect.
-func (col *SSHKeysCollectionHandler) HasLastPage() bool {
+func (col *CollectionHandler[K]) HasLastPage() bool {
 	return col.hasRel("last")
 }
 
-// NextPage navigates to the next page returns a []SSHKey, produces an error, when a
+// NextPage navigates to the next page returns a []Network, produces an error, when a
 // collection has no next page.
 //
 // Before using this method please ensure IsClean returns false and HasNextPage returns true.
 // You can force to load pagination metadata by calling Refresh or List methods.
-func (col *SSHKeysCollectionHandler) NextPage(ctx context.Context) ([]SSHKey, error) {
+func (col *CollectionHandler[K]) NextPage(ctx context.Context) ([]K, error) {
 	return col.navigate(ctx, "next")
 }
 
-// PreviousPage navigates to the previous page returns a []SSHKey, produces an error, when a
+// PreviousPage navigates to the previous page returns a []Network, produces an error, when a
 // collection has no previous page.
 //
 // Before using this method please ensure IsClean returns false and HasPreviousPage returns true.
 // You can force to load pagination metadata by calling Refresh or List methods.
-func (col *SSHKeysCollectionHandler) PreviousPage(ctx context.Context) ([]SSHKey, error) {
+func (col *CollectionHandler[K]) PreviousPage(ctx context.Context) ([]K, error) {
 	return col.navigate(ctx, "prev")
 }
 
-// FirstPage navigates to the first page returns a []SSHKey, produces an error, when a
+// FirstPage navigates to the first page returns a []Network, produces an error, when a
 // collection has no first page.
 //
 // Before using this method please ensure IsClean returns false and HasFirstPage returns true.
 // You can force to load pagination metadata by calling Refresh or List methods.
-func (col *SSHKeysCollectionHandler) FirstPage(ctx context.Context) ([]SSHKey, error) {
+func (col *CollectionHandler[K]) FirstPage(ctx context.Context) ([]K, error) {
 	return col.navigate(ctx, "first")
 }
 
-// LastPage navigates to the last page returns a []SSHKey, produces an error, when a
+// LastPage navigates to the last page returns a []Network, produces an error, when a
 // collection has no last page.
 //
 // Before using this method please ensure IsClean returns false and HasLastPage returns true.
 // You can force to load pagination metadata by calling Refresh or List methods.
-func (col *SSHKeysCollectionHandler) LastPage(ctx context.Context) ([]SSHKey, error) {
+func (col *CollectionHandler[K]) LastPage(ctx context.Context) ([]K, error) {
 	return col.navigate(ctx, "last")
 }
 
 // Collect navigates by pages until the last page is reached will be reached and returns accumulated data between pages.
 //
 // This method uses NextPage.
-func (col *SSHKeysCollectionHandler) Collect(ctx context.Context) ([]SSHKey, error) {
-	var accumulatedCollectionElements []SSHKey
+func (col *CollectionHandler[K]) Collect(ctx context.Context) ([]K, error) {
+	var accumulatedCollectionElements []K
 
 	currentCollectionElements, err := col.List(ctx)
 
@@ -155,9 +153,7 @@ func (col *SSHKeysCollectionHandler) Collect(ctx context.Context) ([]SSHKey, err
 		return nil, err
 	}
 
-	for _, element := range currentCollectionElements {
-		accumulatedCollectionElements = append(accumulatedCollectionElements, element)
-	}
+	accumulatedCollectionElements = append(accumulatedCollectionElements, currentCollectionElements...)
 
 	for col.HasNextPage() {
 		nextCollectionElements, err := col.NextPage(ctx)
@@ -166,9 +162,7 @@ func (col *SSHKeysCollectionHandler) Collect(ctx context.Context) ([]SSHKey, err
 			return nil, err
 		}
 
-		for _, element := range nextCollectionElements {
-			accumulatedCollectionElements = append(accumulatedCollectionElements, element)
-		}
+		accumulatedCollectionElements = append(accumulatedCollectionElements, nextCollectionElements...)
 	}
 
 	return accumulatedCollectionElements, nil
@@ -180,7 +174,7 @@ func (col *SSHKeysCollectionHandler) Collect(ctx context.Context) ([]SSHKey, err
 // perform request when such methods were called before: NextPage, PreviousPage, LastPage, FirstPage, Refresh, Collect.
 //
 // In the case when previously called method is Collect, this method returns data from the last page.
-func (col *SSHKeysCollectionHandler) List(ctx context.Context) ([]SSHKey, error) {
+func (col *CollectionHandler[K]) List(ctx context.Context) ([]K, error) {
 	if col.IsClean() {
 		if err := col.Refresh(ctx); err != nil {
 			return nil, err
@@ -191,7 +185,7 @@ func (col *SSHKeysCollectionHandler) List(ctx context.Context) ([]SSHKey, error)
 }
 
 // SetPage sets current page param.
-func (col *SSHKeysCollectionHandler) SetPage(page int) SSHKeysCollection {
+func (col *CollectionHandler[K]) SetPage(page int) *CollectionHandler[K] {
 	var currentPage string
 
 	if page > 1 {
@@ -206,7 +200,7 @@ func (col *SSHKeysCollectionHandler) SetPage(page int) SSHKeysCollection {
 }
 
 // SetPerPage sets current per page param.
-func (col *SSHKeysCollectionHandler) SetPerPage(perPage int) SSHKeysCollection {
+func (col *CollectionHandler[K]) SetPerPage(perPage int) *CollectionHandler[K] {
 	var currentPerPage string
 
 	if perPage > 0 {
@@ -220,10 +214,17 @@ func (col *SSHKeysCollectionHandler) SetPerPage(perPage int) SSHKeysCollection {
 	return col
 }
 
+// SetParam sets param.
+func (col *CollectionHandler[K]) SetParam(name, value string) *CollectionHandler[K] {
+	col.applyParam(name, value)
+
+	return col
+}
+
 // Refresh performs the request and then updates accumulated data limited by pagination.
 //
 // After calling this method accumulated data can be extracted by List method.
-func (col *SSHKeysCollectionHandler) Refresh(ctx context.Context) error {
+func (col *CollectionHandler[K]) Refresh(ctx context.Context) error {
 	if err := col.fireHTTPRequest(ctx); err != nil {
 		return err
 	}
@@ -231,10 +232,10 @@ func (col *SSHKeysCollectionHandler) Refresh(ctx context.Context) error {
 	return nil
 }
 
-func (col *SSHKeysCollectionHandler) fireHTTPRequest(ctx context.Context) error {
-	var accumulatedCollectionElements []SSHKey
+func (col *CollectionHandler[K]) fireHTTPRequest(ctx context.Context) error {
+	var accumulatedCollectionElements []K
 
-	initialURL := col.client.buildURL(sshKeyListPath)
+	initialURL := col.client.buildURL(col.path)
 	url := col.client.applyParams(
 		initialURL,
 		col.params,
@@ -256,7 +257,7 @@ func (col *SSHKeysCollectionHandler) fireHTTPRequest(ctx context.Context) error 
 	return nil
 }
 
-func (col *SSHKeysCollectionHandler) navigate(ctx context.Context, name string) ([]SSHKey, error) {
+func (col *CollectionHandler[K]) navigate(ctx context.Context, name string) ([]K, error) {
 	if col.IsClean() {
 		if err := col.Refresh(ctx); err != nil {
 			return nil, err
@@ -274,7 +275,7 @@ func (col *SSHKeysCollectionHandler) navigate(ctx context.Context, name string) 
 	return col.collection, nil
 }
 
-func (col *SSHKeysCollectionHandler) applyParam(name, value string) {
+func (col *CollectionHandler[K]) applyParam(name, value string) {
 	if value == "" {
 		delete(col.params, name)
 	} else {
@@ -282,7 +283,7 @@ func (col *SSHKeysCollectionHandler) applyParam(name, value string) {
 	}
 }
 
-func (col *SSHKeysCollectionHandler) applyRel(name string) error {
+func (col *CollectionHandler[K]) applyRel(name string) error {
 	if !col.hasRel(name) {
 		return fmt.Errorf("No rel for: %s", name)
 	}
@@ -299,7 +300,7 @@ func (col *SSHKeysCollectionHandler) applyRel(name string) error {
 	return nil
 }
 
-func (col *SSHKeysCollectionHandler) hasRel(name string) bool {
+func (col *CollectionHandler[K]) hasRel(name string) bool {
 	if _, ok := col.rels[name]; ok {
 		return true
 	}

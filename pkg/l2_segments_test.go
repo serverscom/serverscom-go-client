@@ -7,6 +7,32 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func TestL2SegmentsCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/l2_segments").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.L2Segments.Collection()
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
 func TestL2SegmentsCreate(t *testing.T) {
 	g := NewGomegaWithT(t)
 
@@ -189,4 +215,82 @@ func TestL2SegmentsChangeNetworksCreateOnly(t *testing.T) {
 	g.Expect(L2Segments.LocationGroupID).To(Equal(int64(15)))
 	g.Expect(L2Segments.Created.String()).To(Equal("2020-04-22 06:22:50 +0000 UTC"))
 	g.Expect(L2Segments.Updated.String()).To(Equal("2020-04-22 06:22:50 +0000 UTC"))
+}
+
+func TestL2SegmentsLocationGroupsCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/l2_segments/location_groups").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.L2Segments.LocationGroups()
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
+func TestL2SegmentsMembersCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/l2_segments/a/members").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.L2Segments.Members("a")
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
+func TestL2SegmentsNetworksCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/l2_segments/a/networks").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.L2Segments.Networks("a")
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
