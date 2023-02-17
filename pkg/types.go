@@ -571,7 +571,7 @@ type L4LoadBalancer struct {
 type L4VHostZoneInput struct {
 	ID                   string  `json:"id"`
 	UDP                  bool    `json:"udp"`
-	ProxyProtocolEnabled bool    `json:"proxy_protocol_enabled"`
+	ProxyProtocol        bool    `json:"proxy_protocol"`
 	Ports                []int32 `json:"ports"`
 	Description          *string `json:"description"`
 	UpstreamID           string  `json:"upstream_id"`
