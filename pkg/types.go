@@ -681,7 +681,7 @@ type L7UpstreamZoneInput struct {
 
 // L7LoadBalancerUpdateInput represents l7 load balancer update input
 type L7LoadBalancerUpdateInput struct {
-	Name                string                `json:"name,omitempty"`
+	Name                *string               `json:"name,omitempty"`
 	StoreLogs           *bool                 `json:"store_logs,omitempty"`
 	StoreLogsRegionID   *int                  `json:"store_logs_region_id,,omitempty"`
 	Geoip               *bool                 `json:"geoip,omitempty"`

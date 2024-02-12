@@ -143,3 +143,119 @@ func TestDeleteL4LoadBalancer(t *testing.T) {
 
 	g.Expect(err).To(BeNil())
 }
+
+func TestCreateL7LoadBalancer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/load_balancers/l7").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/load_balancers/l7/create_response.json").
+		WithResponseCode(201).
+		Build()
+
+	defer ts.Close()
+
+	input := L7LoadBalancerCreateInput{
+		Name:       "test-l7",
+		LocationID: int64(1),
+	}
+
+	ctx := context.TODO()
+
+	loadBalancer, err := client.LoadBalancers.CreateL7LoadBalancer(ctx, input)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(loadBalancer).ToNot(BeNil())
+	g.Expect(loadBalancer.ID).To(Equal("y1aKReQG"))
+	g.Expect(loadBalancer.Name).To(Equal("name87"))
+	g.Expect(loadBalancer.Type).To(Equal("l7"))
+	g.Expect(loadBalancer.Status).To(Equal("active"))
+	g.Expect(loadBalancer.Domains).To(ConsistOf("example.com", "www.example.com"))
+	g.Expect(loadBalancer.ExternalAddresses).To(ConsistOf("10.0.0.1"))
+	g.Expect(loadBalancer.LocationID).To(Equal(int64(1)))
+	g.Expect(loadBalancer.Geoip).To(BeTrue())
+	g.Expect(loadBalancer.StoreLogs).To(BeTrue())
+	g.Expect(loadBalancer.StoreLogsRegionID).To(Equal(int64(2)))
+	g.Expect(loadBalancer.Created.String()).To(Equal("2024-01-01 12:00:00 +0000 UTC"))
+	g.Expect(loadBalancer.Updated.String()).To(Equal("2024-01-01 12:10:00 +0000 UTC"))
+}
+
+func TestGetL7LoadBalancer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/load_balancers/l7/y1aKReQG").
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/load_balancers/l7/get_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	loadBalancer, err := client.LoadBalancers.GetL7LoadBalancer(ctx, "y1aKReQG")
+
+	g.Expect(err).To(BeNil())
+	g.Expect(loadBalancer).ToNot(BeNil())
+	g.Expect(loadBalancer.ID).To(Equal("y1aKReQG"))
+	g.Expect(loadBalancer.Name).To(Equal("name87"))
+	g.Expect(loadBalancer.Status).To(Equal("active"))
+	g.Expect(loadBalancer.StoreLogs).To(BeTrue())
+	g.Expect(loadBalancer.Geoip).To(BeFalse())
+	g.Expect(loadBalancer.Created.String()).To(Equal("2024-01-01 12:00:00 +0000 UTC"))
+	g.Expect(loadBalancer.Updated.String()).To(Equal("2024-01-02 12:10:00 +0000 UTC"))
+}
+
+func TestUpdateL7LoadBalancer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/load_balancers/l7/y1aKReQG").
+		WithRequestMethod("PUT").
+		WithResponseBodyStubFile("fixtures/load_balancers/l7/update_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	newName := "some"
+
+	loadBalancer, err := client.LoadBalancers.UpdateL7LoadBalancer(ctx, "y1aKReQG", L7LoadBalancerUpdateInput{Name: &newName})
+
+	g.Expect(err).To(BeNil())
+	g.Expect(loadBalancer).ToNot(BeNil())
+	g.Expect(loadBalancer.ID).To(Equal("y1aKReQG"))
+	g.Expect(loadBalancer.Name).To(Equal(newName))
+	g.Expect(loadBalancer.Type).To(Equal("l7"))
+	g.Expect(loadBalancer.Status).To(Equal("pending"))
+	g.Expect(loadBalancer.Domains).To(ConsistOf("updated.example.com"))
+	g.Expect(loadBalancer.StoreLogs).To(BeTrue())
+	g.Expect(loadBalancer.StoreLogsRegionID).To(Equal(int64(3)))
+	g.Expect(loadBalancer.ExternalAddresses).To(ConsistOf("10.0.0.1"))
+	g.Expect(loadBalancer.LocationID).To(Equal(int64(1)))
+	g.Expect(loadBalancer.Geoip).To(BeFalse())
+	g.Expect(loadBalancer.Created.String()).To(Equal("2024-01-01 12:00:00 +0000 UTC"))
+	g.Expect(loadBalancer.Updated.String()).To(Equal("2024-01-02 12:10:00 +0000 UTC"))
+}
+
+func TestDeleteL7LoadBalancer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/load_balancers/l7/y1aKReQG").
+		WithRequestMethod("DELETE").
+		WithResponseCode(204).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	err := client.LoadBalancers.DeleteL7LoadBalancer(ctx, "y1aKReQG")
+
+	g.Expect(err).To(BeNil())
+}

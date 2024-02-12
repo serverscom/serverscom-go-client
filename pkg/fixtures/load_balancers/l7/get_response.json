@@ -1,0 +1,60 @@
+{
+    "id": "y1aKReQG",
+    "name": "name87",
+    "type": "l7",
+    "status": "active",
+    "domains": [
+        "updated.example.com"
+    ],
+    "external_addresses": [
+        "10.0.0.1"
+    ],
+    "location_id": 1,
+    "geoip": false,
+    "store_logs": true,
+    "store_logs_region_id": 3,
+    "created_at": "2024-01-01T12:00:00Z",
+    "updated_at": "2024-01-02T12:10:00Z",
+    "vhost_zones": [
+        {
+            "id": "vhostZoneUpdated",
+            "ports": [
+                443
+            ],
+            "ssl": true,
+            "http2": true,
+            "http_to_https_redirect": false,
+            "http2_push_preload": true,
+            "domains": [
+                "updated.example.com"
+            ],
+            "ssl_certificate_id": "certIdUpdated",
+            "location_zones": [
+                {
+                    "location": "/updated",
+                    "upstream_id": "upstreamZoneUpdated",
+                    "upstream_path": "/updated-path"
+                }
+            ]
+        }
+    ],
+    "upstream_zones": [
+        {
+            "id": "upstreamZoneUpdated",
+            "method": "round_robin",
+            "ssl": true,
+            "sticky": true,
+            "hc_interval": 15,
+            "hc_jitter": 5,
+            "hc_fails": 3,
+            "hc_passes": 5,
+            "upstreams": [
+                {
+                    "ip": "192.168.2.1",
+                    "port": 80,
+                    "weight": 2
+                }
+            ]
+        }
+    ]
+}
