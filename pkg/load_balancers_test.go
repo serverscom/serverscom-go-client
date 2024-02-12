@@ -224,7 +224,7 @@ func TestUpdateL7LoadBalancer(t *testing.T) {
 
 	newName := "some"
 
-	loadBalancer, err := client.LoadBalancers.UpdateL7LoadBalancer(ctx, "y1aKReQG", L7LoadBalancerUpdateInput{Name: &newName})
+	loadBalancer, err := client.LoadBalancers.UpdateL7LoadBalancer(ctx, "y1aKReQG", L7LoadBalancerUpdateInput{Name: newName})
 
 	g.Expect(err).To(BeNil())
 	g.Expect(loadBalancer).ToNot(BeNil())
