@@ -289,7 +289,7 @@ type CloudComputingInstance struct {
 	Name               string    `json:"name"`
 	ID                 string    `json:"id"`
 	RegionID           int64     `json:"region_id"`
-	RegionCode         string    `json:"region_cod"`
+	RegionCode         string    `json:"region_code"`
 	OpenstackUUID      string    `json:"openstack_uuid"`
 	Status             string    `json:"status"`
 	FlavorID           string    `json:"flavor_id"`
