@@ -27,6 +27,9 @@ const (
 	dedicatedServerReinstallPath       = "/hosts/dedicated_servers/%s/reinstall"
 
 	kubernetesBaremetalNodePath = "/hosts/kubernetes_baremetal_nodes/%s"
+
+	sbmServerCreatePath = "/hosts/sbm_servers"
+	sbmServerPath       = "/hosts/sbm_servers/%s"
 )
 
 // HostsService is an interface for interfacing with Host, Dedicated Server endpoints
@@ -40,7 +43,10 @@ type HostsService interface {
 	// Generic operations
 	GetDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
 	GetKubernetesBaremetalNode(ctx context.Context, id string) (*KubernetesBaremetalNode, error)
+	GetSBMServer(ctx context.Context, id string) (*SBMServer, error)
 	CreateDedicatedServers(ctx context.Context, input DedicatedServerCreateInput) ([]DedicatedServer, error)
+	CreateSBMServers(ctx context.Context, input SBMServerCreateInput) ([]SBMServer, error)
+	ReleaseSBMServer(ctx context.Context, id string) (*SBMServer, error)
 
 	// Additional operations
 	ScheduleReleaseForDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
@@ -337,4 +343,71 @@ func (h *HostsHandler) DedicatedServerPTRRecords(id string) Collection[PTRRecord
 	path := h.client.buildPath(hostPTRsListPath, []interface{}{dedicatedServerTypePrefix, id}...)
 
 	return NewCollection[PTRRecord](h.client, path)
+}
+
+// GetSBMServer returns an sbm server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Scalable-Baremetal-Server/operation/GetAnSbmServer
+func (h *HostsHandler) GetSBMServer(ctx context.Context, id string) (*SBMServer, error) {
+	url := h.client.buildURL(sbmServerPath, []interface{}{id}...)
+
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	sbmServer := new(SBMServer)
+
+	if err := json.Unmarshal(body, &sbmServer); err != nil {
+		return nil, err
+	}
+
+	return sbmServer, nil
+}
+
+// CreateSBMServers creates an SBM servers
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Scalable-Baremetal-Server/operation/CreateAnSbmServer
+func (h *HostsHandler) CreateSBMServers(ctx context.Context, input SBMServerCreateInput) ([]SBMServer, error) {
+	payload, err := json.Marshal(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	url := h.client.buildURL(sbmServerCreatePath)
+
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, payload)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var sbmServers []SBMServer
+
+	if err := json.Unmarshal(body, &sbmServers); err != nil {
+		return nil, err
+	}
+
+	return sbmServers, nil
+}
+
+// ReleaseSBMServer removes an SBM server from account.
+// This action is irreversible and the removal process will be initiated immediately!!!
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Scalable-Baremetal-Server/operation/ReleaseAnSbmServer
+func (h *HostsHandler) ReleaseSBMServer(ctx context.Context, id string) (*SBMServer, error) {
+	url := h.client.buildURL(sbmServerPath, []interface{}{id}...)
+
+	body, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	sbmServer := new(SBMServer)
+
+	if err := json.Unmarshal(body, &sbmServer); err != nil {
+		return nil, err
+	}
+
+	return sbmServer, nil
 }
