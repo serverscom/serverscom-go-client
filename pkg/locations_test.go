@@ -188,3 +188,55 @@ func TestBandwidthOptionsCollection(t *testing.T) {
 	g.Expect(collection.HasFirstPage()).To(Equal(false))
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
+
+func TestSBMFlavorOptionsCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/locations/1/order_options/sbm_flavor_models").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.Locations.SBMFlavorOptions(int64(1))
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
+func TestSBMOperatingSystemOptionsCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/locations/1/order_options/sbm_flavor_models/1/operating_systems").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.Locations.SBMOperatingSystemOptions(int64(1), int64(1))
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}

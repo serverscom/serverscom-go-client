@@ -255,7 +255,7 @@ type SBMServerHostInput struct {
 //		},
 //	}
 type SBMServerCreateInput struct {
-	SBMFlavorModelID   int64                `json:"sbm_flavor_model_id"`
+	FlavorModelID      int64                `json:"sbm_flavor_model_id"`
 	LocationID         int64                `json:"location_id"`
 	Hosts              []SBMServerHostInput `json:"hosts"`
 	OperatingSystemID  *int64               `json:"operating_system_id"`
@@ -748,4 +748,21 @@ type L7LoadBalancerCreateInput struct {
 	Geoip             *bool                 `json:"geoip,omitempty"`
 	VHostZones        []L7VHostZoneInput    `json:"vhost_zones"`
 	UpstreamZones     []L7UpstreamZoneInput `json:"upstream_zones"`
+}
+
+type SBMFlavor struct {
+	ID                     int64  `json:"id"`
+	Name                   string `json:"name"`
+	CPUName                string `json:"cpu_name"`
+	CPUCount               int    `json:"cpu_count"`
+	CPUCoresCount          int    `json:"cpu_cores_count"`
+	CPUFrequency           string `json:"cpu_frequency"`
+	RAMSize                int    `json:"ram_size"`
+	DrivesConfiguration    string `json:"drives_configuration"`
+	PublicUplinkModelID    int    `json:"public_uplink_model_id"`
+	PublicUplinkModelName  string `json:"public_uplink_model_name"`
+	PrivateUplinkModelID   int    `json:"private_uplink_model_id"`
+	PrivateUplinkModelName string `json:"private_uplink_model_name"`
+	BandwidthID            int    `json:"bandwidth_id"`
+	BandwidthName          string `json:"bandwidth_name"`
 }

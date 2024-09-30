@@ -548,3 +548,123 @@ func TestDedicatedServerPTRRecordsCollection(t *testing.T) {
 	g.Expect(collection.HasFirstPage()).To(Equal(false))
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
+
+func TestHostsCreateSBMServers(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/sbm_servers/create_response.json").
+		WithResponseCode(201).
+		Build()
+
+	defer ts.Close()
+
+	input := SBMServerCreateInput{
+		LocationID:    int64(1),
+		FlavorModelID: int64(1),
+		Hosts: []SBMServerHostInput{
+			{Hostname: "example.aa"},
+			{Hostname: "example.bb"},
+		},
+	}
+
+	ctx := context.TODO()
+
+	sbmServers, err := client.Hosts.CreateSBMServers(ctx, input)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(len(sbmServers)).To(Equal(2))
+
+	sbmServer := sbmServers[0]
+
+	g.Expect(sbmServer.ID).To(Equal("xkazYeJ0"))
+	g.Expect(sbmServer.Title).To(Equal("example.aa"))
+	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
+	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.Status).To(Equal("init"))
+	g.Expect(sbmServer.Configuration).To(Equal("Dell chassis-9015 / 2 GB RAM / 2 x hdd-model-404"))
+	g.Expect(sbmServer.PrivateIPv4Address).To(BeNil())
+	g.Expect(sbmServer.PublicIPv4Address).To(BeNil())
+	g.Expect(sbmServer.ScheduledRelease).To(BeNil())
+	g.Expect(sbmServer.Created.String()).To(Equal("2020-04-22 06:22:04 +0000 UTC"))
+	g.Expect(sbmServer.Updated.String()).To(Equal("2020-04-22 06:22:04 +0000 UTC"))
+
+	sbmServer = sbmServers[1]
+
+	g.Expect(sbmServer.ID).To(Equal("w9aAOdvM"))
+	g.Expect(sbmServer.Title).To(Equal("example.bb"))
+	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
+	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.Status).To(Equal("init"))
+	g.Expect(sbmServer.Configuration).To(Equal("Dell chassis-9015 / 2 GB RAM / 2 x hdd-model-404"))
+	g.Expect(sbmServer.PrivateIPv4Address).To(BeNil())
+	g.Expect(sbmServer.PublicIPv4Address).To(BeNil())
+	g.Expect(sbmServer.ScheduledRelease).To(BeNil())
+	g.Expect(sbmServer.Created.String()).To(Equal("2020-04-22 06:22:04 +0000 UTC"))
+	g.Expect(sbmServer.Updated.String()).To(Equal("2020-04-22 06:22:04 +0000 UTC"))
+}
+
+func TestHostsGetSBMServer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers/xkazYeJ0").
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/hosts/sbm_servers/get_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	sbmServer, err := client.Hosts.GetSBMServer(ctx, "xkazYeJ0")
+
+	g.Expect(err).To(BeNil())
+	g.Expect(sbmServer).ToNot(BeNil())
+
+	g.Expect(sbmServer.ID).To(Equal("xkazYeJ0"))
+	g.Expect(sbmServer.Title).To(Equal("example.aa"))
+	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
+	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.Status).To(Equal("active"))
+	g.Expect(sbmServer.Configuration).To(Equal("REMM R123"))
+	g.Expect(*sbmServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
+	g.Expect(*sbmServer.PublicIPv4Address).To(Equal("169.254.0.1"))
+	g.Expect(sbmServer.ScheduledRelease).To(BeNil())
+	g.Expect(sbmServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+	g.Expect(sbmServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}
+
+func TestHostsReleaseSBMServer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers/xkazYeJ0").
+		WithRequestMethod("DELETE").
+		WithResponseBodyStubFile("fixtures/hosts/sbm_servers/release_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	sbmServer, err := client.Hosts.ReleaseSBMServer(ctx, "xkazYeJ0")
+
+	g.Expect(err).To(BeNil())
+	g.Expect(sbmServer).ToNot(BeNil())
+
+	g.Expect(sbmServer.ID).To(Equal("xkazYeJ0"))
+	g.Expect(sbmServer.Title).To(Equal("example.aa"))
+	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
+	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.Status).To(Equal("active"))
+	g.Expect(sbmServer.Configuration).To(Equal("REMM R123"))
+	g.Expect(*sbmServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
+	g.Expect(*sbmServer.PublicIPv4Address).To(Equal("169.254.0.1"))
+	g.Expect(sbmServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+	g.Expect(sbmServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}

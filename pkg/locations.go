@@ -14,6 +14,10 @@ const (
 	uplinkOptionListPath = "/locations/%d/order_options/server_models/%d/uplink_models"
 
 	bandwidthOptionListPath = "/locations/%d/order_options/server_models/%d/uplink_models/%d/bandwidth"
+
+	sbmFlavorOptionListPath = "/locations/%d/order_options/sbm_flavor_models"
+
+	sbmOperatingSystemOptionListPath = "/locations/%d/order_options/sbm_flavor_models/%d/operating_systems"
 )
 
 // LocationsService is an interface to interfacing with the Location and Order options endpoints
@@ -36,6 +40,8 @@ type LocationsService interface {
 	DriveModelOptions(LocationID, ServerModelID int64) Collection[DriveModel]
 	UplinkOptions(LocationID, ServerModelID int64) Collection[UplinkOption]
 	BandwidthOptions(LocationID, ServerModelID, uplinkID int64) Collection[BandwidthOption]
+	SBMFlavorOptions(LocationID int64) Collection[SBMFlavor]
+	SBMOperatingSystemOptions(LocationID, sbmFlavorModelID int64) Collection[OperatingSystemOption]
 }
 
 // LocationsHandler handles operations around cloud instances
@@ -88,4 +94,18 @@ func (h *LocationsHandler) BandwidthOptions(LocationID, ServerModelID, uplinkID 
 	path := h.client.buildPath(bandwidthOptionListPath, []interface{}{LocationID, ServerModelID, uplinkID}...)
 
 	return NewCollection[BandwidthOption](h.client, path)
+}
+
+// SBMFlavorOptions builds a new Collection[SBMFlavor] interface
+func (h *LocationsHandler) SBMFlavorOptions(LocationID int64) Collection[SBMFlavor] {
+	path := h.client.buildPath(sbmFlavorOptionListPath, []interface{}{LocationID}...)
+
+	return NewCollection[SBMFlavor](h.client, path)
+}
+
+// SBMOperatingSystemOptions builds a new Collection[OperatingSystemOption] interface
+func (h *LocationsHandler) SBMOperatingSystemOptions(LocationID, SBMFlavorModelID int64) Collection[OperatingSystemOption] {
+	path := h.client.buildPath(sbmOperatingSystemOptionListPath, []interface{}{LocationID, SBMFlavorModelID}...)
+
+	return NewCollection[OperatingSystemOption](h.client, path)
 }
