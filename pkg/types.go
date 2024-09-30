@@ -110,6 +110,25 @@ type KubernetesBaremetalNode struct {
 	Updated              time.Time            `json:"updated_at"`
 }
 
+// SBMServer represents scalable baremetal server
+type SBMServer struct {
+	ID                   string               `json:"id"`
+	Type                 string               `json:"type"`
+	Title                string               `json:"title"`
+	LocationID           int64                `json:"location_id"`
+	LocationCode         string               `json:"location_code"`
+	Status               string               `json:"status"`
+	OperationalStatus    string               `json:"operational_status"`
+	PowerStatus          string               `json:"power_status"`
+	Configuration        string               `json:"configuration"`
+	PrivateIPv4Address   *string              `json:"private_ipv4_address"`
+	PublicIPv4Address    *string              `json:"public_ipv4_address"`
+	ScheduledRelease     *time.Time           `json:"scheduled_release_at"`
+	ConfigurationDetails ConfigurationDetails `json:"configuration_details"`
+	Created              time.Time            `json:"created_at"`
+	Updated              time.Time            `json:"updated_at"`
+}
+
 // DedicatedServerLayoutPartitionInput represents partition for DedicatedServerLayoutInput
 type DedicatedServerLayoutPartitionInput struct {
 	Target string  `json:"target"`
@@ -198,7 +217,9 @@ type DedicatedServerHostInput struct {
 //	    "48:81:0c:43:99:12:71:5e:ba:fd:e7:2f:20:d7:95:e8"
 //	  },
 //	  Hosts: []DedicatedServerHostInput{
-//	    Hostname: "example-host",
+//		{
+//	 	   Hostname: "example-host",
+//		},
 //	  },
 //	}
 type DedicatedServerCreateInput struct {
@@ -213,6 +234,33 @@ type DedicatedServerCreateInput struct {
 	OperatingSystemID  *int64                           `json:"operating_system_id"`
 	SSHKeyFingerprints []string                         `json:"ssh_key_fingerprints,omitempty"`
 	UserData           *string                          `json:"user_data,omitempty"`
+}
+
+// SBMServerHostInput represents hosts for SBMServerCreateInput
+type SBMServerHostInput struct {
+	Hostname             string  `json:"hostname"`
+	PublicIPv4NetworkID  *string `json:"public_ipv4_network_id,omitempty"`
+	PrivateIPv4NetworkID *string `json:"private_ipv4_network_id,omitempty"`
+}
+
+// SBMServerCreateInput represents SBM server create input, example:
+//
+//	input := &SBMServerCreateInput{
+//		SBMFlavorModelID: 1,
+//		LocationID: 2,
+//		Hosts: []SBMServerHostInput{
+//			{
+//				Hostname: "test",
+//			},
+//		},
+//	}
+type SBMServerCreateInput struct {
+	FlavorModelID      int64                `json:"sbm_flavor_model_id"`
+	LocationID         int64                `json:"location_id"`
+	Hosts              []SBMServerHostInput `json:"hosts"`
+	OperatingSystemID  *int64               `json:"operating_system_id"`
+	SSHKeyFingerprints []string             `json:"ssh_key_fingerprints,omitempty"`
+	UserData           *string              `json:"user_data,omitempty"`
 }
 
 // ServerModelOption represents server model option
@@ -700,4 +748,21 @@ type L7LoadBalancerCreateInput struct {
 	Geoip             *bool                 `json:"geoip,omitempty"`
 	VHostZones        []L7VHostZoneInput    `json:"vhost_zones"`
 	UpstreamZones     []L7UpstreamZoneInput `json:"upstream_zones"`
+}
+
+type SBMFlavor struct {
+	ID                     int64  `json:"id"`
+	Name                   string `json:"name"`
+	CPUName                string `json:"cpu_name"`
+	CPUCount               int    `json:"cpu_count"`
+	CPUCoresCount          int    `json:"cpu_cores_count"`
+	CPUFrequency           string `json:"cpu_frequency"`
+	RAMSize                int    `json:"ram_size"`
+	DrivesConfiguration    string `json:"drives_configuration"`
+	PublicUplinkModelID    int    `json:"public_uplink_model_id"`
+	PublicUplinkModelName  string `json:"public_uplink_model_name"`
+	PrivateUplinkModelID   int    `json:"private_uplink_model_id"`
+	PrivateUplinkModelName string `json:"private_uplink_model_name"`
+	BandwidthID            int    `json:"bandwidth_id"`
+	BandwidthName          string `json:"bandwidth_name"`
 }

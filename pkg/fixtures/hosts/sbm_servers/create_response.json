@@ -1,0 +1,30 @@
+[
+  {
+    "id": "xkazYeJ0",
+    "title": "example.aa",
+    "location_id": 1,
+    "status": "init",
+    "configuration": "Dell chassis-9015 / 2 GB RAM / 2 x hdd-model-404",
+    "private_ipv4_address": null,
+    "public_ipv4_address": null,
+    "lease_start_at": null,
+    "scheduled_release_at": null,
+    "type": "sbm_server",
+    "created_at": "2020-04-22T06:22:04Z",
+    "updated_at": "2020-04-22T06:22:04Z"
+  },
+  {
+    "id": "w9aAOdvM",
+    "title": "example.bb",
+    "location_id": 1,
+    "status": "init",
+    "configuration": "Dell chassis-9015 / 2 GB RAM / 2 x hdd-model-404",
+    "private_ipv4_address": null,
+    "public_ipv4_address": null,
+    "lease_start_at": null,
+    "scheduled_release_at": null,
+    "type": "sbm_server",
+    "created_at": "2020-04-22T06:22:04Z",
+    "updated_at": "2020-04-22T06:22:04Z"
+  }
+]
