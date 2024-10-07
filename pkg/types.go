@@ -231,7 +231,7 @@ type DedicatedServerCreateInput struct {
 	Features           []string                         `json:"features,omitempty"`
 	IPv6               bool                             `json:"ipv6"`
 	Hosts              []DedicatedServerHostInput       `json:"hosts"`
-	OperatingSystemID  *int64                           `json:"operating_system_id"`
+	OperatingSystemID  *int64                           `json:"operating_system_id,omitempty"`
 	SSHKeyFingerprints []string                         `json:"ssh_key_fingerprints,omitempty"`
 	UserData           *string                          `json:"user_data,omitempty"`
 }
@@ -258,7 +258,7 @@ type SBMServerCreateInput struct {
 	FlavorModelID      int64                `json:"sbm_flavor_model_id"`
 	LocationID         int64                `json:"location_id"`
 	Hosts              []SBMServerHostInput `json:"hosts"`
-	OperatingSystemID  *int64               `json:"operating_system_id"`
+	OperatingSystemID  *int64               `json:"operating_system_id,omitempty"`
 	SSHKeyFingerprints []string             `json:"ssh_key_fingerprints,omitempty"`
 	UserData           *string              `json:"user_data,omitempty"`
 }
