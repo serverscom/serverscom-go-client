@@ -31,6 +31,8 @@ type Client struct {
 
 	LoadBalancers LoadBalancersService
 
+	LoadBalancerClusters LoadBalancerClustersService
+
 	token string
 
 	client *http.Client
@@ -76,6 +78,7 @@ func (cli *Client) configureResources() {
 	cli.SSLCertificates = &SSLCertificatesHandler{cli}
 	cli.NetworkPools = &NetworkPoolsHandler{cli}
 	cli.LoadBalancers = &LoadBalancersHandler{cli}
+	cli.LoadBalancerClusters = &LoadBalancerClustersHandler{cli}
 }
 
 func (cli *Client) buildURL(path string, values ...interface{}) string {
