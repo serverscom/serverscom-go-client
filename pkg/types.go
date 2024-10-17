@@ -648,6 +648,7 @@ type L4UpstreamZoneInput struct {
 type L4LoadBalancerUpdateInput struct {
 	Name          *string               `json:"name,omitempty"`
 	StoreLogs     *bool                 `json:"store_logs,omitempty"`
+	ClusterID     string                `json:"cluster_id,omitempty"`
 	VHostZones    []L4VHostZoneInput    `json:"vhost_zones,omitempty"`
 	UpstreamZones []L4UpstreamZoneInput `json:"upstream_zones,omitempty"`
 }
@@ -657,6 +658,7 @@ type L4LoadBalancerCreateInput struct {
 	Name          string                `json:"name"`
 	LocationID    int64                 `json:"location_id"`
 	StoreLogs     *bool                 `json:"store_logs,omitempty"`
+	ClusterID     string                `json:"cluster_id,omitempty"`
 	VHostZones    []L4VHostZoneInput    `json:"vhost_zones"`
 	UpstreamZones []L4UpstreamZoneInput `json:"upstream_zones"`
 }
@@ -738,6 +740,7 @@ type L7LoadBalancerUpdateInput struct {
 	Geoip               *bool                 `json:"geoip,omitempty"`
 	NewExternalIpsCount *int                  `json:"new_external_ips_count,omitempty"`
 	DeleteExternalIps   []string              `json:"delete_external_ips,omitempty"`
+	ClusterID           string                `json:"cluster_id,omitempty"`
 	VHostZones          []L7VHostZoneInput    `json:"vhost_zones,omitempty"`
 	UpstreamZones       []L7UpstreamZoneInput `json:"upstream_zones,omitempty"`
 }
@@ -749,6 +752,7 @@ type L7LoadBalancerCreateInput struct {
 	StoreLogs         *bool                 `json:"store_logs,omitempty"`
 	StoreLogsRegionID *int                  `json:"store_logs_region_id,,omitempty"`
 	Geoip             *bool                 `json:"geoip,omitempty"`
+	ClusterID         string                `json:"cluster_id,omitempty"`
 	VHostZones        []L7VHostZoneInput    `json:"vhost_zones"`
 	UpstreamZones     []L7UpstreamZoneInput `json:"upstream_zones"`
 }
