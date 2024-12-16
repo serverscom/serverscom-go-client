@@ -9,6 +9,7 @@ const (
 	sslCertificateListPath     = "/ssl_certificates"
 	sslCreatificatedCreatePath = "/ssl_certificates/custom"
 	sslCertificatePath         = "/ssl_certificates/custom/%s"
+	sslCertificateLEPath       = "/ssl_certificates/letsencrypt/%s"
 )
 
 // SSLCertificatesService is an interface to interfacing with the SSL Certificate endpoints
@@ -19,7 +20,12 @@ type SSLCertificatesService interface {
 
 	// Generic operations
 	CreateCustom(ctx context.Context, input SSLCertificateCreateCustomInput) (*SSLCertificateCustom, error)
+	UpdateCustom(ctx context.Context, id string, input SSLCertificateUpdateCustomInput) (*SSLCertificateCustom, error)
 	GetCustom(ctx context.Context, id string) (*SSLCertificateCustom, error)
+	DeleteCustom(ctx context.Context, id string) error
+	GetLE(ctx context.Context, id string) (*SSLCertificateLE, error)
+	UpdateLE(ctx context.Context, id string, input SSLCertificateUpdateLEInput) (*SSLCertificateLE, error)
+	DeleteLE(ctx context.Context, id string) error
 }
 
 // SSLCertificatesHandler handles operations around ssl certificates
@@ -74,4 +80,93 @@ func (h *SSLCertificatesHandler) GetCustom(ctx context.Context, id string) (*SSL
 	}
 
 	return SSLCertificate, nil
+}
+
+// UpdateCustom updates a custom SSL certificate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/SSL-Certificate/operation/UpdateACustomSslCertificate
+func (h *SSLCertificatesHandler) UpdateCustom(ctx context.Context, id string, input SSLCertificateUpdateCustomInput) (*SSLCertificateCustom, error) {
+	payload, err := json.Marshal(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	url := h.client.buildURL(sslCertificatePath, []interface{}{id}...)
+
+	body, err := h.client.buildAndExecRequest(ctx, "PUT", url, payload)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var SSLCertificate SSLCertificateCustom
+	if err := json.Unmarshal(body, &SSLCertificate); err != nil {
+		return nil, err
+	}
+
+	return &SSLCertificate, nil
+}
+
+// DeleteCustom deletes a custom SSL certificate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/SSL-Certificate/operation/DeleteACustomSslCertificate
+func (h *SSLCertificatesHandler) DeleteCustom(ctx context.Context, id string) error {
+	url := h.client.buildURL(sslCertificatePath, []interface{}{id}...)
+
+	_, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
+
+	return err
+}
+
+// GetLE returns a Let's Encrypt SSL certificate
+func (h *SSLCertificatesHandler) GetLE(ctx context.Context, id string) (*SSLCertificateLE, error) {
+	url := h.client.buildURL(sslCertificateLEPath, id)
+
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var SSLCertificate SSLCertificateLE
+
+	if err := json.Unmarshal(body, &SSLCertificate); err != nil {
+		return nil, err
+	}
+
+	return &SSLCertificate, nil
+}
+
+// UpdateLE updates a Let's Encrypt SSL certificate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/SSL-Certificate/operation/UpdateALetsEncryptSslCertificate
+func (h *SSLCertificatesHandler) UpdateLE(ctx context.Context, id string, input SSLCertificateUpdateLEInput) (*SSLCertificateLE, error) {
+	payload, err := json.Marshal(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	url := h.client.buildURL(sslCertificateLEPath, []interface{}{id}...)
+
+	body, err := h.client.buildAndExecRequest(ctx, "PUT", url, payload)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var SSLCertificate SSLCertificateLE
+	if err := json.Unmarshal(body, &SSLCertificate); err != nil {
+		return nil, err
+	}
+
+	return &SSLCertificate, nil
+}
+
+// DeleteLE deletes a Let's Encrypt SSL certificate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/SSL-Certificate/operation/DeleteALetsEncryptSslCertificate
+func (h *SSLCertificatesHandler) DeleteLE(ctx context.Context, id string) error {
+	url := h.client.buildURL(sslCertificateLEPath, []interface{}{id}...)
+
+	_, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
+
+	return err
 }

@@ -55,6 +55,7 @@ func TestL2SegmentsCreate(t *testing.T) {
 			{ID: "a", Mode: "native"},
 			{ID: "b", Mode: "trunk"},
 		},
+		Labels: map[string]string{"env": "test"},
 	}
 
 	ctx := context.TODO()
@@ -68,6 +69,7 @@ func TestL2SegmentsCreate(t *testing.T) {
 	g.Expect(L2Segments.Status).To(Equal("pending"))
 	g.Expect(L2Segments.Name).To(Equal("name87"))
 	g.Expect(L2Segments.LocationGroupID).To(Equal(int64(1)))
+	g.Expect(L2Segments.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(L2Segments.Created.String()).To(Equal("2020-04-22 06:22:51 +0000 UTC"))
 	g.Expect(L2Segments.Updated.String()).To(Equal("2020-04-22 06:22:51 +0000 UTC"))
 }
@@ -96,6 +98,7 @@ func TestL2SegmentsGet(t *testing.T) {
 	g.Expect(L2Segments.Name).To(Equal("name84"))
 	g.Expect(L2Segments.Type).To(Equal("public"))
 	g.Expect(L2Segments.LocationGroupID).To(Equal(int64(15)))
+	g.Expect(L2Segments.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(L2Segments.Created.String()).To(Equal("2020-04-22 06:22:50 +0000 UTC"))
 	g.Expect(L2Segments.Updated.String()).To(Equal("2020-04-22 06:22:50 +0000 UTC"))
 }
@@ -106,7 +109,7 @@ func TestL2SegmentsUpdate(t *testing.T) {
 	ts, client := newFakeServer().
 		WithRequestPath("/l2_segments/y1aKReQG").
 		WithRequestMethod("PUT").
-		WithRequestBody(`{"name":"some"}`).
+		WithRequestBody(`{"name":"some","labels":{"env":"new-test"}}`).
 		WithResponseBodyStubFile("fixtures/l2_segments/update_response.json").
 		WithResponseCode(200).
 		Build()
@@ -116,8 +119,9 @@ func TestL2SegmentsUpdate(t *testing.T) {
 	ctx := context.TODO()
 
 	newName := "some"
+	newLabels := map[string]string{"env": "new-test"}
 
-	L2Segments, err := client.L2Segments.Update(ctx, "y1aKReQG", L2SegmentUpdateInput{Name: &newName})
+	L2Segments, err := client.L2Segments.Update(ctx, "y1aKReQG", L2SegmentUpdateInput{Name: &newName, Labels: newLabels})
 
 	g.Expect(err).To(BeNil())
 	g.Expect(L2Segments).ToNot(BeNil())
@@ -127,6 +131,7 @@ func TestL2SegmentsUpdate(t *testing.T) {
 	g.Expect(L2Segments.Name).To(Equal("some"))
 	g.Expect(L2Segments.Type).To(Equal("public"))
 	g.Expect(L2Segments.LocationGroupID).To(Equal(int64(15)))
+	g.Expect(L2Segments.Labels).To(Equal(newLabels))
 	g.Expect(L2Segments.Created.String()).To(Equal("2020-04-22 06:22:50 +0000 UTC"))
 	g.Expect(L2Segments.Updated.String()).To(Equal("2020-04-22 06:22:50 +0000 UTC"))
 }

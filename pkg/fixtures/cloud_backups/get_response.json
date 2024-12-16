@@ -1,0 +1,13 @@
+{
+    "id": "X7ax9byv",
+    "openstack_uuid": "d1473317-bb2c-4d68-992c-0c117a68c01a",
+    "openstack_volume_uuid": "1ac953dc-2414-4831-8124-c2dcbd405926",
+    "region_id": 1,
+    "name": "test-backup-1",
+    "size": 1,
+    "status": "available",
+    "labels": {
+        "env": "test"
+    },
+    "created_at": "2024-11-11T09:57:28Z"
+}

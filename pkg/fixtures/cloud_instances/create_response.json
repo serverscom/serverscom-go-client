@@ -8,6 +8,9 @@
   "public_ipv4_address": null,
   "public_ipv6_address": null,
   "private_ipv4_address": null,
+  "labels": {
+    "env": "test"
+  },
   "created_at": "2020-04-22T06:22:28Z",
   "updated_at": "2020-04-22T06:22:28Z"
 }

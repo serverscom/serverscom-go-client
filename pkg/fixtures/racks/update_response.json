@@ -1,0 +1,9 @@
+{
+    "id": "MYer7LaO",
+    "name": "test-rack-1",
+    "location_id": 1,
+    "location_code": "location-1",
+    "labels": {
+        "env": "new-test"
+    }
+}

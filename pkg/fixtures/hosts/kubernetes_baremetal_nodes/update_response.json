@@ -1,0 +1,38 @@
+{
+    "id": "xkazYeJ0",
+    "kubernetes_cluster_id": "K9b68neE",
+    "kubernetes_cluster_node_id": "y1aKrReQ",
+    "kubernetes_cluster_node_number": 44,
+    "rack_id": "MvbmX3aY",
+    "title": "example.aa",
+    "location_id": 1,
+    "location_code": "location2155",
+    "status": "active",
+    "operational_status": "normal",
+    "power_status": "powered_on",
+    "configuration": "REMM R123",
+    "private_ipv4_address": "10.0.0.1",
+    "public_ipv4_address": "169.254.0.1",
+    "lease_start_at": "2024-11-11",
+    "scheduled_release_at": null,
+    "type": "kubernetes_baremetal_node",
+    "oob_ipv4_address": "198.29.114.3",
+    "configuration_details": {
+        "ram_size": null,
+        "server_model_id": null,
+        "server_model_name": null,
+        "bandwidth_id": null,
+        "bandwidth_name": null,
+        "private_uplink_id": null,
+        "private_uplink_name": null,
+        "public_uplink_id": null,
+        "public_uplink_name": null,
+        "operating_system_id": null,
+        "operating_system_full_name": null
+    },
+    "labels": {
+        "env": "new-test"
+    },
+    "created_at": "2020-04-22T06:22:02Z",
+    "updated_at": "2020-04-22T06:22:02Z"
+}

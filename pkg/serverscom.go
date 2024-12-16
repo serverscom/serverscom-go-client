@@ -33,6 +33,13 @@ type Client struct {
 
 	LoadBalancerClusters LoadBalancerClustersService
 
+	CloudBlockStorageBackups CloudBlockStorageBackupsService
+	CloudBlockStorageVolumes CloudBlockStorageVolumesService
+
+	Racks RacksService
+
+	KubernetesClusters KubernetesClustersService
+
 	token string
 
 	client *http.Client
@@ -79,6 +86,10 @@ func (cli *Client) configureResources() {
 	cli.NetworkPools = &NetworkPoolsHandler{cli}
 	cli.LoadBalancers = &LoadBalancersHandler{cli}
 	cli.LoadBalancerClusters = &LoadBalancerClustersHandler{cli}
+	cli.Racks = &RacksHandler{cli}
+	cli.CloudBlockStorageBackups = &CloudBlockStorageBackupsHandler{cli}
+	cli.CloudBlockStorageVolumes = &CloudBlockStorageVolumesHandler{cli}
+	cli.KubernetesClusters = &KubernetesClustersHandler{cli}
 }
 
 func (cli *Client) buildURL(path string, values ...interface{}) string {

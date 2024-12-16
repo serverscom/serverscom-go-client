@@ -7,6 +7,10 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+const (
+	serverID = "xkazYeJ0"
+)
+
 func TestHostsEmptyCollection(t *testing.T) {
 	g := NewGomegaWithT(t)
 
@@ -80,8 +84,8 @@ func TestHostsCreateDedicatedServers(t *testing.T) {
 			"48:81:0c:43:99:12:71:5e:ba:fd:e7:2f:20:d7:95:e8",
 		},
 		Hosts: []DedicatedServerHostInput{
-			{Hostname: "example.aa"},
-			{Hostname: "example.bb"},
+			{Hostname: "example.aa", Labels: map[string]string{"env": "test"}},
+			{Hostname: "example.bb", Labels: map[string]string{"env": "test"}},
 		},
 	}
 
@@ -94,7 +98,7 @@ func TestHostsCreateDedicatedServers(t *testing.T) {
 
 	dedicatedServer := dedicatedServers[0]
 
-	g.Expect(dedicatedServer.ID).To(Equal("xkazYeJ0"))
+	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
 	g.Expect(dedicatedServer.Status).To(Equal("init"))
@@ -102,6 +106,7 @@ func TestHostsCreateDedicatedServers(t *testing.T) {
 	g.Expect(dedicatedServer.PrivateIPv4Address).To(BeNil())
 	g.Expect(dedicatedServer.PublicIPv4Address).To(BeNil())
 	g.Expect(dedicatedServer.ScheduledRelease).To(BeNil())
+	g.Expect(dedicatedServer.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(dedicatedServer.Created.String()).To(Equal("2020-04-22 06:22:04 +0000 UTC"))
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:04 +0000 UTC"))
 
@@ -115,6 +120,7 @@ func TestHostsCreateDedicatedServers(t *testing.T) {
 	g.Expect(dedicatedServer.PrivateIPv4Address).To(BeNil())
 	g.Expect(dedicatedServer.PublicIPv4Address).To(BeNil())
 	g.Expect(dedicatedServer.ScheduledRelease).To(BeNil())
+	g.Expect(dedicatedServer.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(dedicatedServer.Created.String()).To(Equal("2020-04-22 06:22:04 +0000 UTC"))
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:04 +0000 UTC"))
 }
@@ -123,7 +129,7 @@ func TestHostsGetDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID).
 		WithRequestMethod("GET").
 		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_response.json").
 		WithResponseCode(200).
@@ -133,12 +139,12 @@ func TestHostsGetDedicatedServer(t *testing.T) {
 
 	ctx := context.TODO()
 
-	dedicatedServer, err := client.Hosts.GetDedicatedServer(ctx, "xkazYeJ0")
+	dedicatedServer, err := client.Hosts.GetDedicatedServer(ctx, serverID)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())
 
-	g.Expect(dedicatedServer.ID).To(Equal("xkazYeJ0"))
+	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
 	g.Expect(dedicatedServer.Status).To(Equal("active"))
@@ -146,6 +152,41 @@ func TestHostsGetDedicatedServer(t *testing.T) {
 	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
 	g.Expect(*dedicatedServer.PublicIPv4Address).To(Equal("169.254.0.1"))
 	g.Expect(dedicatedServer.ScheduledRelease).To(BeNil())
+	g.Expect(dedicatedServer.Labels).To(Equal(map[string]string{"env": "test"}))
+	g.Expect(dedicatedServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}
+
+func TestHostsUpdateDedicatedServer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/" + serverID).
+		WithRequestMethod("PUT").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/update_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	newLabels := map[string]string{"env": "new-test"}
+
+	dedicatedServer, err := client.Hosts.UpdateDedicatedServer(ctx, serverID, DedicatedServerUpdateInput{Labels: newLabels})
+
+	g.Expect(err).To(BeNil())
+	g.Expect(dedicatedServer).ToNot(BeNil())
+
+	g.Expect(dedicatedServer.ID).To(Equal(serverID))
+	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
+	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
+	g.Expect(dedicatedServer.Status).To(Equal("active"))
+	g.Expect(dedicatedServer.Configuration).To(Equal("REMM R123"))
+	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
+	g.Expect(*dedicatedServer.PublicIPv4Address).To(Equal("169.254.0.1"))
+	g.Expect(dedicatedServer.ScheduledRelease).To(BeNil())
+	g.Expect(dedicatedServer.Labels).To(Equal(newLabels))
 	g.Expect(dedicatedServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
@@ -154,7 +195,7 @@ func TestHostsScheduleReleaseForDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/schedule_release").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/schedule_release").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/schedule_release_response.json").
 		WithResponseCode(200).
@@ -164,12 +205,12 @@ func TestHostsScheduleReleaseForDedicatedServer(t *testing.T) {
 
 	ctx := context.TODO()
 
-	dedicatedServer, err := client.Hosts.ScheduleReleaseForDedicatedServer(ctx, "xkazYeJ0")
+	dedicatedServer, err := client.Hosts.ScheduleReleaseForDedicatedServer(ctx, serverID)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())
 
-	g.Expect(dedicatedServer.ID).To(Equal("xkazYeJ0"))
+	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
 	g.Expect(dedicatedServer.Status).To(Equal("active"))
@@ -180,6 +221,7 @@ func TestHostsScheduleReleaseForDedicatedServer(t *testing.T) {
 	scheduledRelease := *dedicatedServer.ScheduledRelease
 
 	g.Expect(scheduledRelease.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+	g.Expect(dedicatedServer.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(dedicatedServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
@@ -188,7 +230,7 @@ func TestHostsAbortReleaseForDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/abort_release").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/abort_release").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/abort_release_response.json").
 		WithResponseCode(200).
@@ -198,12 +240,12 @@ func TestHostsAbortReleaseForDedicatedServer(t *testing.T) {
 
 	ctx := context.TODO()
 
-	dedicatedServer, err := client.Hosts.AbortReleaseForDedicatedServer(ctx, "xkazYeJ0")
+	dedicatedServer, err := client.Hosts.AbortReleaseForDedicatedServer(ctx, serverID)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())
 
-	g.Expect(dedicatedServer.ID).To(Equal("xkazYeJ0"))
+	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
 	g.Expect(dedicatedServer.Status).To(Equal("active"))
@@ -211,6 +253,7 @@ func TestHostsAbortReleaseForDedicatedServer(t *testing.T) {
 	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
 	g.Expect(*dedicatedServer.PublicIPv4Address).To(Equal("169.254.0.1"))
 	g.Expect(dedicatedServer.ScheduledRelease).To(BeNil())
+	g.Expect(dedicatedServer.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(dedicatedServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
@@ -219,7 +262,7 @@ func TestHostsPowerOnDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/power_on").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/power_on").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_response.json").
 		WithResponseCode(202).
@@ -229,12 +272,12 @@ func TestHostsPowerOnDedicatedServer(t *testing.T) {
 
 	ctx := context.TODO()
 
-	dedicatedServer, err := client.Hosts.PowerOnDedicatedServer(ctx, "xkazYeJ0")
+	dedicatedServer, err := client.Hosts.PowerOnDedicatedServer(ctx, serverID)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())
 
-	g.Expect(dedicatedServer.ID).To(Equal("xkazYeJ0"))
+	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
 	g.Expect(dedicatedServer.Status).To(Equal("active"))
@@ -242,6 +285,7 @@ func TestHostsPowerOnDedicatedServer(t *testing.T) {
 	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
 	g.Expect(*dedicatedServer.PublicIPv4Address).To(Equal("169.254.0.1"))
 	g.Expect(dedicatedServer.ScheduledRelease).To(BeNil())
+	g.Expect(dedicatedServer.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(dedicatedServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
@@ -250,7 +294,7 @@ func TestHostsPowerOffDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/power_off").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/power_off").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_response.json").
 		WithResponseCode(202).
@@ -260,12 +304,12 @@ func TestHostsPowerOffDedicatedServer(t *testing.T) {
 
 	ctx := context.TODO()
 
-	dedicatedServer, err := client.Hosts.PowerOffDedicatedServer(ctx, "xkazYeJ0")
+	dedicatedServer, err := client.Hosts.PowerOffDedicatedServer(ctx, serverID)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())
 
-	g.Expect(dedicatedServer.ID).To(Equal("xkazYeJ0"))
+	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
 	g.Expect(dedicatedServer.Status).To(Equal("active"))
@@ -273,6 +317,7 @@ func TestHostsPowerOffDedicatedServer(t *testing.T) {
 	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
 	g.Expect(*dedicatedServer.PublicIPv4Address).To(Equal("169.254.0.1"))
 	g.Expect(dedicatedServer.ScheduledRelease).To(BeNil())
+	g.Expect(dedicatedServer.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(dedicatedServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
@@ -281,7 +326,7 @@ func TestHostsPowerCycleDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/power_cycle").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/power_cycle").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_response.json").
 		WithResponseCode(202).
@@ -291,12 +336,12 @@ func TestHostsPowerCycleDedicatedServer(t *testing.T) {
 
 	ctx := context.TODO()
 
-	dedicatedServer, err := client.Hosts.PowerCycleDedicatedServer(ctx, "xkazYeJ0")
+	dedicatedServer, err := client.Hosts.PowerCycleDedicatedServer(ctx, serverID)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())
 
-	g.Expect(dedicatedServer.ID).To(Equal("xkazYeJ0"))
+	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
 	g.Expect(dedicatedServer.Status).To(Equal("active"))
@@ -304,6 +349,7 @@ func TestHostsPowerCycleDedicatedServer(t *testing.T) {
 	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
 	g.Expect(*dedicatedServer.PublicIPv4Address).To(Equal("169.254.0.1"))
 	g.Expect(dedicatedServer.ScheduledRelease).To(BeNil())
+	g.Expect(dedicatedServer.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(dedicatedServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
@@ -312,7 +358,7 @@ func TestHostsDedicatedServerPowerFeeds(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/power_feeds").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/power_feeds").
 		WithRequestMethod("GET").
 		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/power_feeds_response.json").
 		WithResponseCode(200).
@@ -322,7 +368,7 @@ func TestHostsDedicatedServerPowerFeeds(t *testing.T) {
 
 	ctx := context.TODO()
 
-	powerFeeds, err := client.Hosts.DedicatedServerPowerFeeds(ctx, "xkazYeJ0")
+	powerFeeds, err := client.Hosts.DedicatedServerPowerFeeds(ctx, serverID)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(len(powerFeeds)).To(Equal(2))
@@ -342,7 +388,7 @@ func TestHostsCreatePTRRecordForDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/ptr_records").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/ptr_records").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/ptr_record_create_response.json").
 		WithResponseCode(200).
@@ -362,7 +408,7 @@ func TestHostsCreatePTRRecordForDedicatedServer(t *testing.T) {
 		Priority: &priorityValue,
 	}
 
-	ptrRecord, err := client.Hosts.CreatePTRRecordForDedicatedServer(ctx, "xkazYeJ0", input)
+	ptrRecord, err := client.Hosts.CreatePTRRecordForDedicatedServer(ctx, serverID, input)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(ptrRecord).ToNot(BeNil())
@@ -378,7 +424,7 @@ func TestHostsDeletePTRRecordForDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/ptr_records/oQeZzvep").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/ptr_records/oQeZzvep").
 		WithRequestMethod("DELETE").
 		WithResponseCode(204).
 		Build()
@@ -387,7 +433,7 @@ func TestHostsDeletePTRRecordForDedicatedServer(t *testing.T) {
 
 	ctx := context.TODO()
 
-	err := client.Hosts.DeletePTRRecordForDedicatedServer(ctx, "xkazYeJ0", "oQeZzvep")
+	err := client.Hosts.DeletePTRRecordForDedicatedServer(ctx, serverID, "oQeZzvep")
 
 	g.Expect(err).To(BeNil())
 }
@@ -396,7 +442,7 @@ func TestHostsReinstallOperatingSystemForDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/xkazYeJ0/reinstall").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/reinstall").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_response.json").
 		WithResponseCode(202).
@@ -428,12 +474,12 @@ func TestHostsReinstallOperatingSystemForDedicatedServer(t *testing.T) {
 
 	ctx := context.TODO()
 
-	dedicatedServer, err := client.Hosts.ReinstallOperatingSystemForDedicatedServer(ctx, "xkazYeJ0", input)
+	dedicatedServer, err := client.Hosts.ReinstallOperatingSystemForDedicatedServer(ctx, serverID, input)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())
 
-	g.Expect(dedicatedServer.ID).To(Equal("xkazYeJ0"))
+	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
 	g.Expect(dedicatedServer.Status).To(Equal("active"))
@@ -441,6 +487,7 @@ func TestHostsReinstallOperatingSystemForDedicatedServer(t *testing.T) {
 	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
 	g.Expect(*dedicatedServer.PublicIPv4Address).To(Equal("169.254.0.1"))
 	g.Expect(dedicatedServer.ScheduledRelease).To(BeNil())
+	g.Expect(dedicatedServer.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(dedicatedServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 	g.Expect(dedicatedServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
@@ -565,8 +612,8 @@ func TestHostsCreateSBMServers(t *testing.T) {
 		LocationID:    int64(1),
 		FlavorModelID: int64(1),
 		Hosts: []SBMServerHostInput{
-			{Hostname: "example.aa"},
-			{Hostname: "example.bb"},
+			{Hostname: "example.aa", Labels: map[string]string{"env": "test"}},
+			{Hostname: "example.bb", Labels: map[string]string{"env": "test"}},
 		},
 	}
 
@@ -579,7 +626,7 @@ func TestHostsCreateSBMServers(t *testing.T) {
 
 	sbmServer := sbmServers[0]
 
-	g.Expect(sbmServer.ID).To(Equal("xkazYeJ0"))
+	g.Expect(sbmServer.ID).To(Equal(serverID))
 	g.Expect(sbmServer.Title).To(Equal("example.aa"))
 	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
 	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
@@ -588,6 +635,7 @@ func TestHostsCreateSBMServers(t *testing.T) {
 	g.Expect(sbmServer.PrivateIPv4Address).To(BeNil())
 	g.Expect(sbmServer.PublicIPv4Address).To(BeNil())
 	g.Expect(sbmServer.ScheduledRelease).To(BeNil())
+	g.Expect(sbmServer.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(sbmServer.Created.String()).To(Equal("2020-04-22 06:22:04 +0000 UTC"))
 	g.Expect(sbmServer.Updated.String()).To(Equal("2020-04-22 06:22:04 +0000 UTC"))
 
@@ -602,6 +650,7 @@ func TestHostsCreateSBMServers(t *testing.T) {
 	g.Expect(sbmServer.PrivateIPv4Address).To(BeNil())
 	g.Expect(sbmServer.PublicIPv4Address).To(BeNil())
 	g.Expect(sbmServer.ScheduledRelease).To(BeNil())
+	g.Expect(sbmServer.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(sbmServer.Created.String()).To(Equal("2020-04-22 06:22:04 +0000 UTC"))
 	g.Expect(sbmServer.Updated.String()).To(Equal("2020-04-22 06:22:04 +0000 UTC"))
 }
@@ -610,7 +659,7 @@ func TestHostsGetSBMServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/sbm_servers/xkazYeJ0").
+		WithRequestPath("/hosts/sbm_servers/" + serverID).
 		WithRequestMethod("GET").
 		WithResponseBodyStubFile("fixtures/hosts/sbm_servers/get_response.json").
 		WithResponseCode(200).
@@ -620,12 +669,12 @@ func TestHostsGetSBMServer(t *testing.T) {
 
 	ctx := context.TODO()
 
-	sbmServer, err := client.Hosts.GetSBMServer(ctx, "xkazYeJ0")
+	sbmServer, err := client.Hosts.GetSBMServer(ctx, serverID)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(sbmServer).ToNot(BeNil())
 
-	g.Expect(sbmServer.ID).To(Equal("xkazYeJ0"))
+	g.Expect(sbmServer.ID).To(Equal(serverID))
 	g.Expect(sbmServer.Title).To(Equal("example.aa"))
 	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
 	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
@@ -634,6 +683,42 @@ func TestHostsGetSBMServer(t *testing.T) {
 	g.Expect(*sbmServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
 	g.Expect(*sbmServer.PublicIPv4Address).To(Equal("169.254.0.1"))
 	g.Expect(sbmServer.ScheduledRelease).To(BeNil())
+	g.Expect(sbmServer.Labels).To(Equal(map[string]string{"env": "test"}))
+	g.Expect(sbmServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+	g.Expect(sbmServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}
+
+func TestHostsUpdateSBMServer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers/" + serverID).
+		WithRequestMethod("PUT").
+		WithResponseBodyStubFile("fixtures/hosts/sbm_servers/update_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	newLabels := map[string]string{"env": "new-test"}
+
+	sbmServer, err := client.Hosts.UpdateSBMServer(ctx, serverID, SBMServerUpdateInput{Labels: newLabels})
+
+	g.Expect(err).To(BeNil())
+	g.Expect(sbmServer).ToNot(BeNil())
+
+	g.Expect(sbmServer.ID).To(Equal(serverID))
+	g.Expect(sbmServer.Title).To(Equal("example.aa"))
+	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
+	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.Status).To(Equal("active"))
+	g.Expect(sbmServer.Configuration).To(Equal("REMM R123"))
+	g.Expect(*sbmServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
+	g.Expect(*sbmServer.PublicIPv4Address).To(Equal("169.254.0.1"))
+	g.Expect(sbmServer.ScheduledRelease).To(BeNil())
+	g.Expect(sbmServer.Labels).To(Equal(newLabels))
 	g.Expect(sbmServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 	g.Expect(sbmServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
@@ -642,7 +727,7 @@ func TestHostsReleaseSBMServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/sbm_servers/xkazYeJ0").
+		WithRequestPath("/hosts/sbm_servers/" + serverID).
 		WithRequestMethod("DELETE").
 		WithResponseBodyStubFile("fixtures/hosts/sbm_servers/release_response.json").
 		WithResponseCode(200).
@@ -652,12 +737,12 @@ func TestHostsReleaseSBMServer(t *testing.T) {
 
 	ctx := context.TODO()
 
-	sbmServer, err := client.Hosts.ReleaseSBMServer(ctx, "xkazYeJ0")
+	sbmServer, err := client.Hosts.ReleaseSBMServer(ctx, serverID)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(sbmServer).ToNot(BeNil())
 
-	g.Expect(sbmServer.ID).To(Equal("xkazYeJ0"))
+	g.Expect(sbmServer.ID).To(Equal(serverID))
 	g.Expect(sbmServer.Title).To(Equal("example.aa"))
 	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
 	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
@@ -665,6 +750,296 @@ func TestHostsReleaseSBMServer(t *testing.T) {
 	g.Expect(sbmServer.Configuration).To(Equal("REMM R123"))
 	g.Expect(*sbmServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
 	g.Expect(*sbmServer.PublicIPv4Address).To(Equal("169.254.0.1"))
+	g.Expect(sbmServer.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(sbmServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 	g.Expect(sbmServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}
+
+func TestHostsPowerOnSBMServer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers/" + serverID + "/power_on").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/sbm_servers/get_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	sbmServer, err := client.Hosts.PowerOnSBMServer(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(sbmServer).ToNot(BeNil())
+
+	g.Expect(sbmServer.ID).To(Equal(serverID))
+	g.Expect(sbmServer.Title).To(Equal("example.aa"))
+	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
+	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.Status).To(Equal("active"))
+	g.Expect(sbmServer.Configuration).To(Equal("REMM R123"))
+	g.Expect(*sbmServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
+	g.Expect(*sbmServer.PublicIPv4Address).To(Equal("169.254.0.1"))
+	g.Expect(sbmServer.Labels).To(Equal(map[string]string{"env": "test"}))
+	g.Expect(sbmServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+	g.Expect(sbmServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}
+
+func TestHostsPowerOffSBMServer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers/" + serverID + "/power_off").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/sbm_servers/get_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	sbmServer, err := client.Hosts.PowerOffSBMServer(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(sbmServer).ToNot(BeNil())
+
+	g.Expect(sbmServer.ID).To(Equal(serverID))
+	g.Expect(sbmServer.Title).To(Equal("example.aa"))
+	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
+	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.Status).To(Equal("active"))
+	g.Expect(sbmServer.Configuration).To(Equal("REMM R123"))
+	g.Expect(*sbmServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
+	g.Expect(*sbmServer.PublicIPv4Address).To(Equal("169.254.0.1"))
+	g.Expect(sbmServer.Labels).To(Equal(map[string]string{"env": "test"}))
+	g.Expect(sbmServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+	g.Expect(sbmServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}
+
+func TestHostsPowerCycleSBMServer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers/" + serverID + "/power_cycle").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/sbm_servers/get_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	sbmServer, err := client.Hosts.PowerCycleSBMServer(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(sbmServer).ToNot(BeNil())
+
+	g.Expect(sbmServer.ID).To(Equal(serverID))
+	g.Expect(sbmServer.Title).To(Equal("example.aa"))
+	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
+	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.Status).To(Equal("active"))
+	g.Expect(sbmServer.Configuration).To(Equal("REMM R123"))
+	g.Expect(*sbmServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
+	g.Expect(*sbmServer.PublicIPv4Address).To(Equal("169.254.0.1"))
+	g.Expect(sbmServer.Labels).To(Equal(map[string]string{"env": "test"}))
+	g.Expect(sbmServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+	g.Expect(sbmServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}
+
+func TestReinstallOperatingSystemForSBMServer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers/" + serverID + "/reinstall").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/sbm_servers/get_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	sbmServer, err := client.Hosts.ReinstallOperatingSystemForSBMServer(ctx, serverID, SBMOperatingSystemReinstallInput{Hostname: "example.aa", OperatingSystemID: 1})
+
+	g.Expect(err).To(BeNil())
+	g.Expect(sbmServer).ToNot(BeNil())
+
+	g.Expect(sbmServer.ID).To(Equal(serverID))
+	g.Expect(sbmServer.Title).To(Equal("example.aa"))
+	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
+	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.Status).To(Equal("active"))
+	g.Expect(sbmServer.Configuration).To(Equal("REMM R123"))
+	g.Expect(*sbmServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
+	g.Expect(*sbmServer.PublicIPv4Address).To(Equal("169.254.0.1"))
+	g.Expect(sbmServer.Labels).To(Equal(map[string]string{"env": "test"}))
+	g.Expect(sbmServer.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+	g.Expect(sbmServer.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}
+
+func TestHostsGetKubernetesBaremetalNode(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/kubernetes_baremetal_nodes/" + serverID).
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/hosts/kubernetes_baremetal_nodes/get_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	node, err := client.Hosts.GetKubernetesBaremetalNode(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(node).ToNot(BeNil())
+
+	g.Expect(node.ID).To(Equal(serverID))
+	g.Expect(node.Title).To(Equal("example.aa"))
+	g.Expect(node.LocationID).To(Equal(int64(1)))
+	g.Expect(node.Status).To(Equal("active"))
+	g.Expect(node.Configuration).To(Equal("REMM R123"))
+	g.Expect(*node.PrivateIPv4Address).To(Equal("10.0.0.1"))
+	g.Expect(*node.PublicIPv4Address).To(Equal("169.254.0.1"))
+	g.Expect(node.ScheduledRelease).To(BeNil())
+	g.Expect(node.Labels).To(Equal(map[string]string{"env": "test"}))
+	g.Expect(node.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+	g.Expect(node.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}
+
+func TestHostsUpdateKubernetesBaremetalNode(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/kubernetes_baremetal_nodes/" + serverID).
+		WithRequestMethod("PUT").
+		WithResponseBodyStubFile("fixtures/hosts/kubernetes_baremetal_nodes/update_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	newLabels := map[string]string{"env": "new-test"}
+	node, err := client.Hosts.UpdateKubernetesBaremetalNode(ctx, serverID, KubernetesBaremetalNodeUpdateInput{Labels: newLabels})
+
+	g.Expect(err).To(BeNil())
+	g.Expect(node).ToNot(BeNil())
+
+	g.Expect(node.ID).To(Equal(serverID))
+	g.Expect(node.Title).To(Equal("example.aa"))
+	g.Expect(node.LocationID).To(Equal(int64(1)))
+	g.Expect(node.Status).To(Equal("active"))
+	g.Expect(node.Configuration).To(Equal("REMM R123"))
+	g.Expect(*node.PrivateIPv4Address).To(Equal("10.0.0.1"))
+	g.Expect(*node.PublicIPv4Address).To(Equal("169.254.0.1"))
+	g.Expect(node.ScheduledRelease).To(BeNil())
+	g.Expect(node.Labels).To(Equal(newLabels))
+	g.Expect(node.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+	g.Expect(node.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}
+
+func TestHostsPowerOnKubernetesBaremetalNode(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/kubernetes_baremetal_nodes/" + serverID + "/power_on").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/kubernetes_baremetal_nodes/get_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	node, err := client.Hosts.PowerOnKubernetesBaremetalNode(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(node).ToNot(BeNil())
+
+	g.Expect(node.ID).To(Equal(serverID))
+	g.Expect(node.Title).To(Equal("example.aa"))
+	g.Expect(node.Type).To(Equal("kubernetes_baremetal_node"))
+	g.Expect(node.LocationID).To(Equal(int64(1)))
+	g.Expect(node.Status).To(Equal("active"))
+	g.Expect(node.Configuration).To(Equal("REMM R123"))
+	g.Expect(*node.PrivateIPv4Address).To(Equal("10.0.0.1"))
+	g.Expect(*node.PublicIPv4Address).To(Equal("169.254.0.1"))
+	g.Expect(node.Labels).To(Equal(map[string]string{"env": "test"}))
+	g.Expect(node.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+	g.Expect(node.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}
+
+func TestHostsPowerOffKubernetesBaremetalNode(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/kubernetes_baremetal_nodes/" + serverID + "/power_off").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/kubernetes_baremetal_nodes/get_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	node, err := client.Hosts.PowerOffKubernetesBaremetalNode(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(node).ToNot(BeNil())
+
+	g.Expect(node.ID).To(Equal(serverID))
+	g.Expect(node.Title).To(Equal("example.aa"))
+	g.Expect(node.Type).To(Equal("kubernetes_baremetal_node"))
+	g.Expect(node.LocationID).To(Equal(int64(1)))
+	g.Expect(node.Status).To(Equal("active"))
+	g.Expect(node.Configuration).To(Equal("REMM R123"))
+	g.Expect(*node.PrivateIPv4Address).To(Equal("10.0.0.1"))
+	g.Expect(*node.PublicIPv4Address).To(Equal("169.254.0.1"))
+	g.Expect(node.Labels).To(Equal(map[string]string{"env": "test"}))
+	g.Expect(node.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+	g.Expect(node.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}
+
+func TestHostsPowerCycleKubernetesBaremetalNode(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/kubernetes_baremetal_nodes/" + serverID + "/power_cycle").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/kubernetes_baremetal_nodes/get_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	node, err := client.Hosts.PowerCycleKubernetesBaremetalNode(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(node).ToNot(BeNil())
+
+	g.Expect(node.ID).To(Equal(serverID))
+	g.Expect(node.Title).To(Equal("example.aa"))
+	g.Expect(node.Type).To(Equal("kubernetes_baremetal_node"))
+	g.Expect(node.LocationID).To(Equal(int64(1)))
+	g.Expect(node.Status).To(Equal("active"))
+	g.Expect(node.Configuration).To(Equal("REMM R123"))
+	g.Expect(*node.PrivateIPv4Address).To(Equal("10.0.0.1"))
+	g.Expect(*node.PublicIPv4Address).To(Equal("169.254.0.1"))
+	g.Expect(node.Labels).To(Equal(map[string]string{"env": "test"}))
+	g.Expect(node.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+	g.Expect(node.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
