@@ -56,6 +56,7 @@ func TestNetworkPoolsGet(t *testing.T) {
 	g.Expect(*networkPool.Title).To(Equal("new-network-pool-title"))
 	g.Expect(networkPool.CIDR).To(Equal("10.0.0.0/20"))
 	g.Expect(networkPool.Type).To(Equal("private"))
+	g.Expect(networkPool.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(networkPool.Created.String()).To(Equal("2021-03-24 11:46:35 +0000 UTC"))
 	g.Expect(networkPool.Updated.String()).To(Equal("2021-03-24 11:46:35 +0000 UTC"))
 }
@@ -66,7 +67,7 @@ func TestNetworkPoolsUpdate(t *testing.T) {
 	ts, client := newFakeServer().
 		WithRequestPath("/network_pools/a").
 		WithRequestMethod("PUT").
-		WithRequestBody(`{"title":"some"}`).
+		WithRequestBody(`{"title":"some","labels":{"env":"new-test"}}`).
 		WithResponseBodyStubFile("fixtures/network_pools/update_response.json").
 		WithResponseCode(200).
 		Build()
@@ -76,8 +77,9 @@ func TestNetworkPoolsUpdate(t *testing.T) {
 	ctx := context.TODO()
 
 	newTitle := "some"
+	newLabels := map[string]string{"env": "new-test"}
 
-	networkPool, err := client.NetworkPools.Update(ctx, "a", NetworkPoolInput{Title: &newTitle})
+	networkPool, err := client.NetworkPools.Update(ctx, "a", NetworkPoolInput{Title: &newTitle, Labels: newLabels})
 
 	g.Expect(err).To(BeNil())
 	g.Expect(networkPool).ToNot(BeNil())
@@ -86,6 +88,7 @@ func TestNetworkPoolsUpdate(t *testing.T) {
 	g.Expect(*networkPool.Title).To(Equal("some"))
 	g.Expect(networkPool.CIDR).To(Equal("10.0.0.0/20"))
 	g.Expect(networkPool.Type).To(Equal("private"))
+	g.Expect(networkPool.Labels).To(Equal(newLabels))
 	g.Expect(networkPool.Created.String()).To(Equal("2021-03-24 11:46:37 +0000 UTC"))
 	g.Expect(networkPool.Updated.String()).To(Equal("2021-03-24 11:46:38 +0000 UTC"))
 }

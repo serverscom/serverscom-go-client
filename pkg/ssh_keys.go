@@ -30,12 +30,13 @@ type SSHKeysHandler struct {
 }
 
 // Collection builds a new Collection[SSHKey] interface
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/SSH-Key/operation/ListSshKeys
 func (h *SSHKeysHandler) Collection() Collection[SSHKey] {
 	return NewCollection[SSHKey](h.client, sshKeyListPath)
 }
 
 // Get ssh key
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ShowSshKey
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/SSH-Key/operation/GetAnSshKey
 func (h *SSHKeysHandler) Get(ctx context.Context, fingerprint string) (*SSHKey, error) {
 	url := h.client.buildURL(sshKeyPath, []interface{}{fingerprint}...)
 
@@ -55,7 +56,7 @@ func (h *SSHKeysHandler) Get(ctx context.Context, fingerprint string) (*SSHKey, 
 }
 
 // Create ssh key
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/AddNewSshKey
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/SSH-Key/operation/AddAnSshKey
 func (h *SSHKeysHandler) Create(ctx context.Context, input SSHKeyCreateInput) (*SSHKey, error) {
 	payload, err := json.Marshal(input)
 
@@ -81,7 +82,7 @@ func (h *SSHKeysHandler) Create(ctx context.Context, input SSHKeyCreateInput) (*
 }
 
 // Update ssh key
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/UpdateTheNameOfSshKey
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/SSH-Key/operation/UpdateAnSshKey
 func (h *SSHKeysHandler) Update(ctx context.Context, fingerprint string, input SSHKeyUpdateInput) (*SSHKey, error) {
 	payload, err := json.Marshal(input)
 
@@ -107,7 +108,7 @@ func (h *SSHKeysHandler) Update(ctx context.Context, fingerprint string, input S
 }
 
 // Delete ssh key
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/DeleteSshKey
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/SSH-Key/operation/DeleteAnSshKey
 func (h *SSHKeysHandler) Delete(ctx context.Context, fingerprint string) error {
 	url := h.client.buildURL(sshKeyPath, []interface{}{fingerprint}...)
 

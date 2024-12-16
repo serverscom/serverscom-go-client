@@ -59,12 +59,13 @@ type CloudComputingInstancesHandler struct {
 }
 
 // Collection builds a new Collection[CloudComputingInstance] interface
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/ListCloudInstances
 func (h *CloudComputingInstancesHandler) Collection() Collection[CloudComputingInstance] {
 	return NewCollection[CloudComputingInstance](h.client, cloudInstanceListPath)
 }
 
 // Get cloud instance
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ShowCloudComputingInstance
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/GetACloudInstance
 func (h *CloudComputingInstancesHandler) Get(ctx context.Context, id string) (*CloudComputingInstance, error) {
 	url := h.client.buildURL(cloudInstancePath, []interface{}{id}...)
 
@@ -84,7 +85,7 @@ func (h *CloudComputingInstancesHandler) Get(ctx context.Context, id string) (*C
 }
 
 // Create cloud instace
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/CreateANewCloudComputingInstance
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/CreateACloudInstance
 func (h *CloudComputingInstancesHandler) Create(ctx context.Context, input CloudComputingInstanceCreateInput) (*CloudComputingInstance, error) {
 	payload, err := json.Marshal(input)
 
@@ -110,7 +111,7 @@ func (h *CloudComputingInstancesHandler) Create(ctx context.Context, input Cloud
 }
 
 // Update cloud instance
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/UpdateCloudComputingInstance
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/UpdateACloudInstance
 func (h *CloudComputingInstancesHandler) Update(ctx context.Context, id string, input CloudComputingInstanceUpdateInput) (*CloudComputingInstance, error) {
 	payload, err := json.Marshal(input)
 
@@ -136,7 +137,7 @@ func (h *CloudComputingInstancesHandler) Update(ctx context.Context, id string, 
 }
 
 // Delete cloud instance
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/DeleteInstance
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/DeleteACloudInstance
 func (h *CloudComputingInstancesHandler) Delete(ctx context.Context, id string) error {
 	url := h.client.buildURL(cloudInstanceDeletePath, []interface{}{id}...)
 
@@ -146,7 +147,7 @@ func (h *CloudComputingInstancesHandler) Delete(ctx context.Context, id string) 
 }
 
 // Reinstall cloud instance
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ReinstallInstanceWithImage
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/ReinstallACloudInstance
 func (h *CloudComputingInstancesHandler) Reinstall(ctx context.Context, id string, input CloudComputingInstanceReinstallInput) (*CloudComputingInstance, error) {
 	payload, err := json.Marshal(input)
 
@@ -172,7 +173,7 @@ func (h *CloudComputingInstancesHandler) Reinstall(ctx context.Context, id strin
 }
 
 // Rescue cloud instance
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/MoveInstanceToRescueState
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/ActivateRescueModeForACloudInstance
 func (h *CloudComputingInstancesHandler) Rescue(ctx context.Context, id string) (*CloudComputingInstance, error) {
 	url := h.client.buildURL(cloudInstanceRescuePath, []interface{}{id}...)
 
@@ -192,7 +193,7 @@ func (h *CloudComputingInstancesHandler) Rescue(ctx context.Context, id string) 
 }
 
 // Unrescue cloud instance
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ExitFromRescueState
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/DeactivateRescueModeForACloudInstance
 func (h *CloudComputingInstancesHandler) Unrescue(ctx context.Context, id string) (*CloudComputingInstance, error) {
 	url := h.client.buildURL(cloudInstanceUnrescuePath, []interface{}{id}...)
 
@@ -212,7 +213,7 @@ func (h *CloudComputingInstancesHandler) Unrescue(ctx context.Context, id string
 }
 
 // Upgrade cloud instance
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/UpgradeInstance
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/UpgradeACloudInstance
 func (h *CloudComputingInstancesHandler) Upgrade(ctx context.Context, id string, input CloudComputingInstanceUpgradeInput) (*CloudComputingInstance, error) {
 	payload, err := json.Marshal(input)
 
@@ -238,7 +239,7 @@ func (h *CloudComputingInstancesHandler) Upgrade(ctx context.Context, id string,
 }
 
 // RevertUpgrade cloud instance
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/RevertInstanceUpgrade
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/RevertUpgradeForACloudInstance
 func (h *CloudComputingInstancesHandler) RevertUpgrade(ctx context.Context, id string) (*CloudComputingInstance, error) {
 	url := h.client.buildURL(cloudInstanceRevertUpgradePath, []interface{}{id}...)
 
@@ -258,7 +259,7 @@ func (h *CloudComputingInstancesHandler) RevertUpgrade(ctx context.Context, id s
 }
 
 // ApproveUpgrade cloud instance
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/ApproveInstanceUpgrade
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/ApproveUpgradeForACloudInstance
 func (h *CloudComputingInstancesHandler) ApproveUpgrade(ctx context.Context, id string) (*CloudComputingInstance, error) {
 	url := h.client.buildURL(cloudInstanceApproveUpgradePath, []interface{}{id}...)
 
@@ -278,7 +279,7 @@ func (h *CloudComputingInstancesHandler) ApproveUpgrade(ctx context.Context, id 
 }
 
 // PowerOn cloud instance
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/SwitchPowerOn
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/PowerOnACloudInstance
 func (h *CloudComputingInstancesHandler) PowerOn(ctx context.Context, id string) (*CloudComputingInstance, error) {
 	url := h.client.buildURL(cloudInstancePowerOnPath, []interface{}{id}...)
 
@@ -298,7 +299,7 @@ func (h *CloudComputingInstancesHandler) PowerOn(ctx context.Context, id string)
 }
 
 // PowerOff cloud instance
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/SwitchPowerOff
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/PowerOffACloudInstance
 func (h *CloudComputingInstancesHandler) PowerOff(ctx context.Context, id string) (*CloudComputingInstance, error) {
 	url := h.client.buildURL(cloudInstancePowerOffPath, []interface{}{id}...)
 
@@ -318,6 +319,7 @@ func (h *CloudComputingInstancesHandler) PowerOff(ctx context.Context, id string
 }
 
 // PTRRecords builds a new Collection[PTRRecord] interface
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/ListPtrRecordsForACloudInstance
 func (h *CloudComputingInstancesHandler) PTRRecords(id string) Collection[PTRRecord] {
 	path := h.client.buildPath(cloudInstancePTRsListPath, []interface{}{id}...)
 
@@ -325,7 +327,7 @@ func (h *CloudComputingInstancesHandler) PTRRecords(id string) Collection[PTRRec
 }
 
 // CreatePTRRecord creates ptr record for the cloud instance
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/CreatePtrForInstance
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/CreateAPtrRecordForACloudInstance
 func (h *CloudComputingInstancesHandler) CreatePTRRecord(ctx context.Context, cloudInstanceID string, input PTRRecordCreateInput) (*PTRRecord, error) {
 	url := h.client.buildURL(cloudInstanceCreatePTRRecordPath, []interface{}{cloudInstanceID}...)
 
@@ -345,7 +347,7 @@ func (h *CloudComputingInstancesHandler) CreatePTRRecord(ctx context.Context, cl
 }
 
 // DeletePTRRecord deleted ptr record for the cloud instance
-// Endpoint: https://developers.servers.com/api-documentation/v1/#operation/DetetePtrForInstance
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/DeleteAPtrRecordForACloudInstance
 func (h *CloudComputingInstancesHandler) DeletePTRRecord(ctx context.Context, cloudInstanceID string, ptrRecordID string) error {
 	url := h.client.buildURL(cloudInstanceDeletePTRRecordPath, []interface{}{cloudInstanceID, ptrRecordID}...)
 

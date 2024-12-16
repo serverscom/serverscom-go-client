@@ -4,6 +4,9 @@
     "type": "public",
     "status": "pending",
     "location_group_id": 1,
+    "labels": {
+        "env": "test"
+    },
     "updated_at": "2020-04-22T06:22:51Z",
     "created_at": "2020-04-22T06:22:51Z"
 }

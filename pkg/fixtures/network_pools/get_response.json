@@ -6,6 +6,9 @@
   "location_ids": [
     541
   ],
+  "labels": {
+    "env": "test"
+  },
   "updated_at": "2021-03-24T11:46:35Z",
   "created_at": "2021-03-24T11:46:35Z"
 }

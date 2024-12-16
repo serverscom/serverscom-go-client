@@ -50,6 +50,7 @@ func TestCloudComputingInstancesCreate(t *testing.T) {
 		FlavorID: "102",
 		ImageID:  "76effbf9-76e5-46d2-a21d-ee2a72cc8757",
 		RegionID: 0,
+		Labels:   map[string]string{"env": "test"},
 	}
 
 	ctx := context.TODO()
@@ -68,6 +69,7 @@ func TestCloudComputingInstancesCreate(t *testing.T) {
 	g.Expect(cloudInstance.PublicIPv4Address).To(BeNil())
 	g.Expect(cloudInstance.PrivateIPv4Address).To(BeNil())
 	g.Expect(cloudInstance.PublicIPv6Address).To(BeNil())
+	g.Expect(cloudInstance.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:28 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:28 +0000 UTC"))
 }
@@ -100,6 +102,7 @@ func TestCloudComputingInstancesGet(t *testing.T) {
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
 	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
+	g.Expect(cloudInstance.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
@@ -119,8 +122,9 @@ func TestCloudComputingInstancesUpdate(t *testing.T) {
 	ctx := context.TODO()
 
 	newName := "some"
+	newLabels := map[string]string{"env": "test"}
 
-	cloudInstance, err := client.CloudComputingInstances.Update(ctx, "BDbDxbl2", CloudComputingInstanceUpdateInput{Name: &newName})
+	cloudInstance, err := client.CloudComputingInstances.Update(ctx, "BDbDxbl2", CloudComputingInstanceUpdateInput{Name: &newName, Labels: newLabels})
 
 	g.Expect(err).To(BeNil())
 	g.Expect(cloudInstance).ToNot(BeNil())
@@ -134,6 +138,7 @@ func TestCloudComputingInstancesUpdate(t *testing.T) {
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
 	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
+	g.Expect(cloudInstance.Labels).To(Equal(newLabels))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
@@ -184,6 +189,7 @@ func TestCloudComputingInstancesReinstall(t *testing.T) {
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
 	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
+	g.Expect(cloudInstance.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
@@ -216,6 +222,7 @@ func TestCloudComputingInstancesRescue(t *testing.T) {
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
 	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
+	g.Expect(cloudInstance.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
@@ -248,6 +255,7 @@ func TestCloudComputingInstancesUnrescue(t *testing.T) {
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
 	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
+	g.Expect(cloudInstance.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
@@ -280,6 +288,7 @@ func TestCloudComputingInstancesUpgrade(t *testing.T) {
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
 	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
+	g.Expect(cloudInstance.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
@@ -312,6 +321,7 @@ func TestCloudComputingInstancesRevertUpgrade(t *testing.T) {
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
 	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
+	g.Expect(cloudInstance.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
@@ -344,6 +354,7 @@ func TestCloudComputingInstancesApproveUpgrade(t *testing.T) {
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
 	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
+	g.Expect(cloudInstance.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
@@ -376,6 +387,7 @@ func TestCloudComputingInstancesPowerOn(t *testing.T) {
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
 	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
+	g.Expect(cloudInstance.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }
@@ -408,6 +420,7 @@ func TestCloudComputingInstancesPowerOff(t *testing.T) {
 	g.Expect(*cloudInstance.PublicIPv4Address).To(Equal("127.0.0.1"))
 	g.Expect(*cloudInstance.PrivateIPv4Address).To(Equal("127.0.0.2"))
 	g.Expect(*cloudInstance.PublicIPv6Address).To(Equal("::1"))
+	g.Expect(cloudInstance.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(cloudInstance.Created.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 	g.Expect(cloudInstance.Updated.String()).To(Equal("2020-04-22 06:22:32 +0000 UTC"))
 }

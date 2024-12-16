@@ -14,6 +14,9 @@
     "geoip": true,
     "store_logs": true,
     "store_logs_region_id": 2,
+    "labels": {
+        "env": "test"
+    },
     "created_at": "2024-01-01T12:00:00Z",
     "updated_at": "2024-01-01T12:10:00Z",
     "vhost_zones": [

@@ -9,6 +9,9 @@
   ],
   "sha1_fingerprint": "70b0083f15fe81526129eb2569167dcba6f29fc1",
   "expires_at": "2030-04-22T06:23:33Z",
+  "labels": {
+    "env": "test"
+  },
   "created_at": "2020-04-22T06:23:33Z",
   "updated_at": "2020-04-22T06:23:33Z"
 }
