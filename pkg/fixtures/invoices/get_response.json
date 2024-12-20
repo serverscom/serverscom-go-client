@@ -1,0 +1,12 @@
+{
+    "id": "9qzw9Hj4",
+    "number": 843071,
+    "parent_id": null,
+    "status": "paid",
+    "date": "2024-06-23",
+    "type": "invoice",
+    "total_due": 11.90,
+    "currency": "EUR",
+    "csv_url": "url",
+    "pdf_url": "url"
+}
