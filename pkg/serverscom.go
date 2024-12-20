@@ -40,6 +40,8 @@ type Client struct {
 
 	KubernetesClusters KubernetesClustersService
 
+	Invoices InvoiceService
+
 	token string
 
 	client *http.Client
@@ -90,6 +92,7 @@ func (cli *Client) configureResources() {
 	cli.CloudBlockStorageBackups = &CloudBlockStorageBackupsHandler{cli}
 	cli.CloudBlockStorageVolumes = &CloudBlockStorageVolumesHandler{cli}
 	cli.KubernetesClusters = &KubernetesClustersHandler{cli}
+	cli.Invoices = &InvoiceHandler{cli}
 }
 
 func (cli *Client) buildURL(path string, values ...interface{}) string {
