@@ -252,7 +252,7 @@ func (col *CollectionHandler[K]) fireHTTPRequest(ctx context.Context) error {
 
 	col.clean = false
 	col.collection = accumulatedCollectionElements
-	col.rels = hyperHeaderParser(response.Header)
+	col.rels = hyperHeaderParser(response.Header())
 
 	return nil
 }
