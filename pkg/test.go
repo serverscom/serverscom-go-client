@@ -3,7 +3,7 @@ package serverscom
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -103,7 +103,7 @@ func (fs *fakeServer) WithResponseBodyStub(filename string) *fakeServer {
 	_, currentFile, _, _ := runtime.Caller(1)
 	stubFilePath := path.Join(path.Dir(currentFile), "..", filename)
 
-	stub, err := ioutil.ReadFile(stubFilePath)
+	stub, err := os.ReadFile(stubFilePath)
 	if err != nil {
 		panic(fmt.Sprintf("Stub error: %q", err))
 	}
@@ -127,7 +127,7 @@ func (fs *fakeServer) WithResponseBodyStubFile(filePath string) *fakeServer {
 
 	defer f.Close()
 
-	b, err := ioutil.ReadAll(f)
+	b, err := io.ReadAll(f)
 	if err != nil {
 		panic(err)
 	}
@@ -179,7 +179,7 @@ func (fs *fakeServer) Build() (*fakeServer, *Client) {
 			}
 
 			if currentRequest.RequestBody != "" {
-				b, err := ioutil.ReadAll(r.Body)
+				b, err := io.ReadAll(r.Body)
 				defer r.Body.Close()
 				if err != nil {
 					http.Error(w, err.Error(), 500)

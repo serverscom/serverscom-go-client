@@ -40,8 +40,6 @@ type Client struct {
 
 	KubernetesClusters KubernetesClustersService
 
-	token string
-
 	client *resty.Client
 }
 
