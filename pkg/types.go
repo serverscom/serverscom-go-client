@@ -367,7 +367,7 @@ type SSHKeyCreateInput struct {
 
 // SSHKeyUpdateInput represents ssh key update input
 type SSHKeyUpdateInput struct {
-	Name   string            `json:"name"`
+	Name   string            `json:"name,omitempty"`
 	Labels map[string]string `json:"labels,omitempty"`
 }
 

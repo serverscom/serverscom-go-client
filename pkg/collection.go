@@ -235,6 +235,7 @@ func (col *CollectionHandler[K]) Refresh(ctx context.Context) error {
 func (col *CollectionHandler[K]) fireHTTPRequest(ctx context.Context) error {
 	var accumulatedCollectionElements []K
 
+	//nolint:govet
 	initialURL := col.client.buildURL(col.path)
 	url := col.client.applyParams(
 		initialURL,
@@ -252,7 +253,7 @@ func (col *CollectionHandler[K]) fireHTTPRequest(ctx context.Context) error {
 
 	col.clean = false
 	col.collection = accumulatedCollectionElements
-	col.rels = hyperHeaderParser(response.Header)
+	col.rels = hyperHeaderParser(response.Header())
 
 	return nil
 }
