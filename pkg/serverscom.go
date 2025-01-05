@@ -1,14 +1,14 @@
 package serverscom
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/go-resty/resty/v2"
 )
 
 const defaultAPIEndpoint string = "https://api.servers.com/v1"
@@ -44,7 +44,7 @@ type Client struct {
 
 	token string
 
-	client *http.Client
+	client *resty.Client
 }
 
 // NewClient builds a new client with token
@@ -58,13 +58,15 @@ func NewClientWithEndpoint(token, baseURL string) *Client {
 		Proxy: http.ProxyFromEnvironment,
 	}
 
-	client := &http.Client{Transport: tr}
+	rClient := resty.NewWithClient(&http.Client{Transport: tr})
+
+	rClient.SetAuthToken(token)
+	rClient.SetHeader("Content-Type", "application/json")
+	rClient.SetHeader("User-Agent", "go-serverscom-client")
 
 	scClient := &Client{
-		baseURL:   baseURL,
-		UserAgent: "go-serverscom-client",
-		token:     token,
-		client:    client,
+		baseURL: baseURL,
+		client:  rClient,
 	}
 
 	scClient.configureResources()
@@ -75,6 +77,11 @@ func NewClientWithEndpoint(token, baseURL string) *Client {
 // SetupUserAgent setups custom User-Agent header, by default: go-serverscom-client
 func (cli *Client) SetupUserAgent(userAgent string) {
 	cli.UserAgent = userAgent
+}
+
+// SetVerbose sets debug mode for client
+func (cli *Client) SetVerbose(verbose bool) {
+	cli.client.SetDebug(verbose)
 }
 
 func (cli *Client) configureResources() {
@@ -125,51 +132,31 @@ func (cli *Client) applyParams(endpointURL string, params map[string]string) str
 	)
 }
 
-func (cli *Client) buildAndExecRequestWithResponse(ctx context.Context, method, endpointURL string, body []byte) (*http.Response, []byte, error) {
-	var req *http.Request
-	var err error
+func (cli *Client) buildAndExecRequestWithResponse(ctx context.Context, method, endpointURL string, body []byte) (*resty.Response, []byte, error) {
+	request := cli.client.R().SetContext(ctx)
 
 	if body != nil {
-		reader := bytes.NewReader(body)
-		req, err = http.NewRequest(method, endpointURL, reader)
-	} else {
-		req, err = http.NewRequest(method, endpointURL, nil)
+		request.SetBody(body)
 	}
 
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", cli.token))
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Set("User-Agent", cli.UserAgent)
-
-	resp, err := cli.client.Do(req.WithContext(ctx))
-
+	resp, err := request.Execute(method, endpointURL)
 	if err != nil {
 		return nil, nil, fmt.Errorf("Client request error: %q", err)
 	}
 
-	defer resp.Body.Close()
+	contents := resp.Body()
 
-	contents, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		return nil, nil, fmt.Errorf("Client can't read body: %q", err)
-	}
-
-	if resp.StatusCode < 400 {
+	if resp.StatusCode() < 400 {
 		return resp, contents, nil
 	}
 
-	contentType := resp.Header.Get("Content-Type")
-
-	var responseError = responseErrorWrapper{}
+	contentType := resp.Header().Get("Content-Type")
+	var responseError responseErrorWrapper
 
 	if strings.HasPrefix(contentType, "application/json") {
 		if err := json.Unmarshal(contents, &responseError); err != nil {
 			return nil, nil, newParsingError(
-				resp.StatusCode,
+				resp.StatusCode(),
 				string(contents),
 				err,
 			)
@@ -179,23 +166,23 @@ func (cli *Client) buildAndExecRequestWithResponse(ctx context.Context, method, 
 		responseError.Message = string(contents)
 	}
 
-	switch resp.StatusCode {
+	switch resp.StatusCode() {
 	case 400:
-		return nil, nil, newBadRequestError(resp.StatusCode, responseError.Code, responseError.Message)
+		return nil, nil, newBadRequestError(resp.StatusCode(), responseError.Code, responseError.Message)
 	case 401:
-		return nil, nil, newUnauthorizedError(resp.StatusCode, responseError.Code, responseError.Message)
+		return nil, nil, newUnauthorizedError(resp.StatusCode(), responseError.Code, responseError.Message)
 	case 403:
-		return nil, nil, newForbiddenError(resp.StatusCode, responseError.Code, responseError.Message)
+		return nil, nil, newForbiddenError(resp.StatusCode(), responseError.Code, responseError.Message)
 	case 404:
-		return nil, nil, newNotFoundError(resp.StatusCode, responseError.Code, responseError.Message)
+		return nil, nil, newNotFoundError(resp.StatusCode(), responseError.Code, responseError.Message)
 	case 409:
-		return nil, nil, newConflictError(resp.StatusCode, responseError.Code, responseError.Message)
+		return nil, nil, newConflictError(resp.StatusCode(), responseError.Code, responseError.Message)
 	case 422:
-		return nil, nil, newUnprocessableEntityError(resp.StatusCode, responseError.Code, responseError.Message, responseError.Errors)
+		return nil, nil, newUnprocessableEntityError(resp.StatusCode(), responseError.Code, responseError.Message, responseError.Errors)
 	case 500:
-		return nil, nil, newInternalServerError(resp.StatusCode, responseError.Code, responseError.Message)
+		return nil, nil, newInternalServerError(resp.StatusCode(), responseError.Code, responseError.Message)
 	default:
-		return nil, nil, fmt.Errorf("Unexpected response code: %d, with body: %s", resp.StatusCode, string(contents))
+		return nil, nil, fmt.Errorf("Unexpected response code: %d, with body: %s", resp.StatusCode(), string(contents))
 	}
 }
 
