@@ -72,7 +72,10 @@ func NewClientWithEndpoint(token, baseURL string) *Client {
 
 // SetupUserAgent setups custom User-Agent header, by default: go-serverscom-client
 func (cli *Client) SetupUserAgent(userAgent string) {
-	cli.UserAgent = userAgent
+	if userAgent != "" {
+		cli.UserAgent = userAgent
+		cli.client.SetHeader("User-Agent", userAgent)
+	}
 }
 
 // SetVerbose sets debug mode for client
