@@ -42,8 +42,6 @@ type Client struct {
 
 	Invoices InvoiceService
 
-	token string
-
 	client *resty.Client
 }
 
