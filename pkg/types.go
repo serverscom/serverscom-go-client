@@ -976,7 +976,6 @@ type KubernetesCluster struct {
 }
 
 // KubernetesClusterNode represents Kubernetes cluster node
-
 type KubernetesClusterNode struct {
 	ID                 string            `json:"id"`
 	Number             int64             `json:"number"`
@@ -997,4 +996,30 @@ type KubernetesClusterNode struct {
 // KubernetesClusterUpdateInput represents Kubernetes cluster update input
 type KubernetesClusterUpdateInput struct {
 	Labels map[string]string `json:"labels,omitempty"`
+}
+
+// InvoiceList represents invoices list
+type InvoiceList struct {
+	ID       string  `json:"id"`
+	Number   int64   `json:"number"`
+	ParentID *string `json:"parent_id"`
+	Status   string  `json:"status"`
+	Date     string  `json:"date"`
+	Type     string  `json:"type"`
+	TotalDue float64 `json:"total_due"`
+	Currency string  `json:"currency"`
+}
+
+// Invoice represents an invoice
+type Invoice struct {
+	ID       string  `json:"id"`
+	Number   int64   `json:"number"`
+	ParentID *string `json:"parent_id"`
+	Status   string  `json:"status"`
+	Date     string  `json:"date"`
+	Type     string  `json:"type"`
+	TotalDue float64 `json:"total_due"`
+	Currency string  `json:"currency"`
+	CsvUrl   string  `json:"csv_url"`
+	PdfUrl   string  `json:"pdf_url"`
 }
