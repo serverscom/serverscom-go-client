@@ -4,6 +4,11 @@ import (
 	"time"
 )
 
+const (
+	RealIP       RealIPHeaderName = "real_ip"
+	ForwardedFor RealIPHeaderName = "forwarded_for"
+)
+
 // Location represents location
 type Location struct {
 	ID   int64  `json:"id"`
@@ -760,6 +765,7 @@ type L7VHostZoneInput struct {
 	Domains             []string              `json:"domains"`
 	SSLCertID           string                `json:"ssl_certificate_id"`
 	LocationZones       []L7LocationZoneInput `json:"location_zones"`
+	RealIPHeader        *RealIPHeader         `json:"real_ip_header,omitempty"`
 }
 
 // L7UpstreamInput represents l7 upstream input
@@ -1022,4 +1028,13 @@ type Invoice struct {
 	Currency string  `json:"currency"`
 	CsvUrl   string  `json:"csv_url"`
 	PdfUrl   string  `json:"pdf_url"`
+}
+
+// RealIPHeaderName represents real IP header name
+type RealIPHeaderName string
+
+// RealIPHeader represents real IP header
+type RealIPHeader struct {
+	Name     RealIPHeaderName `json:"name"`
+	Networks []string         `json:"networks"`
 }
