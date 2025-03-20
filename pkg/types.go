@@ -20,6 +20,10 @@ type Location struct {
 type SSLCertificate struct {
 	ID              string            `json:"id"`
 	Name            string            `json:"name"`
+	Type            string            `json:"type"`
+	Issuer          *string           `json:"issuer"`
+	Subject         string            `json:"subject"`
+	DomainNames     []string          `json:"domain_names"`
 	Sha1Fingerprint string            `json:"sha1_fingerprint"`
 	Labels          map[string]string `json:"labels"`
 	Expires         *time.Time        `json:"expires_at"`
