@@ -22,7 +22,7 @@ type InvoiceService interface {
 	GetBillingInvoice(ctx context.Context, id string) (*Invoice, error)
 }
 
-// InvoiceHandler handles operations around hosts
+// InvoiceHandler handles operations around invoices
 type InvoiceHandler struct {
 	client *Client
 }
