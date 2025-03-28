@@ -1042,3 +1042,10 @@ type RealIPHeader struct {
 	Name     RealIPHeaderName `json:"name"`
 	Networks []string         `json:"networks"`
 }
+
+// AccountBalance represents account balance info
+type AccountBalance struct {
+	CurrentBalance      float64 `json:"current_balance"`
+	NextInvoiceTotalDue float64 `json:"next_invoice_total_due"`
+	Currency            string  `json:"currency"`
+}

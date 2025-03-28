@@ -42,6 +42,8 @@ type Client struct {
 
 	Invoices InvoiceService
 
+	Account AccountService
+
 	client *resty.Client
 }
 
@@ -101,6 +103,7 @@ func (cli *Client) configureResources() {
 	cli.CloudBlockStorageVolumes = &CloudBlockStorageVolumesHandler{cli}
 	cli.KubernetesClusters = &KubernetesClustersHandler{cli}
 	cli.Invoices = &InvoiceHandler{cli}
+	cli.Account = &AccountHandler{cli}
 }
 
 func (cli *Client) buildURL(path string, values ...interface{}) string {
