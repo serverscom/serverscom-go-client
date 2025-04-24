@@ -406,9 +406,12 @@ type CloudComputingInstance struct {
 	ImageName          *string           `json:"image_name"`
 	PublicIPv4Address  *string           `json:"public_ipv4_address"`
 	PrivateIPv4Address *string           `json:"private_ipv4_address"`
+	LocalIPv4Address   *string           `json:"local_ipv4_address"`
 	PublicIPv6Address  *string           `json:"public_ipv6_address"`
 	GPNEnabled         bool              `json:"gpn_enabled"`
 	IPv6Enabled        bool              `json:"ipv6_enabled"`
+	BackupCopies       int64             `json:"backup_copies"`
+	PublicPortBlocked  bool              `json:"public_port_blocked"`
 	Labels             map[string]string `json:"labels"`
 	Created            time.Time         `json:"created_at"`
 	Updated            time.Time         `json:"updated_at"`
