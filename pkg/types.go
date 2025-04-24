@@ -115,6 +115,7 @@ type ConfigurationDetails struct {
 // DedicatedServer represents dedicated server
 type DedicatedServer struct {
 	ID                   string               `json:"id"`
+	RackID               string               `json:"rack_id"`
 	Type                 string               `json:"type"`
 	Title                string               `json:"title"`
 	LocationID           int64                `json:"location_id"`
@@ -125,7 +126,9 @@ type DedicatedServer struct {
 	Configuration        string               `json:"configuration"`
 	PrivateIPv4Address   *string              `json:"private_ipv4_address"`
 	PublicIPv4Address    *string              `json:"public_ipv4_address"`
+	LeaseStart           string               `json:"lease_start_at"`
 	ScheduledRelease     *time.Time           `json:"scheduled_release_at"`
+	OobIPv4Address       string               `json:"oob_ipv4_address"`
 	ConfigurationDetails ConfigurationDetails `json:"configuration_details"`
 	Labels               map[string]string    `json:"labels"`
 	Created              time.Time            `json:"created_at"`
@@ -134,27 +137,34 @@ type DedicatedServer struct {
 
 // KubernetesBaremetalNode represents kubernetes baremetal node
 type KubernetesBaremetalNode struct {
-	ID                   string               `json:"id"`
-	Type                 string               `json:"type"`
-	Title                string               `json:"title"`
-	LocationID           int64                `json:"location_id"`
-	LocationCode         string               `json:"location_code"`
-	Status               string               `json:"status"`
-	OperationalStatus    string               `json:"operational_status"`
-	PowerStatus          string               `json:"power_status"`
-	Configuration        string               `json:"configuration"`
-	PrivateIPv4Address   *string              `json:"private_ipv4_address"`
-	PublicIPv4Address    *string              `json:"public_ipv4_address"`
-	ScheduledRelease     *time.Time           `json:"scheduled_release_at"`
-	ConfigurationDetails ConfigurationDetails `json:"configuration_details"`
-	Labels               map[string]string    `json:"labels"`
-	Created              time.Time            `json:"created_at"`
-	Updated              time.Time            `json:"updated_at"`
+	ID                          string               `json:"id"`
+	KubernetesClusterID         string               `json:"kubernetes_cluster_id"`
+	KubernetesClusterNodeID     string               `json:"kubernetes_cluster_node_id"`
+	KubernetesClusterNodeNumber int64                `json:"kubernetes_cluster_node_number"`
+	RackID                      string               `json:"rack_id"`
+	Type                        string               `json:"type"`
+	Title                       string               `json:"title"`
+	LocationID                  int64                `json:"location_id"`
+	LocationCode                string               `json:"location_code"`
+	Status                      string               `json:"status"`
+	OperationalStatus           string               `json:"operational_status"`
+	PowerStatus                 string               `json:"power_status"`
+	Configuration               string               `json:"configuration"`
+	PrivateIPv4Address          *string              `json:"private_ipv4_address"`
+	PublicIPv4Address           *string              `json:"public_ipv4_address"`
+	LeaseStart                  string               `json:"lease_start_at"`
+	ScheduledRelease            *time.Time           `json:"scheduled_release_at"`
+	OobIPv4Address              string               `json:"oob_ipv4_address"`
+	ConfigurationDetails        ConfigurationDetails `json:"configuration_details"`
+	Labels                      map[string]string    `json:"labels"`
+	Created                     time.Time            `json:"created_at"`
+	Updated                     time.Time            `json:"updated_at"`
 }
 
 // SBMServer represents scalable baremetal server
 type SBMServer struct {
 	ID                   string               `json:"id"`
+	RackID               string               `json:"rack_id"`
 	Type                 string               `json:"type"`
 	Title                string               `json:"title"`
 	LocationID           int64                `json:"location_id"`
@@ -165,7 +175,9 @@ type SBMServer struct {
 	Configuration        string               `json:"configuration"`
 	PrivateIPv4Address   *string              `json:"private_ipv4_address"`
 	PublicIPv4Address    *string              `json:"public_ipv4_address"`
+	LeaseStart           string               `json:"lease_start_at"`
 	ScheduledRelease     *time.Time           `json:"scheduled_release_at"`
+	OobIPv4Address       string               `json:"oob_ipv4_address"`
 	ConfigurationDetails ConfigurationDetails `json:"configuration_details"`
 	Labels               map[string]string    `json:"labels"`
 	Created              time.Time            `json:"created_at"`
