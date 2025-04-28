@@ -1,0 +1,7 @@
+{
+    "id": 294,
+    "name": "Private 1 Gbps without redundancy",
+    "type": "private",
+    "speed": 1000,
+    "redundancy": false
+}
