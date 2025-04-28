@@ -11,9 +11,14 @@ const (
 
 // Location represents location
 type Location struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
-	Code string `json:"code"`
+	ID                   int64    `json:"id"`
+	Name                 string   `json:"name"`
+	Status               string   `json:"status"`
+	Code                 string   `json:"code"`
+	SupportedFeatures    []string `json:"supported_features"`
+	L2SegmentsEnabled    bool     `json:"l2_segments_enabled"`
+	PrivateRacksEnabled  bool     `json:"private_racks_enabled"`
+	LoadBalancersEnabled bool     `json:"load_balancers_enabled"`
 }
 
 // SSLCertificate represents ssl certificate
@@ -322,9 +327,43 @@ type SBMServerCreateInput struct {
 
 // ServerModelOption represents server model option
 type ServerModelOption struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
-	RAM  int    `json:"ram"`
+	ID                 int64  `json:"id"`
+	Name               string `json:"name"`
+	CPUName            string `json:"cpu_name"`
+	CPUCount           int    `json:"cpu_count"`
+	CPUCoresCount      int    `json:"cpu_cores_count"`
+	CPUFrequency       int    `json:"cpu_frequency"`
+	RAM                int    `json:"ram"`
+	RAMType            string `json:"ram_type"`
+	MaxRAM             int    `json:"max_ram"`
+	HasRAIDController  bool   `json:"has_raid_controller"`
+	RAIDControllerName string `json:"raid_controller_name"`
+	DriveSlotsCount    int    `json:"drive_slots_count"`
+}
+
+// ServerModelOptionDetail represents full server model option
+type ServerModelOptionDetail struct {
+	ID                 int64                  `json:"id"`
+	Name               string                 `json:"name"`
+	CPUName            string                 `json:"cpu_name"`
+	CPUCount           int                    `json:"cpu_count"`
+	CPUCoresCount      int                    `json:"cpu_cores_count"`
+	CPUFrequency       int                    `json:"cpu_frequency"`
+	RAM                int                    `json:"ram"`
+	RAMType            string                 `json:"ram_type"`
+	MaxRAM             int                    `json:"max_ram"`
+	HasRAIDController  bool                   `json:"has_raid_controller"`
+	RAIDControllerName string                 `json:"raid_controller_name"`
+	DriveSlotsCount    int                    `json:"drive_slots_count"`
+	DriveSlots         []ServerModelDriveSlot `json:"drive_slots"`
+}
+
+type ServerModelDriveSlot struct {
+	Position     int    `json:"position"`
+	Interface    string `json:"interface"`
+	FormFactor   string `json:"form_factor"`
+	DriveModelID int64  `json:"drive_model_id"`
+	HotSwappable bool   `json:"hot_swappable"`
 }
 
 // RAMOption represents ram option
