@@ -1,0 +1,18 @@
+{
+    "id": 1108,
+    "name": "location2251",
+    "status": "active",
+    "code": "location2251",
+    "supported_features": [
+        "disaggregated_public_ports",
+        "disaggregated_private_ports",
+        "no_public_network",
+        "no_private_ip",
+        "no_public_ip_address",
+        "host_rescue_mode",
+        "oob_public_access"
+    ],
+    "l2_segments_enabled": false,
+    "private_racks_enabled": false,
+    "load_balancers_enabled": false
+}

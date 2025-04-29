@@ -1,0 +1,30 @@
+{
+    "id": 231,
+    "name": "server-model-469",
+    "cpu_name": "cpu-model-model-468",
+    "cpu_count": 2,
+    "cpu_cores_count": 16,
+    "cpu_frequency": 1970,
+    "ram": 32,
+    "ram_type": "DDR3",
+    "max_ram": 384,
+    "has_raid_controller": true,
+    "raid_controller_name": "AHCI controller",
+    "drive_slots_count": 8,
+    "drive_slots": [
+        {
+            "position": 0,
+            "interface": "SAS",
+            "form_factor": "2_5",
+            "drive_model_id": 234,
+            "hot_swappable": false
+        },
+        {
+            "position": 1,
+            "interface": "SAS",
+            "form_factor": "2_5",
+            "drive_model_id": 235,
+            "hot_swappable": false
+        }
+    ]
+}

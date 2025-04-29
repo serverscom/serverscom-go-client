@@ -1,0 +1,8 @@
+{
+    "id": 369,
+    "name": "ssd-model-504",
+    "capacity": 100,
+    "interface": "SATA3",
+    "form_factor": "2.5",
+    "media_type": "SSD"
+}
