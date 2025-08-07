@@ -1103,3 +1103,22 @@ type AccountBalance struct {
 	NextInvoiceTotalDue float64 `json:"next_invoice_total_due"`
 	Currency            string  `json:"currency"`
 }
+
+// NetworkInput represents network input
+type NetworkInput struct {
+	DistributionMethod string `json:"distribution_method,omitempty"`
+	Mask               int    `json:"mask"`
+}
+
+// Utilization represents utilization info
+type Utilization struct {
+	Value  int64  `json:"value"`
+	Commit int64  `json:"commit"`
+	Unit   string `json:"unit"`
+}
+
+// NetworkUsage represents network usage
+type NetworkUsage struct {
+	Type        string       `json:"type"`
+	Utilization *Utilization `json:"utilization"`
+}

@@ -1,0 +1,8 @@
+{
+  "type": "traffic",
+  "utilization": {
+    "value": 2000000,
+    "commit": 1000000,
+    "unit": "KB"
+  }
+}

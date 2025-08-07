@@ -26,6 +26,14 @@ const (
 	dedicatedServerPTRRecordDeletePath = "/hosts/dedicated_servers/%s/ptr_records/%s"
 	dedicatedServerReinstallPath       = "/hosts/dedicated_servers/%s/reinstall"
 
+	// ds networks
+	dedicatedServerNetworkUsagePath          = "/hosts/dedicated_servers/%s/network_utilization"
+	dedicatedServerNetworkPath               = "/hosts/dedicated_servers/%s/networks/%s"
+	dedicatedServerAddPublicIPv4NetworkPath  = "/hosts/dedicated_servers/%s/networks/public_ipv4"
+	dedicatedServerAddPrivateIPv4NetworkPath = "/hosts/dedicated_servers/%s/networks/private_ipv4"
+	dedicatedServerActivatePublicIPv6Path    = "/hosts/dedicated_servers/%s/networks/public_ipv6"
+	dedicatedServerDeleteNetworkPath         = "/hosts/dedicated_servers/%s/networks/%s"
+
 	kubernetesBaremetalNodePath           = "/hosts/kubernetes_baremetal_nodes/%s"
 	kubernetesBaremetalNodePowerOnPath    = "/hosts/kubernetes_baremetal_nodes/%s/power_on"
 	kubernetesBaremetalNodePowerOffPath   = "/hosts/kubernetes_baremetal_nodes/%s/power_off"
@@ -73,8 +81,16 @@ type HostsService interface {
 	PowerOffDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
 	PowerCycleDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
 	CreatePTRRecordForDedicatedServer(ctx context.Context, id string, input PTRRecordCreateInput) (*PTRRecord, error)
-	DeletePTRRecordForDedicatedServer(ctx context.Context, hostID string, ptrRecordID string) error
+	DeletePTRRecordForDedicatedServer(ctx context.Context, serverID string, ptrRecordID string) error
 	ReinstallOperatingSystemForDedicatedServer(ctx context.Context, id string, input OperatingSystemReinstallInput) (*DedicatedServer, error)
+
+	// ds network methods
+	GetDedicatedServerNetworkUsage(ctx context.Context, id string) (*NetworkUsage, error)
+	GetDedicatedServerNetwork(ctx context.Context, serverID string, networkID string) (*Network, error)
+	AddDedicatedServerPublicIPv4Network(ctx context.Context, id string, input NetworkInput) (*Network, error)
+	AddDedicatedServerPrivateIPv4Network(ctx context.Context, id string, input NetworkInput) (*Network, error)
+	ActivateDedicatedServerPubliIPv6Network(ctx context.Context, id string) (*Network, error)
+	DeleteDedicatedServerNetwork(ctx context.Context, serverID string, networkID string) (*Network, error)
 
 	// sbm
 	PowerOnSBMServer(ctx context.Context, id string) (*SBMServer, error)
@@ -658,4 +674,122 @@ func (h *HostsHandler) PowerCycleKubernetesBaremetalNode(ctx context.Context, id
 	}
 
 	return &node, nil
+}
+
+// Get network utilization for a dedicated server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/GetNetworkUsageForADedicatedServer
+func (h *HostsHandler) GetDedicatedServerNetworkUsage(ctx context.Context, id string) (*NetworkUsage, error) {
+	url := h.client.buildURL(dedicatedServerNetworkUsagePath, id)
+
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var networkUsage NetworkUsage
+	if err := json.Unmarshal(body, &networkUsage); err != nil {
+		return nil, err
+	}
+
+	return &networkUsage, nil
+}
+
+// Get network details for a dedicated server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/GetANetworkForADedicatedServer
+func (h *HostsHandler) GetDedicatedServerNetwork(ctx context.Context, serverID, networkID string) (*Network, error) {
+	url := h.client.buildURL(dedicatedServerNetworkPath, serverID, networkID)
+
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var network Network
+	if err := json.Unmarshal(body, &network); err != nil {
+		return nil, err
+	}
+
+	return &network, nil
+}
+
+// Add a public IPv4 network to a dedicated server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/CreateAPublicIpv4NetworkForADedicatedServer
+func (h *HostsHandler) AddDedicatedServerPublicIPv4Network(ctx context.Context, id string, input NetworkInput) (*Network, error) {
+	payload, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	url := h.client.buildURL(dedicatedServerAddPublicIPv4NetworkPath, id)
+
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, payload)
+	if err != nil {
+		return nil, err
+	}
+
+	var network Network
+	if err := json.Unmarshal(body, &network); err != nil {
+		return nil, err
+	}
+
+	return &network, nil
+}
+
+// Add a private IPv4 network to a dedicated server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/CreateAPrivateIpv4NetworkForADedicatedServer
+func (h *HostsHandler) AddDedicatedServerPrivateIPv4Network(ctx context.Context, id string, input NetworkInput) (*Network, error) {
+	payload, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	url := h.client.buildURL(dedicatedServerAddPrivateIPv4NetworkPath, id)
+
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, payload)
+	if err != nil {
+		return nil, err
+	}
+
+	var network Network
+	if err := json.Unmarshal(body, &network); err != nil {
+		return nil, err
+	}
+
+	return &network, nil
+}
+
+// Activate a public IPv6 network for a dedicated server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ActivateAPublicIpv6NetworkForADedicatedServer
+func (h *HostsHandler) ActivateDedicatedServerPubliIPv6Network(ctx context.Context, id string) (*Network, error) {
+	url := h.client.buildURL(dedicatedServerActivatePublicIPv6Path, id)
+
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var network Network
+	if err := json.Unmarshal(body, &network); err != nil {
+		return nil, err
+	}
+
+	return &network, nil
+}
+
+// Delete a network from a dedicated server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/DeleteANetworkForADedicatedServer
+func (h *HostsHandler) DeleteDedicatedServerNetwork(ctx context.Context, serverID, networkID string) (*Network, error) {
+	url := h.client.buildURL(dedicatedServerDeleteNetworkPath, serverID, networkID)
+
+	body, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var network Network
+	if err := json.Unmarshal(body, &network); err != nil {
+		return nil, err
+	}
+
+	return &network, nil
 }
