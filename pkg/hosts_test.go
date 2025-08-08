@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	serverID = "xkazYeJ0"
+	serverID  = "xkazYeJ0"
+	networkID = "pen5zld7"
 )
 
 func TestHostsEmptyCollection(t *testing.T) {
@@ -1042,4 +1043,139 @@ func TestHostsPowerCycleKubernetesBaremetalNode(t *testing.T) {
 	g.Expect(node.Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(node.Created.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 	g.Expect(node.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
+}
+
+func TestHostsGetDedicatedServerNetworkUsage(t *testing.T) {
+	g := NewGomegaWithT(t)
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/network_utilization").
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/network_utilization.json").
+		WithResponseCode(200).
+		Build()
+	defer ts.Close()
+
+	ctx := context.TODO()
+	usage, err := client.Hosts.GetDedicatedServerNetworkUsage(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(usage).ToNot(BeNil())
+	g.Expect(usage.Type).To(Equal("traffic"))
+	g.Expect(usage.Utilization).ToNot(BeNil())
+	g.Expect(usage.Utilization.Value).To(Equal(int64(2000000)))
+	g.Expect(usage.Utilization.Commit).To(Equal(int64(1000000)))
+	g.Expect(usage.Utilization.Unit).To(Equal("KB"))
+}
+
+func TestHostsGetDedicatedServerNetwork(t *testing.T) {
+	g := NewGomegaWithT(t)
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/networks/" + networkID).
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_network_response.json").
+		WithResponseCode(200).
+		Build()
+	defer ts.Close()
+
+	ctx := context.TODO()
+	network, err := client.Hosts.GetDedicatedServerNetwork(ctx, serverID, networkID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(network).ToNot(BeNil())
+	g.Expect(network.ID).To(Equal(networkID))
+	g.Expect(*network.Title).To(Equal("Public"))
+	g.Expect(network.Status).To(Equal("active"))
+	g.Expect(*network.Cidr).To(Equal("100.0.8.0/29"))
+	g.Expect(network.Family).To(Equal("ipv4"))
+	g.Expect(network.InterfaceType).To(Equal("public"))
+	g.Expect(network.DistributionMethod).To(Equal("gateway"))
+	g.Expect(network.Additional).To(Equal(false))
+	g.Expect(network.Created.String()).To(Equal("2025-07-31 11:03:36 +0000 UTC"))
+	g.Expect(network.Updated.String()).To(Equal("2025-07-31 11:03:36 +0000 UTC"))
+}
+
+func TestHostsAddDedicatedServerPublicNetwork(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/networks/public_ipv4").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_network_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	input := NetworkInput{
+		DistributionMethod: "gateway",
+		Mask:               29,
+	}
+
+	ctx := context.TODO()
+	network, err := client.Hosts.AddDedicatedServerPublicIPv4Network(ctx, serverID, input)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(network).ToNot(BeNil())
+	g.Expect(network.ID).ToNot(BeEmpty())
+}
+
+func TestHostsAddDedicatedServerPrivateNetwork(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/networks/private_ipv4").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_network_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	input := NetworkInput{
+		DistributionMethod: "gateway",
+		Mask:               29,
+	}
+
+	ctx := context.TODO()
+	network, err := client.Hosts.AddDedicatedServerPrivateIPv4Network(ctx, serverID, input)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(network).ToNot(BeNil())
+	g.Expect(network.ID).ToNot(BeEmpty())
+}
+
+func TestHostsActivateDedicatedServerPublicIPv6Network(t *testing.T) {
+	g := NewGomegaWithT(t)
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/networks/public_ipv6").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_network_response.json").
+		WithResponseCode(202).
+		Build()
+	defer ts.Close()
+
+	ctx := context.TODO()
+	network, err := client.Hosts.ActivateDedicatedServerPubliIPv6Network(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(network).ToNot(BeNil())
+	g.Expect(network.ID).ToNot(BeEmpty())
+}
+
+func TestHostsDeleteDedicatedServerNetwork(t *testing.T) {
+	g := NewGomegaWithT(t)
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/networks/" + networkID).
+		WithRequestMethod("DELETE").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_network_response.json").
+		WithResponseCode(202).
+		Build()
+	defer ts.Close()
+
+	ctx := context.TODO()
+	network, err := client.Hosts.DeleteDedicatedServerNetwork(ctx, serverID, networkID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(network).ToNot(BeNil())
+	g.Expect(network.ID).To(Equal(networkID))
 }
