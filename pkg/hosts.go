@@ -25,6 +25,7 @@ const (
 	dedicatedServerPTRRecordCreatePath = "/hosts/dedicated_servers/%s/ptr_records"
 	dedicatedServerPTRRecordDeletePath = "/hosts/dedicated_servers/%s/ptr_records/%s"
 	dedicatedServerReinstallPath       = "/hosts/dedicated_servers/%s/reinstall"
+	dedicatedServersListPath           = "/hosts/dedicated_servers"
 
 	// ds networks
 	dedicatedServerNetworkUsagePath          = "/hosts/dedicated_servers/%s/network_utilization"
@@ -38,6 +39,7 @@ const (
 	kubernetesBaremetalNodePowerOnPath    = "/hosts/kubernetes_baremetal_nodes/%s/power_on"
 	kubernetesBaremetalNodePowerOffPath   = "/hosts/kubernetes_baremetal_nodes/%s/power_off"
 	kubernetesBaremetalNodePowerCyclePath = "/hosts/kubernetes_baremetal_nodes/%s/power_cycle"
+	kubernetesBaremetalNodesListPath      = "/hosts/kubernetes_baremetal_nodes"
 
 	sbmServerCreatePath     = "/hosts/sbm_servers"
 	sbmServerPath           = "/hosts/sbm_servers/%s"
@@ -45,6 +47,7 @@ const (
 	sbmServerPowerOffPath   = "/hosts/sbm_servers/%s/power_off"
 	sbmServerPowerCyclePath = "/hosts/sbm_servers/%s/power_cycle"
 	sbmServerReinstallPath  = "/hosts/sbm_servers/%s/reinstall"
+	sbmServersListPath      = "/hosts/sbm_servers"
 )
 
 // HostsService is an interface for interfacing with Host, Dedicated Server endpoints
@@ -109,6 +112,9 @@ type HostsService interface {
 	DedicatedServerNetworks(id string) Collection[Network]
 	DedicatedServerDriveSlots(id string) Collection[HostDriveSlot]
 	DedicatedServerPTRRecords(id string) Collection[PTRRecord]
+	ListDedicatedServers() Collection[DedicatedServer]
+	ListKubernetesBaremetalNodes() Collection[KubernetesBaremetalNode]
+	ListSBMServers() Collection[SBMServer]
 }
 
 // HostsHandler handles operations around hosts
@@ -792,4 +798,22 @@ func (h *HostsHandler) DeleteDedicatedServerNetwork(ctx context.Context, serverI
 	}
 
 	return &network, nil
+}
+
+// ListDedicatedServers returns a collection of all dedicated servers
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ListDedicatedServers
+func (h *HostsHandler) ListDedicatedServers() Collection[DedicatedServer] {
+	return NewCollection[DedicatedServer](h.client, dedicatedServersListPath)
+}
+
+// ListKubernetesBaremetalNodes returns a collection of all Kubernetes bare metal nodes
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Kubernetes-Baremetal-Node/operation/ListKubernetesBaremetalNodes
+func (h *HostsHandler) ListKubernetesBaremetalNodes() Collection[KubernetesBaremetalNode] {
+	return NewCollection[KubernetesBaremetalNode](h.client, kubernetesBaremetalNodesListPath)
+}
+
+// ListSBMServers returns a collection of all scalable bare metal servers
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Scalable-Baremetal-Server/operation/ListSbmServers
+func (h *HostsHandler) ListSBMServers() Collection[SBMServer] {
+	return NewCollection[SBMServer](h.client, sbmServersListPath)
 }

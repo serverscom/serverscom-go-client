@@ -1179,3 +1179,78 @@ func TestHostsDeleteDedicatedServerNetwork(t *testing.T) {
 	g.Expect(network).ToNot(BeNil())
 	g.Expect(network.ID).To(Equal(networkID))
 }
+
+func TestListDedicatedServersCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.Hosts.ListDedicatedServers()
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
+func TestListKubernetesBaremetalNodesCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/kubernetes_baremetal_nodes").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.Hosts.ListKubernetesBaremetalNodes()
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
+func TestListSBMServersCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.Hosts.ListSBMServers()
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
