@@ -466,6 +466,7 @@ type CloudComputingInstanceCreateInput struct {
 	IPv6Enabled       *bool             `json:"ipv6_enabled,omitempty"`
 	SSHKeyFingerprint *string           `json:"ssh_key_fingerprint,omitempty"`
 	BackupCopies      *int              `json:"backup_copies,omitempty"`
+	UserData          *string           `json:"user_data,omitempty"`
 	Labels            map[string]string `json:"labels,omitempty"`
 }
 
