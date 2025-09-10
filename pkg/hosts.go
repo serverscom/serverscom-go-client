@@ -10,9 +10,11 @@ const (
 	hostConnectionListPath = "/hosts/%s/%s/connections"
 	hostNetworksListPath   = "/hosts/%s/%s/networks"
 	hostDriveSlotListPath  = "/hosts/%s/%s/drive_slots"
+	hostPowerFeedsListPath = "/hosts/%s/%s/power_feeds"
 	hostPTRsListPath       = "/hosts/%s/%s/ptr_records"
 
-	dedicatedServerTypePrefix = "dedicated_servers"
+	dedicatedServerTypePrefix     = "dedicated_servers"
+	kubernetesBaremetalNodePrefix = "kubernetes_baremetal_nodes"
 
 	dedicatedServerCreatePath          = "/hosts/dedicated_servers"
 	dedicatedServerPath                = "/hosts/dedicated_servers/%s"
@@ -21,7 +23,6 @@ const (
 	dedicatedServerPowerOnPath         = "/hosts/dedicated_servers/%s/power_on"
 	dedicatedServerPowerOffPath        = "/hosts/dedicated_servers/%s/power_off"
 	dedicatedServerPowerCyclePath      = "/hosts/dedicated_servers/%s/power_cycle"
-	dedicatedServerPowerFeedsPath      = "/hosts/dedicated_servers/%s/power_feeds"
 	dedicatedServerPTRRecordCreatePath = "/hosts/dedicated_servers/%s/ptr_records"
 	dedicatedServerPTRRecordDeletePath = "/hosts/dedicated_servers/%s/ptr_records/%s"
 	dedicatedServerReinstallPath       = "/hosts/dedicated_servers/%s/reinstall"
@@ -115,6 +116,9 @@ type HostsService interface {
 	ListDedicatedServers() Collection[DedicatedServer]
 	ListKubernetesBaremetalNodes() Collection[KubernetesBaremetalNode]
 	ListSBMServers() Collection[SBMServer]
+	KubernetesBaremetalNodePowerFeeds(ctx context.Context, id string) ([]HostPowerFeed, error)
+	KubernetesBaremetalNodeNetworks(id string) Collection[Network]
+	KubernetesBaremetalNodeDriveSlots(id string) Collection[HostDriveSlot]
 }
 
 // HostsHandler handles operations around hosts
@@ -296,7 +300,7 @@ func (h *HostsHandler) PowerCycleDedicatedServer(ctx context.Context, id string)
 // DedicatedServerPowerFeeds returns list of dedicated server power feeds with status
 // Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ListPowerFeedsForADedicatedServer
 func (h *HostsHandler) DedicatedServerPowerFeeds(ctx context.Context, id string) ([]HostPowerFeed, error) {
-	url := h.client.buildURL(dedicatedServerPowerFeedsPath, []interface{}{id}...)
+	url := h.client.buildURL(hostPowerFeedsListPath, []interface{}{dedicatedServerTypePrefix, id}...)
 
 	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
 
@@ -389,6 +393,39 @@ func (h *HostsHandler) DedicatedServerNetworks(id string) Collection[Network] {
 // Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ListDriveSlotsForADedicatedServer
 func (h *HostsHandler) DedicatedServerDriveSlots(id string) Collection[HostDriveSlot] {
 	path := h.client.buildPath(hostDriveSlotListPath, []interface{}{dedicatedServerTypePrefix, id}...)
+
+	return NewCollection[HostDriveSlot](h.client, path)
+}
+
+// KubernetesBaremetalNodePowerFeeds returns list of dedicated server power feeds with status
+func (h *HostsHandler) KubernetesBaremetalNodePowerFeeds(ctx context.Context, id string) ([]HostPowerFeed, error) {
+	url := h.client.buildURL(hostPowerFeedsListPath, []interface{}{kubernetesBaremetalNodePrefix, id}...)
+
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var powerFeeds []HostPowerFeed
+
+	if err := json.Unmarshal(body, &powerFeeds); err != nil {
+		return nil, err
+	}
+
+	return powerFeeds, nil
+}
+
+// KubernetesBaremetalNodeNetworks builds a new Collection[Network] interface
+func (h *HostsHandler) KubernetesBaremetalNodeNetworks(id string) Collection[Network] {
+	path := h.client.buildPath(hostNetworksListPath, []interface{}{kubernetesBaremetalNodePrefix, id}...)
+
+	return NewCollection[Network](h.client, path)
+}
+
+// KubernetesBaremetalNodeDriveSlots builds a new Collection[HostDriveSlot] interface
+func (h *HostsHandler) KubernetesBaremetalNodeDriveSlots(id string) Collection[HostDriveSlot] {
+	path := h.client.buildPath(hostDriveSlotListPath, []interface{}{kubernetesBaremetalNodePrefix, id}...)
 
 	return NewCollection[HostDriveSlot](h.client, path)
 }

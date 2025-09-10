@@ -1045,6 +1045,88 @@ func TestHostsPowerCycleKubernetesBaremetalNode(t *testing.T) {
 	g.Expect(node.Updated.String()).To(Equal("2020-04-22 06:22:02 +0000 UTC"))
 }
 
+func TestHostsKubernetesBaremetalNodePowerFeeds(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/kubernetes_baremetal_nodes/" + serverID + "/power_feeds").
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/hosts/kubernetes_baremetal_nodes/power_feeds_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	powerFeeds, err := client.Hosts.KubernetesBaremetalNodePowerFeeds(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(len(powerFeeds)).To(Equal(2))
+
+	powerFeed := powerFeeds[0]
+
+	g.Expect(powerFeed.Name).To(Equal("Power 2"))
+	g.Expect(powerFeed.Status).To(Equal("on"))
+
+	powerFeed = powerFeeds[1]
+
+	g.Expect(powerFeed.Name).To(Equal("Power 1"))
+	g.Expect(powerFeed.Status).To(Equal("on"))
+}
+
+func TestKubernetesBaremetalNodeNetworksCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/kubernetes_baremetal_nodes/a/networks").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.Hosts.KubernetesBaremetalNodeNetworks("a")
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
+func TestKubernetesBaremetalNodeDriveSlotsCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/kubernetes_baremetal_nodes/a/drive_slots").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.Hosts.KubernetesBaremetalNodeDriveSlots("a")
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
 func TestHostsGetDedicatedServerNetworkUsage(t *testing.T) {
 	g := NewGomegaWithT(t)
 	ts, client := newFakeServer().
