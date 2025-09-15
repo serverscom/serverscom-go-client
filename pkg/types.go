@@ -76,7 +76,11 @@ type SSLCertificateCreateCustomInput struct {
 
 // SSLCertificateUpdateCustomInput represents custom ssl certificate update input
 type SSLCertificateUpdateCustomInput struct {
-	Labels map[string]string `json:"labels,omitempty"`
+	Name       string            `json:"name"`
+	PublicKey  string            `json:"public_key"`
+	PrivateKey string            `json:"private_key"`
+	ChainKey   string            `json:"chain_key,omitempty"`
+	Labels     map[string]string `json:"labels,omitempty"`
 }
 
 // SSLCertificateUpdateLEInput represents let's encrypt ssl certificate update input
