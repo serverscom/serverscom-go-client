@@ -108,12 +108,18 @@ func TestSSLCertificatesUpdateCustom(t *testing.T) {
 	ctx := context.TODO()
 	newLabels := map[string]string{"env": "new-test"}
 
-	SSLCertificateCustom, err := client.SSLCertificates.UpdateCustom(ctx, sslCertID, SSLCertificateUpdateCustomInput{Labels: newLabels})
+	SSLCertificateCustom, err := client.SSLCertificates.UpdateCustom(ctx, sslCertID, SSLCertificateUpdateCustomInput{
+		Name:       "newName",
+		PublicKey:  sslCertificateCustomPublicKey,
+		PrivateKey: sslCertificateCustomPrivateKey,
+		Labels:     newLabels,
+	})
 
 	g.Expect(err).To(BeNil())
 	g.Expect(SSLCertificateCustom).ToNot(BeNil())
 
-	g.Expect(SSLCertificateCustom.Name).To(Equal("name156"))
+	g.Expect(SSLCertificateCustom.Name).To(Equal("newName"))
+	g.Expect(SSLCertificateCustom.Labels).To(Equal(newLabels))
 	g.Expect(SSLCertificateCustom.Type).To(Equal("custom"))
 }
 
