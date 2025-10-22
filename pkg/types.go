@@ -921,6 +921,7 @@ type LoadBalancerCluster struct {
 // DedicatedServerUpdateInput represents dedicated server update input
 type DedicatedServerUpdateInput struct {
 	Labels map[string]string `json:"labels,omitempty"`
+	Title  string            `json:"title"`
 }
 
 // KubernetesBaremetalNodeUpdateInput represents kubernetes baremetal node update input
