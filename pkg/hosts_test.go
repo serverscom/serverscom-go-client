@@ -173,14 +173,15 @@ func TestHostsUpdateDedicatedServer(t *testing.T) {
 	ctx := context.TODO()
 
 	newLabels := map[string]string{"env": "new-test"}
+	newTitle := "new-title"
 
-	dedicatedServer, err := client.Hosts.UpdateDedicatedServer(ctx, serverID, DedicatedServerUpdateInput{Labels: newLabels})
+	dedicatedServer, err := client.Hosts.UpdateDedicatedServer(ctx, serverID, DedicatedServerUpdateInput{Labels: newLabels, Title: newTitle})
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())
 
 	g.Expect(dedicatedServer.ID).To(Equal(serverID))
-	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
+	g.Expect(dedicatedServer.Title).To(Equal(newTitle))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
 	g.Expect(dedicatedServer.Status).To(Equal("active"))
 	g.Expect(dedicatedServer.Configuration).To(Equal("REMM R123"))
