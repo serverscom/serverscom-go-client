@@ -44,6 +44,8 @@ type Client struct {
 
 	Account AccountService
 
+	RemoteBlockStorageVolumes RemoteBlockStorageVolumesService
+
 	client *resty.Client
 }
 
@@ -104,6 +106,7 @@ func (cli *Client) configureResources() {
 	cli.KubernetesClusters = &KubernetesClustersHandler{cli}
 	cli.Invoices = &InvoiceHandler{cli}
 	cli.Account = &AccountHandler{cli}
+	cli.RemoteBlockStorageVolumes = &RemoteBlockStorageVolumesHandler{cli}
 }
 
 func (cli *Client) buildURL(path string, values ...interface{}) string {

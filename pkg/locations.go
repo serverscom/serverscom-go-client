@@ -30,6 +30,9 @@ const (
 	sbmFlavorOptionPath              = "/locations/%d/order_options/sbm_flavor_models/%d"
 	sbmOperatingSystemOptionListPath = "/locations/%d/order_options/sbm_flavor_models/%d/operating_systems"
 	sbmOperatingSystemOptionPath     = "/locations/%d/order_options/sbm_flavor_models/%d/operating_systems/%d"
+
+	remoteBlockStorageFlavorListPath = "/locations/%d/order_options/remote_block_storage/flavors"
+	remoteBlockStorageFlavorPath     = "/locations/%d/order_options/remote_block_storage/flavors/%d"
 )
 
 // LocationsService is an interface to interfacing with the Location and Order options endpoints
@@ -42,6 +45,7 @@ const (
 // https://developers.servers.com/api-documentation/v1/#tag/Operating-System-Option
 // https://developers.servers.com/api-documentation/v1/#tag/Uplink-Model-Option
 // https://developers.servers.com/api-documentation/v1/#tag/Bandwidth-Option
+// https://developers.servers.com/api-documentation/v1/#tag/Remote-Block-Storage-Flavor
 type LocationsService interface {
 	// Primary collection
 	Collection() Collection[Location]
@@ -63,6 +67,8 @@ type LocationsService interface {
 	GetSBMFlavorOption(ctx context.Context, locationID, sbmFlavorModelID int64) (*SBMFlavor, error)
 	SBMOperatingSystemOptions(locationID, sbmFlavorModelID int64) Collection[OperatingSystemOption]
 	GetSBMOperatingSystemOption(ctx context.Context, locationID, sbmFlavorModelID, operatingSystemID int64) (*OperatingSystemOption, error)
+	RemoteBlockStorageFlavors(locationID int64) Collection[RemoteBlockStorageFlavor]
+	GetRemoteBlockStorageFlavor(ctx context.Context, locationID, flavorID int64) (*RemoteBlockStorageFlavor, error)
 }
 
 // LocationsHandler handles operations around cloud instances
@@ -265,4 +271,27 @@ func (h *LocationsHandler) GetSBMOperatingSystemOption(ctx context.Context, loca
 	}
 
 	return operatingSystemOption, nil
+}
+
+// RemoteBlockStorageFlavors builds a new Collection[RemoteBlockStorageFlavor] interface
+func (h *LocationsHandler) RemoteBlockStorageFlavors(locationID int64) Collection[RemoteBlockStorageFlavor] {
+	path := h.client.buildPath(remoteBlockStorageFlavorListPath, []interface{}{locationID}...)
+	return NewCollection[RemoteBlockStorageFlavor](h.client, path)
+}
+
+// GetRemoteBlockStorageFlavor returns an RBS flavor detail
+func (h *LocationsHandler) GetRemoteBlockStorageFlavor(ctx context.Context, locationID, flavorID int64) (*RemoteBlockStorageFlavor, error) {
+	url := h.client.buildURL(remoteBlockStorageFlavorPath, locationID, flavorID)
+
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	flavor := new(RemoteBlockStorageFlavor)
+	if err := json.Unmarshal(body, flavor); err != nil {
+		return nil, err
+	}
+
+	return flavor, nil
 }

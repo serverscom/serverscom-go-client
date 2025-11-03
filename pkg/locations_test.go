@@ -491,3 +491,53 @@ func TestLocationsGetSBMOperatingSystemOption(t *testing.T) {
 	g.Expect(osOption.Arch).To(Equal("x86_64"))
 	g.Expect(osOption.Filesystems).To(ContainElements("ext2", "ext4", "swap", "xfs", "reiser"))
 }
+
+func TestRemoteBlockStorageFlavorsCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/locations/1/order_options/remote_block_storage/flavors").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.Locations.RemoteBlockStorageFlavors(int64(1))
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
+func TestLocationsGetRemoteBlockStorageFlavor(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/locations/1108/order_options/remote_block_storage/flavors/1775").
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/locations/rbs_flavor_get_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	flavor, err := client.Locations.GetRemoteBlockStorageFlavor(ctx, 1108, 1775)
+	g.Expect(err).To(BeNil())
+	g.Expect(flavor).ToNot(BeNil())
+
+	g.Expect(flavor.ID).To(Equal(1775))
+	g.Expect(flavor.Name).To(Equal("RBS Flavor name631"))
+	g.Expect(flavor.IOPSPerGB).To(Equal(float64(25)))
+	g.Expect(flavor.BandwidthPerGB).To(Equal(float64(57)))
+	g.Expect(flavor.MinSizeGB).To(Equal(446))
+}
