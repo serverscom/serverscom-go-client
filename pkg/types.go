@@ -1128,3 +1128,56 @@ type NetworkUsage struct {
 	Type        string       `json:"type"`
 	Utilization *Utilization `json:"utilization"`
 }
+
+// RemoteBlockStorageVolume represents a volume in the RBS system
+type RemoteBlockStorageVolume struct {
+	ID           string            `json:"id"`
+	Name         string            `json:"name"`
+	Size         int64             `json:"size"`
+	Status       string            `json:"status"`
+	Labels       map[string]string `json:"labels,omitempty"`
+	LocationID   int               `json:"location_id"`
+	LocationCode string            `json:"location_code"`
+	IPAddress    *string           `json:"ip_address,omitempty"`
+	FlavorID     int               `json:"flavor_id"`
+	FlavorName   string            `json:"flavor_name"`
+	IOPS         float64           `json:"iops"`
+	Bandwidth    float64           `json:"bandwidth"`
+	TargetIQN    *string           `json:"target_iqn,omitempty"`
+	CreatedAt    time.Time         `json:"created_at"`
+	UpdatedAt    time.Time         `json:"updated_at"`
+}
+
+// RemoteBlockStorageVolumeCreateInput represents remote block storage volume create input
+type RemoteBlockStorageVolumeCreateInput struct {
+	Name       string            `json:"name"`
+	Size       int64             `json:"size"`
+	LocationID int               `json:"location_id"`
+	FlavorID   int               `json:"flavor_id"`
+	Labels     map[string]string `json:"labels,omitempty"`
+}
+
+// RemoteBlockStorageVolumeUpdateInput represents remote block storage volume update input
+type RemoteBlockStorageVolumeUpdateInput struct {
+	Name   string            `json:"name,omitempty"`
+	Size   int64             `json:"size,omitempty"`
+	Labels map[string]string `json:"labels,omitempty"`
+}
+
+// RemoteBlockStorageVolumeCredentials represents iSCSI connection credentials for a volume
+type RemoteBlockStorageVolumeCredentials struct {
+	VolumeID  string  `json:"volume_id"`
+	Username  string  `json:"username"`
+	Password  string  `json:"password"`
+	TargetIQN *string `json:"target_iqn"`
+	IPAddress *string `json:"ip_address"`
+}
+
+// RemoteBlockStorageFlavor represents a storage flavor with performance characteristics
+type RemoteBlockStorageFlavor struct {
+	ID             int     `json:"id"`
+	Name           string  `json:"name"`
+	IOPSPerGB      float64 `json:"iops_per_gb"`
+	BandwidthPerGB float64 `json:"bandwidth_per_gb"`
+	MinSizeGB      int     `json:"min_size_gb"`
+}

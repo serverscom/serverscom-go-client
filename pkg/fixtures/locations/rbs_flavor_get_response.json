@@ -1,0 +1,7 @@
+{
+    "id": 1775,
+    "name": "RBS Flavor name631",
+    "iops_per_gb": 25,
+    "bandwidth_per_gb": 57,
+    "min_size_gb": 446
+}
