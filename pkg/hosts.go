@@ -15,6 +15,7 @@ const (
 
 	dedicatedServerTypePrefix     = "dedicated_servers"
 	kubernetesBaremetalNodePrefix = "kubernetes_baremetal_nodes"
+	sbmPrefix                     = "sbm_servers"
 
 	dedicatedServerCreatePath          = "/hosts/dedicated_servers"
 	dedicatedServerPath                = "/hosts/dedicated_servers/%s"
@@ -27,6 +28,9 @@ const (
 	dedicatedServerPTRRecordDeletePath = "/hosts/dedicated_servers/%s/ptr_records/%s"
 	dedicatedServerReinstallPath       = "/hosts/dedicated_servers/%s/reinstall"
 	dedicatedServersListPath           = "/hosts/dedicated_servers"
+	dedicatedServerServicesPath        = "/hosts/dedicated_servers/%s/services"
+	dedicatedServerFeaturesPath        = "/hosts/dedicated_servers/%s/features"
+	dedicatedServerOOBCredentialsPath  = "/hosts/dedicated_servers/%s/oob_credentials"
 
 	// ds networks
 	dedicatedServerNetworkUsagePath          = "/hosts/dedicated_servers/%s/network_utilization"
@@ -36,19 +40,24 @@ const (
 	dedicatedServerActivatePublicIPv6Path    = "/hosts/dedicated_servers/%s/networks/public_ipv6"
 	dedicatedServerDeleteNetworkPath         = "/hosts/dedicated_servers/%s/networks/%s"
 
-	kubernetesBaremetalNodePath           = "/hosts/kubernetes_baremetal_nodes/%s"
-	kubernetesBaremetalNodePowerOnPath    = "/hosts/kubernetes_baremetal_nodes/%s/power_on"
-	kubernetesBaremetalNodePowerOffPath   = "/hosts/kubernetes_baremetal_nodes/%s/power_off"
-	kubernetesBaremetalNodePowerCyclePath = "/hosts/kubernetes_baremetal_nodes/%s/power_cycle"
-	kubernetesBaremetalNodesListPath      = "/hosts/kubernetes_baremetal_nodes"
+	// kbm nodes
+	kubernetesBaremetalNodePath               = "/hosts/kubernetes_baremetal_nodes/%s"
+	kubernetesBaremetalNodePowerOnPath        = "/hosts/kubernetes_baremetal_nodes/%s/power_on"
+	kubernetesBaremetalNodePowerOffPath       = "/hosts/kubernetes_baremetal_nodes/%s/power_off"
+	kubernetesBaremetalNodePowerCyclePath     = "/hosts/kubernetes_baremetal_nodes/%s/power_cycle"
+	kubernetesBaremetalNodeListDriveSlotsPath = "/hosts/kubernetes_baremetal_nodes/%s/drive_slots"
+	kubernetesBaremetalNodesListPath          = "/hosts/kubernetes_baremetal_nodes"
 
-	sbmServerCreatePath     = "/hosts/sbm_servers"
-	sbmServerPath           = "/hosts/sbm_servers/%s"
-	sbmServerPowerOnPath    = "/hosts/sbm_servers/%s/power_on"
-	sbmServerPowerOffPath   = "/hosts/sbm_servers/%s/power_off"
-	sbmServerPowerCyclePath = "/hosts/sbm_servers/%s/power_cycle"
-	sbmServerReinstallPath  = "/hosts/sbm_servers/%s/reinstall"
-	sbmServersListPath      = "/hosts/sbm_servers"
+	// sbm nodes
+	sbmServerCreatePath          = "/hosts/sbm_servers"
+	sbmServerPath                = "/hosts/sbm_servers/%s"
+	sbmServerPowerOnPath         = "/hosts/sbm_servers/%s/power_on"
+	sbmServerPowerOffPath        = "/hosts/sbm_servers/%s/power_off"
+	sbmServerPowerCyclePath      = "/hosts/sbm_servers/%s/power_cycle"
+	sbmServerReinstallPath       = "/hosts/sbm_servers/%s/reinstall"
+	sbmServersListPath           = "/hosts/sbm_servers"
+	sbmServerPTRRecordCreatePath = "/hosts/sbm_servers/%s/ptr_records"
+	sbmServerPTRRecordDeletePath = "/hosts/sbm_servers/%s/ptr_records/%s"
 )
 
 // HostsService is an interface for interfacing with Host, Dedicated Server endpoints
@@ -79,7 +88,7 @@ type HostsService interface {
 
 	// Additional operations
 	// dedicated
-	ScheduleReleaseForDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
+	ScheduleReleaseForDedicatedServer(ctx context.Context, id string, input ScheduleReleaseInput) (*DedicatedServer, error)
 	AbortReleaseForDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
 	PowerOnDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
 	PowerOffDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error)
@@ -87,6 +96,7 @@ type HostsService interface {
 	CreatePTRRecordForDedicatedServer(ctx context.Context, id string, input PTRRecordCreateInput) (*PTRRecord, error)
 	DeletePTRRecordForDedicatedServer(ctx context.Context, serverID string, ptrRecordID string) error
 	ReinstallOperatingSystemForDedicatedServer(ctx context.Context, id string, input OperatingSystemReinstallInput) (*DedicatedServer, error)
+	GetDedicatedServerOOBCredentials(ctx context.Context, id string, params map[string]string) (*DedicatedServerOOBCredentials, error)
 
 	// ds network methods
 	GetDedicatedServerNetworkUsage(ctx context.Context, id string) (*NetworkUsage, error)
@@ -101,6 +111,8 @@ type HostsService interface {
 	PowerOffSBMServer(ctx context.Context, id string) (*SBMServer, error)
 	PowerCycleSBMServer(ctx context.Context, id string) (*SBMServer, error)
 	ReinstallOperatingSystemForSBMServer(ctx context.Context, id string, input SBMOperatingSystemReinstallInput) (*SBMServer, error)
+	CreatePTRRecordForSBMServer(ctx context.Context, id string, input PTRRecordCreateInput) (*PTRRecord, error)
+	DeletePTRRecordForSBMServer(ctx context.Context, serverID string, ptrRecordID string) error
 
 	// kubernetes
 	PowerOnKubernetesBaremetalNode(ctx context.Context, id string) (*KubernetesBaremetalNode, error)
@@ -113,9 +125,13 @@ type HostsService interface {
 	DedicatedServerNetworks(id string) Collection[Network]
 	DedicatedServerDriveSlots(id string) Collection[HostDriveSlot]
 	DedicatedServerPTRRecords(id string) Collection[PTRRecord]
+	DedicatedServerServices(id string) Collection[DedicatedServerService]
+	DedicatedServerFeatures(id string) Collection[DedicatedServerFeature]
 	ListDedicatedServers() Collection[DedicatedServer]
 	ListKubernetesBaremetalNodes() Collection[KubernetesBaremetalNode]
 	ListSBMServers() Collection[SBMServer]
+	SBMServerPowerFeeds(ctx context.Context, id string) ([]HostPowerFeed, error)
+	SBMServerPTRRecords(id string) Collection[PTRRecord]
 	KubernetesBaremetalNodePowerFeeds(ctx context.Context, id string) ([]HostPowerFeed, error)
 	KubernetesBaremetalNodeNetworks(id string) Collection[Network]
 	KubernetesBaremetalNodeDriveSlots(id string) Collection[HostDriveSlot]
@@ -199,10 +215,15 @@ func (h *HostsHandler) CreateDedicatedServers(ctx context.Context, input Dedicat
 
 // ScheduleReleaseForDedicatedServer schedules release for for the dedicated server
 // Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ScheduleReleaseForADedicatedServer
-func (h *HostsHandler) ScheduleReleaseForDedicatedServer(ctx context.Context, id string) (*DedicatedServer, error) {
-	url := h.client.buildURL(dedicatedServerScheduleReleasePath, []interface{}{id}...)
+func (h *HostsHandler) ScheduleReleaseForDedicatedServer(ctx context.Context, id string, input ScheduleReleaseInput) (*DedicatedServer, error) {
+	payload, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
 
-	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
+	url := h.client.buildURL(dedicatedServerScheduleReleasePath, id)
+
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, payload)
 
 	if err != nil {
 		return nil, err
@@ -318,11 +339,17 @@ func (h *HostsHandler) DedicatedServerPowerFeeds(ctx context.Context, id string)
 }
 
 // CreatePTRRecordForDedicatedServer creates ptr record for the dedicated server
-// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ListPtrRecordsForADedicatedServer
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/CreateAPtrRecordForADedicatedServer
 func (h *HostsHandler) CreatePTRRecordForDedicatedServer(ctx context.Context, id string, input PTRRecordCreateInput) (*PTRRecord, error) {
-	url := h.client.buildURL(dedicatedServerPTRRecordCreatePath, []interface{}{id}...)
+	payload, err := json.Marshal(input)
 
-	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	url := h.client.buildURL(dedicatedServerPTRRecordCreatePath, id)
+
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, payload)
 
 	if err != nil {
 		return nil, err
@@ -853,4 +880,100 @@ func (h *HostsHandler) ListKubernetesBaremetalNodes() Collection[KubernetesBarem
 // Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Scalable-Baremetal-Server/operation/ListSbmServers
 func (h *HostsHandler) ListSBMServers() Collection[SBMServer] {
 	return NewCollection[SBMServer](h.client, sbmServersListPath)
+}
+
+// DedicatedServerServices builds a new Collection[DedicatedServerService] interface
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ListServicesForADedicatedServer
+func (h *HostsHandler) DedicatedServerServices(id string) Collection[DedicatedServerService] {
+	path := h.client.buildPath(dedicatedServerServicesPath, id)
+
+	return NewCollection[DedicatedServerService](h.client, path)
+}
+
+// DedicatedServerFeatures builds a new Collection[DedicatedServerFeature] interface
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ListFeaturesForADedicatedServer
+func (h *HostsHandler) DedicatedServerFeatures(id string) Collection[DedicatedServerFeature] {
+	path := h.client.buildPath(dedicatedServerFeaturesPath, id)
+
+	return NewCollection[DedicatedServerFeature](h.client, path)
+}
+
+// GetDedicatedServerOOBCredentials returns dedicated server OOB credentials
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/GetOobCredentialsForADedicatedServer
+func (h *HostsHandler) GetDedicatedServerOOBCredentials(ctx context.Context, id string, params map[string]string) (*DedicatedServerOOBCredentials, error) {
+	url := h.client.buildURL(dedicatedServerOOBCredentialsPath, id)
+	urlWithParams := h.client.applyParams(url, params)
+	body, err := h.client.buildAndExecRequest(ctx, "GET", urlWithParams, nil)
+	if err != nil {
+		return nil, err
+	}
+	credentials := new(DedicatedServerOOBCredentials)
+	if err := json.Unmarshal(body, credentials); err != nil {
+		return nil, err
+	}
+	return credentials, nil
+}
+
+// SBMServerPowerFeeds returns list of sbm server power feeds with status
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Scalable-Baremetal-Server/operation/ListPowerFeedsForAnSbmServer
+func (h *HostsHandler) SBMServerPowerFeeds(ctx context.Context, id string) ([]HostPowerFeed, error) {
+	url := h.client.buildURL(hostPowerFeedsListPath, []interface{}{sbmPrefix, id}...)
+
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var powerFeeds []HostPowerFeed
+
+	if err := json.Unmarshal(body, &powerFeeds); err != nil {
+		return nil, err
+	}
+
+	return powerFeeds, nil
+}
+
+// SBMServerPTRRecords builds a new Collection[PTRRecord] interface
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Scalable-Baremetal-Server/operation/ListPtrRecordsForAnSbmServer
+func (h *HostsHandler) SBMServerPTRRecords(id string) Collection[PTRRecord] {
+	path := h.client.buildPath(hostPTRsListPath, []interface{}{sbmPrefix, id}...)
+
+	return NewCollection[PTRRecord](h.client, path)
+}
+
+// CreatePTRRecordForSBMServer creates ptr record for the sbm server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Scalable-Baremetal-Server/operation/CreateAPtrRecordForAnSbmServer
+func (h *HostsHandler) CreatePTRRecordForSBMServer(ctx context.Context, id string, input PTRRecordCreateInput) (*PTRRecord, error) {
+	payload, err := json.Marshal(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	url := h.client.buildURL(sbmServerPTRRecordCreatePath, id)
+
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, payload)
+
+	if err != nil {
+		return nil, err
+	}
+
+	ptrRecord := new(PTRRecord)
+
+	if err := json.Unmarshal(body, &ptrRecord); err != nil {
+		return nil, err
+	}
+
+	return ptrRecord, nil
+}
+
+// DeletePTRRecordForSBMServer deleted ptr record for the sbm server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Scalable-Baremetal-Server/operation/DeleteAPtrRecordForAnSbmServer
+func (h *HostsHandler) DeletePTRRecordForSBMServer(ctx context.Context, hostID string, ptrRecordID string) error {
+	url := h.client.buildURL(sbmServerPTRRecordDeletePath, []interface{}{hostID, ptrRecordID}...)
+
+	_, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
+
+	return err
 }
