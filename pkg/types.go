@@ -1215,5 +1215,5 @@ type DedicatedServerOOBCredentials struct {
 
 // ScheduleReleaseInput represents input for dedicated server schedule release request
 type ScheduleReleaseInput struct {
-	ReleaseAfter string `json:"release_after"`
+	ReleaseAfter string `json:"release_after,omitempty"`
 }
