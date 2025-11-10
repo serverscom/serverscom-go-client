@@ -590,11 +590,12 @@ type Network struct {
 
 // L2LocationGroup represents l2 location groups
 type L2LocationGroup struct {
-	ID          int64   `json:"id"`
-	Name        string  `json:"name"`
-	Code        string  `json:"code"`
-	GroupType   string  `json:"group_type"`
-	LocationIDs []int64 `json:"location_ids"`
+	ID           int64    `json:"id"`
+	Name         string   `json:"name"`
+	Code         string   `json:"code"`
+	GroupType    string   `json:"group_type"`
+	LocationIDs  []int64  `json:"location_ids"`
+	Hyperscalers []string `json:"hyperscalers"`
 }
 
 // HostPowerFeed represents feed status
