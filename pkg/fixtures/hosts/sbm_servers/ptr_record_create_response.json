@@ -1,0 +1,7 @@
+{
+    "id": "sbmPTR123",
+    "ip": "192.168.1.5",
+    "domain": "example.sbmserver.com",
+    "ttl": 120,
+    "priority": 5
+}

@@ -207,7 +207,8 @@ func TestHostsScheduleReleaseForDedicatedServer(t *testing.T) {
 
 	ctx := context.TODO()
 
-	dedicatedServer, err := client.Hosts.ScheduleReleaseForDedicatedServer(ctx, serverID)
+	input := ScheduleReleaseInput{ReleaseAfter: "2022-05-24T12:48:00+03:00"}
+	dedicatedServer, err := client.Hosts.ScheduleReleaseForDedicatedServer(ctx, serverID, input)
 
 	g.Expect(err).To(BeNil())
 	g.Expect(dedicatedServer).ToNot(BeNil())
@@ -1336,4 +1337,176 @@ func TestListSBMServersCollection(t *testing.T) {
 	g.Expect(collection.HasPreviousPage()).To(Equal(false))
 	g.Expect(collection.HasFirstPage()).To(Equal(false))
 	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
+func TestDedicatedServerServicesCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/a/services").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+	defer ts.Close()
+
+	collection := client.Hosts.DedicatedServerServices("a")
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
+func TestDedicatedServerFeaturesCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/a/features").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+	defer ts.Close()
+
+	collection := client.Hosts.DedicatedServerFeatures("a")
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
+func TestSBMServerPTRRecordsCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers/a/ptr_records").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+	defer ts.Close()
+
+	collection := client.Hosts.SBMServerPTRRecords("a")
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
+func TestGetDedicatedServerOOBCredentials(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/a/oob_credentials").
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/oob_credentials.json").
+		WithResponseCode(200).
+		Build()
+	defer ts.Close()
+
+	ctx := context.TODO()
+	params := map[string]string{} // можно добавить параметры, если нужно
+
+	credentials, err := client.Hosts.GetDedicatedServerOOBCredentials(ctx, "a", params)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(credentials).ToNot(BeNil())
+	g.Expect(credentials.Login).To(Equal("admin"))
+	g.Expect(credentials.Secret).To(Equal("supersecret"))
+}
+
+func TestHostsSBMServerPowerFeeds(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers/a/power_feeds").
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/hosts/sbm_servers/power_feeds_response.json").
+		WithResponseCode(200).
+		Build()
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	powerFeeds, err := client.Hosts.SBMServerPowerFeeds(ctx, "a")
+
+	g.Expect(err).To(BeNil())
+	g.Expect(len(powerFeeds)).To(Equal(2)) // или ожидаемое количество элементов
+
+	// Проверка первых элементов
+	g.Expect(powerFeeds[0].Name).To(Equal("Power 1"))
+	g.Expect(powerFeeds[0].Status).To(Equal("on"))
+
+	g.Expect(powerFeeds[1].Name).To(Equal("Power 2"))
+	g.Expect(powerFeeds[1].Status).To(Equal("on"))
+}
+
+func TestHostsCreatePTRRecordForSBMServer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers/a/ptr_records").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/sbm_servers/ptr_record_create_response.json").
+		WithResponseCode(200).
+		Build()
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	ttlValue := 120
+	priorityValue := 5
+
+	input := PTRRecordCreateInput{
+		IP:       "192.168.1.5",
+		Domain:   "example.sbmserver.com",
+		TTL:      &ttlValue,
+		Priority: &priorityValue,
+	}
+
+	ptrRecord, err := client.Hosts.CreatePTRRecordForSBMServer(ctx, "a", input)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(ptrRecord).ToNot(BeNil())
+
+	g.Expect(ptrRecord.ID).To(Equal("sbmPTR123"))
+	g.Expect(ptrRecord.IP).To(Equal("192.168.1.5"))
+	g.Expect(ptrRecord.Domain).To(Equal("example.sbmserver.com"))
+	g.Expect(ptrRecord.Priority).To(Equal(5))
+	g.Expect(ptrRecord.TTL).To(Equal(120))
+}
+
+func TestHostsDeletePTRRecordForSBMServer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers/a/ptr_records/sbmPTR123").
+		WithRequestMethod("DELETE").
+		WithResponseCode(204).
+		Build()
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	err := client.Hosts.DeletePTRRecordForSBMServer(ctx, "a", "sbmPTR123")
+
+	g.Expect(err).To(BeNil())
 }

@@ -590,17 +590,19 @@ type Network struct {
 
 // L2LocationGroup represents l2 location groups
 type L2LocationGroup struct {
-	ID          int64   `json:"id"`
-	Name        string  `json:"name"`
-	Code        string  `json:"code"`
-	GroupType   string  `json:"group_type"`
-	LocationIDs []int64 `json:"location_ids"`
+	ID           int64    `json:"id"`
+	Name         string   `json:"name"`
+	Code         string   `json:"code"`
+	GroupType    string   `json:"group_type"`
+	LocationIDs  []int64  `json:"location_ids"`
+	Hyperscalers []string `json:"hyperscalers"`
 }
 
 // HostPowerFeed represents feed status
 type HostPowerFeed struct {
 	Name   string `json:"name"`
 	Status string `json:"status"`
+	Type   string `json:"type"`
 }
 
 // HostConnection represents host connection
@@ -1180,4 +1182,39 @@ type RemoteBlockStorageFlavor struct {
 	IOPSPerGB      float64 `json:"iops_per_gb"`
 	BandwidthPerGB float64 `json:"bandwidth_per_gb"`
 	MinSizeGB      int     `json:"min_size_gb"`
+}
+
+// DedicatedServerService represents a service associated with dedicated server
+type DedicatedServerService struct {
+	ID            string    `json:"id"`
+	Name          string    `json:"name"`
+	Type          string    `json:"type"`
+	Currency      string    `json:"currency"`
+	Label         *string   `json:"label"`
+	StartedAt     time.Time `json:"started_at"`
+	FinishedAt    time.Time `json:"finished_at"`
+	DateFrom      string    `json:"date_from"`
+	DateTo        string    `json:"date_to"`
+	UsageQuantity float64   `json:"usage_quantity"`
+	Tax           float64   `json:"tax"`
+	Total         float64   `json:"total"`
+	Subtotal      float64   `json:"subtotal"`
+	DiscountRate  float64   `json:"discount_rate"`
+}
+
+// DedicatedServerFeature represents a feature associated with dedicated server
+type DedicatedServerFeature struct {
+	Name   string `json:"name"`
+	Status string `json:"status"`
+}
+
+// DedicatedServerOOBCredentials represents OOB credentials for dedicated server
+type DedicatedServerOOBCredentials struct {
+	Login  string `json:"login"`
+	Secret string `json:"secret"`
+}
+
+// ScheduleReleaseInput represents input for dedicated server schedule release request
+type ScheduleReleaseInput struct {
+	ReleaseAfter string `json:"release_after,omitempty"`
 }
