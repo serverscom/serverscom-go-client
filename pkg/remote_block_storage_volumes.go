@@ -22,7 +22,7 @@ type RemoteBlockStorageVolumesService interface {
 	Get(ctx context.Context, id string) (*RemoteBlockStorageVolume, error)
 	Create(ctx context.Context, input RemoteBlockStorageVolumeCreateInput) (*RemoteBlockStorageVolume, error)
 	Update(ctx context.Context, id string, input RemoteBlockStorageVolumeUpdateInput) (*RemoteBlockStorageVolume, error)
-	Delete(ctx context.Context, id string) (*RemoteBlockStorageVolume, error)
+	Delete(ctx context.Context, id string) error
 	GetCredentials(ctx context.Context, id string) (*RemoteBlockStorageVolumeCredentials, error)
 	ResetCredentials(ctx context.Context, id string) (*RemoteBlockStorageVolume, error)
 }
@@ -92,17 +92,11 @@ func (h *RemoteBlockStorageVolumesHandler) Update(ctx context.Context, id string
 
 // Delete a remote block storage volume
 // Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Remote-Block-Storage-Volume/operation/DeleteAnRbsVolume
-func (h *RemoteBlockStorageVolumesHandler) Delete(ctx context.Context, id string) (*RemoteBlockStorageVolume, error) {
+func (h *RemoteBlockStorageVolumesHandler) Delete(ctx context.Context, id string) error {
 	url := h.client.buildURL(remoteBlockStorageVolumePathWithID, id)
-	body, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
-	if err != nil {
-		return nil, err
-	}
-	var volume RemoteBlockStorageVolume
-	if err := json.Unmarshal(body, &volume); err != nil {
-		return nil, err
-	}
-	return &volume, nil
+	_, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
+
+	return err
 }
 
 // Get credentials for a remote block storage volume

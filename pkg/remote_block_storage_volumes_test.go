@@ -125,12 +125,9 @@ func TestRemoteBlockStorageVolumesDelete(t *testing.T) {
 
 	ctx := context.TODO()
 
-	volume, err := client.RemoteBlockStorageVolumes.Delete(ctx, rbsVolumeID)
+	err := client.RemoteBlockStorageVolumes.Delete(ctx, rbsVolumeID)
 
 	g.Expect(err).To(BeNil())
-	g.Expect(volume).ToNot(BeNil())
-	g.Expect(volume.ID).To(Equal(rbsVolumeID))
-	g.Expect(volume.Status).To(Equal("deleting"))
 }
 
 func TestRemoteBlockStorageVolumesGetCredentials(t *testing.T) {
