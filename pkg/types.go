@@ -485,7 +485,8 @@ type CloudComputingInstanceUpdateInput struct {
 
 // CloudComputingInstanceReinstallInput represents cloud instance reinstall input
 type CloudComputingInstanceReinstallInput struct {
-	ImageID string `json:"image_id"`
+	ImageID  string `json:"image_id"`
+	UserData string `json:"user_data,omitempty"`
 }
 
 // CloudComputingInstanceUpgradeInput represents cloud instance upgrade input
@@ -510,6 +511,14 @@ type CloudComputingImage struct {
 type CloudComputingFlavor struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+}
+
+// CloudComputingRegionCredentials represents OpenStack credentials for a cloud region
+type CloudComputingRegionCredentials struct {
+	Password   string `json:"password"`
+	TenantName int64  `json:"tenant_name"`
+	URL        string `json:"url"`
+	Username   int64  `json:"username"`
 }
 
 // L2Segment represents l2 segment

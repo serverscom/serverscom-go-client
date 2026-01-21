@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "name": "Region 1",
+        "code": "region1"
+    },
+    {
+        "id": 2,
+        "name": "Region 2",
+        "code": "region2"
+    }
+]
