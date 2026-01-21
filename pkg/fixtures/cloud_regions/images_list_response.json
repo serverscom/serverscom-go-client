@@ -1,0 +1,10 @@
+[
+    {
+        "id": "image1",
+        "name": "Ubuntu 20.04"
+    },
+    {
+        "id": "image2",
+        "name": "CentOS 7"
+    }
+]

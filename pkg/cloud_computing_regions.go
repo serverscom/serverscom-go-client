@@ -1,9 +1,15 @@
 package serverscom
 
+import (
+	"context"
+	"encoding/json"
+)
+
 const (
-	cloudComputingRegionListPath = "/cloud_computing/regions"
-	cloudComputingImageListPath  = "/cloud_computing/regions/%d/images"
-	cloudComputingFlavorListPath = "/cloud_computing/regions/%d/flavors"
+	cloudComputingRegionListPath  = "/cloud_computing/regions"
+	cloudComputingImageListPath   = "/cloud_computing/regions/%d/images"
+	cloudComputingFlavorListPath  = "/cloud_computing/regions/%d/flavors"
+	cloudComputingCredentialsPath = "/cloud_computing/regions/%d/credentials"
 )
 
 // CloudComputingRegionsService is an interface to interfacing with the cloud computing regions endpoints
@@ -16,6 +22,8 @@ type CloudComputingRegionsService interface {
 	// Additional collections
 	Images(regionID int64) Collection[CloudComputingImage]
 	Flavors(regionID int64) Collection[CloudComputingFlavor]
+
+	Credentials(ctx context.Context, regionID int64) (*CloudComputingRegionCredentials, error)
 }
 
 // CloudComputingRegionsHandler handles operations around cloud computing regions
@@ -30,14 +38,33 @@ func (h *CloudComputingRegionsHandler) Collection() Collection[CloudComputingReg
 
 // Images builds a new Collection[CloudComputingImage] interface
 func (h *CloudComputingRegionsHandler) Images(regionID int64) Collection[CloudComputingImage] {
-	path := h.client.buildPath(cloudComputingImageListPath, []interface{}{regionID}...)
+	path := h.client.buildPath(cloudComputingImageListPath, regionID)
 
 	return NewCollection[CloudComputingImage](h.client, path)
 }
 
 // Flavors builds a new Collection[CloudComputingFlavor] interface
 func (h *CloudComputingRegionsHandler) Flavors(regionID int64) Collection[CloudComputingFlavor] {
-	path := h.client.buildPath(cloudComputingFlavorListPath, []interface{}{regionID}...)
+	path := h.client.buildPath(cloudComputingFlavorListPath, regionID)
 
 	return NewCollection[CloudComputingFlavor](h.client, path)
+}
+
+// Credentials returns cloud region OpenStack credentials
+func (h *CloudComputingRegionsHandler) Credentials(ctx context.Context, regionID int64) (*CloudComputingRegionCredentials, error) {
+	url := h.client.buildURL(cloudComputingCredentialsPath, regionID)
+
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	credentials := new(CloudComputingRegionCredentials)
+
+	if err := json.Unmarshal(body, credentials); err != nil {
+		return nil, err
+	}
+
+	return credentials, nil
 }

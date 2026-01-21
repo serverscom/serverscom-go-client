@@ -512,6 +512,14 @@ type CloudComputingFlavor struct {
 	Name string `json:"name"`
 }
 
+// CloudComputingRegionCredentials represents OpenStack credentials for a cloud region
+type CloudComputingRegionCredentials struct {
+	Password   string `json:"password"`
+	TenantName int64  `json:"tenant_name"`
+	URL        string `json:"url"`
+	Username   int64  `json:"username"`
+}
+
 // L2Segment represents l2 segment
 type L2Segment struct {
 	ID                string            `json:"id"`
