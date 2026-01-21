@@ -485,7 +485,8 @@ type CloudComputingInstanceUpdateInput struct {
 
 // CloudComputingInstanceReinstallInput represents cloud instance reinstall input
 type CloudComputingInstanceReinstallInput struct {
-	ImageID string `json:"image_id"`
+	ImageID  string `json:"image_id"`
+	UserData string `json:"user_data,omitempty"`
 }
 
 // CloudComputingInstanceUpgradeInput represents cloud instance upgrade input
