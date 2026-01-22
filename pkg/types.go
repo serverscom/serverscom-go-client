@@ -521,6 +521,23 @@ type CloudComputingRegionCredentials struct {
 	Username   int64  `json:"username"`
 }
 
+// CloudSnapshot represents cloud snapshot
+type CloudSnapshot struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	ImageSize int64  `json:"image_size"`
+	MinDisk   int    `json:"min_disk"`
+	Status    string `json:"status"`
+	IsBackup  bool   `json:"is_backup"`
+	FileURL   string `json:"file_url"`
+}
+
+// CloudSnapshotCreateInput represents cloud snapshot create input
+type CloudSnapshotCreateInput struct {
+	Name       string `json:"name"`
+	InstanceID string `json:"instance_id"`
+}
+
 // L2Segment represents l2 segment
 type L2Segment struct {
 	ID                string            `json:"id"`

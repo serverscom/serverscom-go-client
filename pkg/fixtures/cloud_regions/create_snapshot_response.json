@@ -1,0 +1,9 @@
+{
+    "id": "snapshot123",
+    "name": "test-snapshot",
+    "image_size": 0,
+    "min_disk": 0,
+    "status": "pending",
+    "is_backup": false,
+    "file_url": "http://example.com/snapshot123"
+}

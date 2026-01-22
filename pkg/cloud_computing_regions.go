@@ -6,10 +6,12 @@ import (
 )
 
 const (
-	cloudComputingRegionListPath  = "/cloud_computing/regions"
-	cloudComputingImageListPath   = "/cloud_computing/regions/%d/images"
-	cloudComputingFlavorListPath  = "/cloud_computing/regions/%d/flavors"
-	cloudComputingCredentialsPath = "/cloud_computing/regions/%d/credentials"
+	cloudComputingRegionListPath     = "/cloud_computing/regions"
+	cloudComputingImageListPath      = "/cloud_computing/regions/%d/images"
+	cloudComputingFlavorListPath     = "/cloud_computing/regions/%d/flavors"
+	cloudComputingCredentialsPath    = "/cloud_computing/regions/%d/credentials"
+	cloudComputingSnapshotListPath   = "/cloud_computing/regions/%d/snapshots"
+	cloudComputingSnapshotDeletePath = "/cloud_computing/regions/%d/snapshots/%s"
 )
 
 // CloudComputingRegionsService is an interface to interfacing with the cloud computing regions endpoints
@@ -22,8 +24,11 @@ type CloudComputingRegionsService interface {
 	// Additional collections
 	Images(regionID int64) Collection[CloudComputingImage]
 	Flavors(regionID int64) Collection[CloudComputingFlavor]
+	Snapshots(regionID int64) Collection[CloudSnapshot]
 
 	Credentials(ctx context.Context, regionID int64) (*CloudComputingRegionCredentials, error)
+	CreateSnapshot(ctx context.Context, regionID int64, input CloudSnapshotCreateInput) (*CloudSnapshot, error)
+	DeleteSnapshot(ctx context.Context, regionID int64, snapshotID string) error
 }
 
 // CloudComputingRegionsHandler handles operations around cloud computing regions
@@ -50,6 +55,13 @@ func (h *CloudComputingRegionsHandler) Flavors(regionID int64) Collection[CloudC
 	return NewCollection[CloudComputingFlavor](h.client, path)
 }
 
+// Snapshots builds a new Collection[CloudSnapshot] interface
+func (h *CloudComputingRegionsHandler) Snapshots(regionID int64) Collection[CloudSnapshot] {
+	path := h.client.buildPath(cloudComputingSnapshotListPath, regionID)
+
+	return NewCollection[CloudSnapshot](h.client, path)
+}
+
 // Credentials returns cloud region OpenStack credentials
 func (h *CloudComputingRegionsHandler) Credentials(ctx context.Context, regionID int64) (*CloudComputingRegionCredentials, error) {
 	url := h.client.buildURL(cloudComputingCredentialsPath, regionID)
@@ -67,4 +79,38 @@ func (h *CloudComputingRegionsHandler) Credentials(ctx context.Context, regionID
 	}
 
 	return credentials, nil
+}
+
+// CreateSnapshot creates a snapshot for a cloud instance
+func (h *CloudComputingRegionsHandler) CreateSnapshot(ctx context.Context, regionID int64, input CloudSnapshotCreateInput) (*CloudSnapshot, error) {
+	url := h.client.buildURL(cloudComputingSnapshotListPath, regionID)
+
+	payload, err := json.Marshal(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, payload)
+
+	if err != nil {
+		return nil, err
+	}
+
+	snapshot := new(CloudSnapshot)
+
+	if err := json.Unmarshal(body, snapshot); err != nil {
+		return nil, err
+	}
+
+	return snapshot, nil
+}
+
+// DeleteSnapshot deletes a snapshot
+func (h *CloudComputingRegionsHandler) DeleteSnapshot(ctx context.Context, regionID int64, snapshotID string) error {
+	url := h.client.buildURL(cloudComputingSnapshotDeletePath, regionID, snapshotID)
+
+	_, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
+
+	return err
 }
