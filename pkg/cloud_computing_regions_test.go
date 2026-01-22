@@ -109,3 +109,78 @@ func TestCloudComputingRegionsCredentials(t *testing.T) {
 	g.Expect(creds.URL).To(Equal("https://example.com"))
 	g.Expect(creds.Username).To(Equal(int64(456)))
 }
+
+func TestCloudComputingRegionsSnapshots(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/cloud_computing/regions/101/snapshots").
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/cloud_regions/snapshots_list_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.CloudComputingRegions.Snapshots(101)
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(HaveLen(2))
+	g.Expect(list[0].ID).To(Equal("snapshot1"))
+	g.Expect(list[0].Name).To(Equal("Snapshot 1"))
+	g.Expect(list[0].Status).To(Equal("active"))
+	g.Expect(list[1].ID).To(Equal("snapshot2"))
+	g.Expect(list[1].Name).To(Equal("Snapshot 2"))
+	g.Expect(list[1].Status).To(Equal("pending"))
+}
+
+func TestCloudComputingRegionsCreateSnapshot(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/cloud_computing/regions/202/snapshots").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/cloud_regions/create_snapshot_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	input := CloudSnapshotCreateInput{
+		Name:       "test-snapshot",
+		InstanceID: "instance123",
+	}
+
+	ctx := context.TODO()
+
+	snapshot, err := client.CloudComputingRegions.CreateSnapshot(ctx, 202, input)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(snapshot).ToNot(BeNil())
+	g.Expect(snapshot.ID).To(Equal("snapshot123"))
+	g.Expect(snapshot.Name).To(Equal("test-snapshot"))
+	g.Expect(snapshot.Status).To(Equal("pending"))
+	g.Expect(snapshot.IsBackup).To(Equal(false))
+}
+
+func TestCloudComputingRegionsDeleteSnapshot(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/cloud_computing/regions/303/snapshots/snapshot456").
+		WithRequestMethod("DELETE").
+		WithResponseCode(204).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	err := client.CloudComputingRegions.DeleteSnapshot(ctx, 303, "snapshot456")
+
+	g.Expect(err).To(BeNil())
+}

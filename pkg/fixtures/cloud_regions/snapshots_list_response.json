@@ -1,0 +1,20 @@
+[
+    {
+        "id": "snapshot1",
+        "name": "Snapshot 1",
+        "image_size": 1024,
+        "min_disk": 10,
+        "status": "active",
+        "is_backup": false,
+        "file_url": "http://example.com/snapshot1"
+    },
+    {
+        "id": "snapshot2",
+        "name": "Snapshot 2",
+        "image_size": 2048,
+        "min_disk": 20,
+        "status": "pending",
+        "is_backup": true,
+        "file_url": "http://example.com/snapshot2"
+    }
+]
