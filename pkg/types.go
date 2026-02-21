@@ -435,6 +435,22 @@ type SSHKeyUpdateInput struct {
 	Labels map[string]string `json:"labels,omitempty"`
 }
 
+// SSHKeyAttachInput represents input for attaching SSH keys to a dedicated server
+type SSHKeyAttachInput struct {
+	SSHKeyFingerprints []string `json:"ssh_key_fingerprints"`
+}
+
+// HostRescueModeFeatureInput represents input for activating the host_rescue_mode feature
+type HostRescueModeFeatureInput struct {
+	AuthMethods        []string `json:"auth_methods"`
+	SSHKeyFingerprints []string `json:"ssh_key_fingerprints,omitempty"`
+}
+
+// PrivateIpxeBootFeatureInput represents input for activating the private_ipxe_boot feature
+type PrivateIpxeBootFeatureInput struct {
+	IPXEConfig string `json:"ipxe_config"`
+}
+
 // CloudComputingInstance represents cloud instance
 type CloudComputingInstance struct {
 	Name               string            `json:"name"`
@@ -948,8 +964,10 @@ type LoadBalancerCluster struct {
 
 // DedicatedServerUpdateInput represents dedicated server update input
 type DedicatedServerUpdateInput struct {
-	Labels map[string]string `json:"labels,omitempty"`
-	Title  string            `json:"title"`
+	Labels     map[string]string `json:"labels,omitempty"`
+	Title      string            `json:"title,omitempty"`
+	UserData   *string           `json:"user_data,omitempty"`
+	IPXEConfig *string           `json:"ipxe_config,omitempty"`
 }
 
 // KubernetesBaremetalNodeUpdateInput represents kubernetes baremetal node update input
