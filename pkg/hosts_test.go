@@ -1510,3 +1510,206 @@ func TestHostsDeletePTRRecordForSBMServer(t *testing.T) {
 
 	g.Expect(err).To(BeNil())
 }
+
+func TestActivateOobPublicAccessFeature(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/features/oob_public_access/activate").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/feature_action_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	feature, err := client.Hosts.ActivateOobPublicAccessFeature(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(feature).ToNot(BeNil())
+	g.Expect(feature.Name).To(Equal("oob_public_access"))
+	g.Expect(feature.Status).To(Equal("activation"))
+}
+
+func TestDeactivateOobPublicAccessFeature(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/features/oob_public_access/deactivate").
+		WithRequestMethod("POST").
+		WithResponseBodyStubInline(`{"name":"oob_public_access","status":"deactivation"}`).
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	feature, err := client.Hosts.DeactivateOobPublicAccessFeature(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(feature).ToNot(BeNil())
+	g.Expect(feature.Status).To(Equal("deactivation"))
+}
+
+func TestActivateHostRescueModeFeature(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/features/host_rescue_mode/activate").
+		WithRequestMethod("POST").
+		WithResponseBodyStubInline(`{"name":"host_rescue_mode","status":"activation"}`).
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	input := HostRescueModeFeatureInput{
+		AuthMethods: []string{"password"},
+	}
+
+	feature, err := client.Hosts.ActivateHostRescueModeFeature(ctx, serverID, input)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(feature).ToNot(BeNil())
+	g.Expect(feature.Name).To(Equal("host_rescue_mode"))
+	g.Expect(feature.Status).To(Equal("activation"))
+}
+
+func TestDeactivateHostRescueModeFeature(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/features/host_rescue_mode/deactivate").
+		WithRequestMethod("POST").
+		WithResponseBodyStubInline(`{"name":"host_rescue_mode","status":"deactivation"}`).
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	feature, err := client.Hosts.DeactivateHostRescueModeFeature(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(feature).ToNot(BeNil())
+	g.Expect(feature.Status).To(Equal("deactivation"))
+}
+
+func TestActivatePrivateIpxeBootFeature(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/features/private_ipxe_boot/activate").
+		WithRequestMethod("POST").
+		WithResponseBodyStubInline(`{"name":"private_ipxe_boot","status":"activation"}`).
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	input := PrivateIpxeBootFeatureInput{IPXEConfig: "#!ipxe\nchain http://boot.example.com"}
+
+	feature, err := client.Hosts.ActivatePrivateIpxeBootFeature(ctx, serverID, input)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(feature).ToNot(BeNil())
+	g.Expect(feature.Name).To(Equal("private_ipxe_boot"))
+}
+
+func TestDeactivatePrivateIpxeBootFeature(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/features/private_ipxe_boot/deactivate").
+		WithRequestMethod("POST").
+		WithResponseBodyStubInline(`{"name":"private_ipxe_boot","status":"deactivation"}`).
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	feature, err := client.Hosts.DeactivatePrivateIpxeBootFeature(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(feature).ToNot(BeNil())
+	g.Expect(feature.Status).To(Equal("deactivation"))
+}
+
+func TestListDedicatedServerSSHKeys(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/ssh_keys").
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/ssh_keys/list_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	keys, err := client.Hosts.ListDedicatedServerSSHKeys(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(keys).To(HaveLen(1))
+	g.Expect(keys[0].Name).To(Equal("test-key"))
+	g.Expect(keys[0].Fingerprint).To(Equal(sshFingerprint))
+	g.Expect(keys[0].Labels).To(Equal(map[string]string{"env": "test"}))
+	g.Expect(keys[0].Created.String()).To(Equal("2020-04-22 06:23:09 +0000 UTC"))
+	g.Expect(keys[0].Updated.String()).To(Equal("2020-04-22 06:23:09 +0000 UTC"))
+}
+
+func TestAttachSSHKeysToDedicatedServer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/ssh_keys").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/ssh_keys/attach_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	input := SSHKeyAttachInput{
+		SSHKeyFingerprints: []string{sshFingerprint},
+	}
+
+	keys, err := client.Hosts.AttachSSHKeysToDedicatedServer(ctx, serverID, input)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(keys).To(HaveLen(1))
+	g.Expect(keys[0].Name).To(Equal("test-key"))
+	g.Expect(keys[0].Fingerprint).To(Equal(sshFingerprint))
+}
+
+func TestDetachSSHKeyFromDedicatedServer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/ssh_keys/"+sshFingerprint).
+		WithRequestMethod("DELETE").
+		WithResponseCode(204).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	err := client.Hosts.DetachSSHKeyFromDedicatedServer(ctx, serverID, sshFingerprint)
+
+	g.Expect(err).To(BeNil())
+}
