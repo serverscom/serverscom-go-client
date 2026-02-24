@@ -17,24 +17,24 @@ const (
 	kubernetesBaremetalNodePrefix = "kubernetes_baremetal_nodes"
 	sbmPrefix                     = "sbm_servers"
 
-	dedicatedServerCreatePath          = "/hosts/dedicated_servers"
-	dedicatedServerPath                = "/hosts/dedicated_servers/%s"
-	dedicatedServerScheduleReleasePath = "/hosts/dedicated_servers/%s/schedule_release"
-	dedicatedServerAbortReleasePath    = "/hosts/dedicated_servers/%s/abort_release"
-	dedicatedServerPowerOnPath         = "/hosts/dedicated_servers/%s/power_on"
-	dedicatedServerPowerOffPath        = "/hosts/dedicated_servers/%s/power_off"
-	dedicatedServerPowerCyclePath      = "/hosts/dedicated_servers/%s/power_cycle"
-	dedicatedServerPTRRecordCreatePath = "/hosts/dedicated_servers/%s/ptr_records"
-	dedicatedServerPTRRecordDeletePath = "/hosts/dedicated_servers/%s/ptr_records/%s"
-	dedicatedServerReinstallPath       = "/hosts/dedicated_servers/%s/reinstall"
-	dedicatedServersListPath           = "/hosts/dedicated_servers"
-	dedicatedServerServicesPath        = "/hosts/dedicated_servers/%s/services"
-	dedicatedServerFeaturesPath        = "/hosts/dedicated_servers/%s/features"
+	dedicatedServerCreatePath            = "/hosts/dedicated_servers"
+	dedicatedServerPath                  = "/hosts/dedicated_servers/%s"
+	dedicatedServerScheduleReleasePath   = "/hosts/dedicated_servers/%s/schedule_release"
+	dedicatedServerAbortReleasePath      = "/hosts/dedicated_servers/%s/abort_release"
+	dedicatedServerPowerOnPath           = "/hosts/dedicated_servers/%s/power_on"
+	dedicatedServerPowerOffPath          = "/hosts/dedicated_servers/%s/power_off"
+	dedicatedServerPowerCyclePath        = "/hosts/dedicated_servers/%s/power_cycle"
+	dedicatedServerPTRRecordCreatePath   = "/hosts/dedicated_servers/%s/ptr_records"
+	dedicatedServerPTRRecordDeletePath   = "/hosts/dedicated_servers/%s/ptr_records/%s"
+	dedicatedServerReinstallPath         = "/hosts/dedicated_servers/%s/reinstall"
+	dedicatedServersListPath             = "/hosts/dedicated_servers"
+	dedicatedServerServicesPath          = "/hosts/dedicated_servers/%s/services"
+	dedicatedServerFeaturesPath          = "/hosts/dedicated_servers/%s/features"
 	dedicatedServerFeatureActivatePath   = "/hosts/dedicated_servers/%s/features/%s/activate"
 	dedicatedServerFeatureDeactivatePath = "/hosts/dedicated_servers/%s/features/%s/deactivate"
 	dedicatedServerSSHKeysPath           = "/hosts/dedicated_servers/%s/ssh_keys"
-	dedicatedServerSSHKeyPath          = "/hosts/dedicated_servers/%s/ssh_keys/%s"
-	dedicatedServerOOBCredentialsPath  = "/hosts/dedicated_servers/%s/oob_credentials"
+	dedicatedServerSSHKeyPath            = "/hosts/dedicated_servers/%s/ssh_keys/%s"
+	dedicatedServerOOBCredentialsPath    = "/hosts/dedicated_servers/%s/oob_credentials"
 
 	// ds networks
 	dedicatedServerNetworkUsagePath          = "/hosts/dedicated_servers/%s/network_utilization"
@@ -960,79 +960,79 @@ func (h *HostsHandler) deactivateFeature(ctx context.Context, serverID, feature 
 }
 
 // ActivateDisaggregatedPublicPortsFeature activates the disaggregated_public_ports feature.
-// Endpoint: POST /hosts/dedicated_servers/{id}/features/disaggregated_public_ports/activate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ActivateDisaggregatedPublicPortsFeatureForADedicatedServer
 func (h *HostsHandler) ActivateDisaggregatedPublicPortsFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error) {
 	return h.activateFeature(ctx, serverID, "disaggregated_public_ports", nil)
 }
 
 // DeactivateDisaggregatedPublicPortsFeature deactivates the disaggregated_public_ports feature.
-// Endpoint: POST /hosts/dedicated_servers/{id}/features/disaggregated_public_ports/deactivate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/DeactivateDisaggregatedPublicPortsFeatureForADedicatedServer
 func (h *HostsHandler) DeactivateDisaggregatedPublicPortsFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error) {
 	return h.deactivateFeature(ctx, serverID, "disaggregated_public_ports")
 }
 
 // ActivateDisaggregatedPrivatePortsFeature activates the disaggregated_private_ports feature.
-// Endpoint: POST /hosts/dedicated_servers/{id}/features/disaggregated_private_ports/activate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/DeactivateDisaggregatedPrivatePortsFeatureForADedicatedServer
 func (h *HostsHandler) ActivateDisaggregatedPrivatePortsFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error) {
 	return h.activateFeature(ctx, serverID, "disaggregated_private_ports", nil)
 }
 
 // DeactivateDisaggregatedPrivatePortsFeature deactivates the disaggregated_private_ports feature.
-// Endpoint: POST /hosts/dedicated_servers/{id}/features/disaggregated_private_ports/deactivate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/DeactivateDisaggregatedPrivatePortsFeatureForADedicatedServer
 func (h *HostsHandler) DeactivateDisaggregatedPrivatePortsFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error) {
 	return h.deactivateFeature(ctx, serverID, "disaggregated_private_ports")
 }
 
 // ActivateNoPublicIpAddressFeature activates the no_public_ip_address feature.
-// Endpoint: POST /hosts/dedicated_servers/{id}/features/no_public_ip_address/activate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ActivateNoPublicIpAddressFeatureForADedicatedServer
 func (h *HostsHandler) ActivateNoPublicIpAddressFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error) {
 	return h.activateFeature(ctx, serverID, "no_public_ip_address", nil)
 }
 
 // DeactivateNoPublicIpAddressFeature deactivates the no_public_ip_address feature.
-// Endpoint: POST /hosts/dedicated_servers/{id}/features/no_public_ip_address/deactivate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/DeactivateNoPublicIpAddressFeatureForADedicatedServer
 func (h *HostsHandler) DeactivateNoPublicIpAddressFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error) {
 	return h.deactivateFeature(ctx, serverID, "no_public_ip_address")
 }
 
 // ActivateNoPrivateIpFeature activates the no_private_ip feature.
-// Endpoint: POST /hosts/dedicated_servers/{id}/features/no_private_ip/activate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ActivateNoPrivateIpFeatureForADedicatedServer
 func (h *HostsHandler) ActivateNoPrivateIpFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error) {
 	return h.activateFeature(ctx, serverID, "no_private_ip", nil)
 }
 
 // DeactivateNoPrivateIpFeature deactivates the no_private_ip feature.
-// Endpoint: POST /hosts/dedicated_servers/{id}/features/no_private_ip/deactivate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/DeactivateNoPrivateIpFeatureForADedicatedServer
 func (h *HostsHandler) DeactivateNoPrivateIpFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error) {
 	return h.deactivateFeature(ctx, serverID, "no_private_ip")
 }
 
 // ActivateOobPublicAccessFeature activates the oob_public_access feature.
-// Endpoint: POST /hosts/dedicated_servers/{id}/features/oob_public_access/activate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ActivateOobPublicAccessFeatureForADedicatedServer
 func (h *HostsHandler) ActivateOobPublicAccessFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error) {
 	return h.activateFeature(ctx, serverID, "oob_public_access", nil)
 }
 
 // DeactivateOobPublicAccessFeature deactivates the oob_public_access feature.
-// Endpoint: POST /hosts/dedicated_servers/{id}/features/oob_public_access/deactivate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/DeactivateOobPublicAccessFeatureForADedicatedServer
 func (h *HostsHandler) DeactivateOobPublicAccessFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error) {
 	return h.deactivateFeature(ctx, serverID, "oob_public_access")
 }
 
 // ActivateNoPublicNetworkFeature activates the no_public_network feature.
-// Endpoint: POST /hosts/dedicated_servers/{id}/features/no_public_network/activate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ActivateNoPublicNetworkFeatureForADedicatedServer
 func (h *HostsHandler) ActivateNoPublicNetworkFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error) {
 	return h.activateFeature(ctx, serverID, "no_public_network", nil)
 }
 
 // DeactivateNoPublicNetworkFeature deactivates the no_public_network feature.
-// Endpoint: POST /hosts/dedicated_servers/{id}/features/no_public_network/deactivate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/DeactivateNoPublicNetworkFeatureForADedicatedServer
 func (h *HostsHandler) DeactivateNoPublicNetworkFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error) {
 	return h.deactivateFeature(ctx, serverID, "no_public_network")
 }
 
 // ActivateHostRescueModeFeature activates the host_rescue_mode feature.
-// Endpoint: POST /hosts/dedicated_servers/{id}/features/host_rescue_mode/activate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ActivateHostRescueModeFeatureForADedicatedServer
 func (h *HostsHandler) ActivateHostRescueModeFeature(ctx context.Context, serverID string, input HostRescueModeFeatureInput) (*DedicatedServerFeature, error) {
 	payload, err := json.Marshal(input)
 	if err != nil {
@@ -1043,13 +1043,13 @@ func (h *HostsHandler) ActivateHostRescueModeFeature(ctx context.Context, server
 }
 
 // DeactivateHostRescueModeFeature deactivates the host_rescue_mode feature.
-// Endpoint: POST /hosts/dedicated_servers/{id}/features/host_rescue_mode/deactivate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/DeactivateHostRescueModeFeatureForADedicatedServer
 func (h *HostsHandler) DeactivateHostRescueModeFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error) {
 	return h.deactivateFeature(ctx, serverID, "host_rescue_mode")
 }
 
 // ActivatePrivateIpxeBootFeature activates the private_ipxe_boot feature.
-// Endpoint: POST /hosts/dedicated_servers/{id}/features/private_ipxe_boot/activate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ActivatePrivateIpxeBootFeatureForADedicatedServer
 func (h *HostsHandler) ActivatePrivateIpxeBootFeature(ctx context.Context, serverID string, input PrivateIpxeBootFeatureInput) (*DedicatedServerFeature, error) {
 	payload, err := json.Marshal(input)
 	if err != nil {
@@ -1060,7 +1060,7 @@ func (h *HostsHandler) ActivatePrivateIpxeBootFeature(ctx context.Context, serve
 }
 
 // DeactivatePrivateIpxeBootFeature deactivates the private_ipxe_boot feature.
-// Endpoint: POST /hosts/dedicated_servers/{id}/features/private_ipxe_boot/deactivate
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/DeactivatePrivateIpxeBootFeatureForADedicatedServer
 func (h *HostsHandler) DeactivatePrivateIpxeBootFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error) {
 	return h.deactivateFeature(ctx, serverID, "private_ipxe_boot")
 }
