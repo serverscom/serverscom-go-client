@@ -1,6 +1,8 @@
 {
   "id": "BDbDxbl2",
   "openstack_uuid": "b9e388ff-e53b-498a-8ef4-764450236788",
+  "region_id": 1,
+  "region_code": "test",
   "status": "ACTIVE",
   "name": "name37",
   "flavor_id": "101",

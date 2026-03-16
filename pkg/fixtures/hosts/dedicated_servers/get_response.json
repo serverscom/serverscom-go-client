@@ -2,6 +2,7 @@
     "id": "xkazYeJ0",
     "title": "example.aa",
     "location_id": 1,
+    "location_code": "location2155",
     "status": "active",
     "configuration": "REMM R123",
     "private_ipv4_address": "10.0.0.1",

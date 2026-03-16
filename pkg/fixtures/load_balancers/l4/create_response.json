@@ -5,6 +5,7 @@
   "status": "in_process",
   "external_addresses": [],
   "location_id": 1,
+  "location_code": "location2155",
   "proxy_protocol_enabled": true,
   "store_logs": true,
   "vhost_zones": [

@@ -3,6 +3,7 @@
     "openstack_uuid": "d1473317-bb2c-4d68-992c-0c117a68c01a",
     "openstack_volume_uuid": "1ac953dc-2414-4831-8124-c2dcbd405926",
     "region_id": 1,
+    "region_code": "test",
     "name": "test-backup-1",
     "size": 1,
     "status": "restoring",

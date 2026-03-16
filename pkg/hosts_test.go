@@ -102,6 +102,7 @@ func TestHostsCreateDedicatedServers(t *testing.T) {
 	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
+	g.Expect(dedicatedServer.LocationCode).To(Equal("location2155"))
 	g.Expect(dedicatedServer.Status).To(Equal("init"))
 	g.Expect(dedicatedServer.Configuration).To(Equal("Dell chassis-9015 / 2 GB RAM / 2 x hdd-model-404"))
 	g.Expect(dedicatedServer.PrivateIPv4Address).To(BeNil())
@@ -116,6 +117,7 @@ func TestHostsCreateDedicatedServers(t *testing.T) {
 	g.Expect(dedicatedServer.ID).To(Equal("w9aAOdvM"))
 	g.Expect(dedicatedServer.Title).To(Equal("example.bb"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
+	g.Expect(dedicatedServer.LocationCode).To(Equal("location2155"))
 	g.Expect(dedicatedServer.Status).To(Equal("init"))
 	g.Expect(dedicatedServer.Configuration).To(Equal("Dell chassis-9015 / 2 GB RAM / 2 x hdd-model-404"))
 	g.Expect(dedicatedServer.PrivateIPv4Address).To(BeNil())
@@ -148,6 +150,7 @@ func TestHostsGetDedicatedServer(t *testing.T) {
 	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
+	g.Expect(dedicatedServer.LocationCode).To(Equal("location2155"))
 	g.Expect(dedicatedServer.Status).To(Equal("active"))
 	g.Expect(dedicatedServer.Configuration).To(Equal("REMM R123"))
 	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -183,6 +186,7 @@ func TestHostsUpdateDedicatedServer(t *testing.T) {
 	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal(newTitle))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
+	g.Expect(dedicatedServer.LocationCode).To(Equal("location2155"))
 	g.Expect(dedicatedServer.Status).To(Equal("active"))
 	g.Expect(dedicatedServer.Configuration).To(Equal("REMM R123"))
 	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -216,6 +220,7 @@ func TestHostsScheduleReleaseForDedicatedServer(t *testing.T) {
 	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
+	g.Expect(dedicatedServer.LocationCode).To(Equal("location2155"))
 	g.Expect(dedicatedServer.Status).To(Equal("active"))
 	g.Expect(dedicatedServer.Configuration).To(Equal("REMM R123"))
 	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -251,6 +256,7 @@ func TestHostsAbortReleaseForDedicatedServer(t *testing.T) {
 	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
+	g.Expect(dedicatedServer.LocationCode).To(Equal("location2155"))
 	g.Expect(dedicatedServer.Status).To(Equal("active"))
 	g.Expect(dedicatedServer.Configuration).To(Equal("REMM R123"))
 	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -283,6 +289,7 @@ func TestHostsPowerOnDedicatedServer(t *testing.T) {
 	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
+	g.Expect(dedicatedServer.LocationCode).To(Equal("location2155"))
 	g.Expect(dedicatedServer.Status).To(Equal("active"))
 	g.Expect(dedicatedServer.Configuration).To(Equal("REMM R123"))
 	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -315,6 +322,7 @@ func TestHostsPowerOffDedicatedServer(t *testing.T) {
 	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
+	g.Expect(dedicatedServer.LocationCode).To(Equal("location2155"))
 	g.Expect(dedicatedServer.Status).To(Equal("active"))
 	g.Expect(dedicatedServer.Configuration).To(Equal("REMM R123"))
 	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -347,6 +355,7 @@ func TestHostsPowerCycleDedicatedServer(t *testing.T) {
 	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
+	g.Expect(dedicatedServer.LocationCode).To(Equal("location2155"))
 	g.Expect(dedicatedServer.Status).To(Equal("active"))
 	g.Expect(dedicatedServer.Configuration).To(Equal("REMM R123"))
 	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -485,6 +494,7 @@ func TestHostsReinstallOperatingSystemForDedicatedServer(t *testing.T) {
 	g.Expect(dedicatedServer.ID).To(Equal(serverID))
 	g.Expect(dedicatedServer.Title).To(Equal("example.aa"))
 	g.Expect(dedicatedServer.LocationID).To(Equal(int64(1)))
+	g.Expect(dedicatedServer.LocationCode).To(Equal("location2155"))
 	g.Expect(dedicatedServer.Status).To(Equal("active"))
 	g.Expect(dedicatedServer.Configuration).To(Equal("REMM R123"))
 	g.Expect(*dedicatedServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -633,6 +643,7 @@ func TestHostsCreateSBMServers(t *testing.T) {
 	g.Expect(sbmServer.Title).To(Equal("example.aa"))
 	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
 	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.LocationCode).To(Equal("location2155"))
 	g.Expect(sbmServer.Status).To(Equal("init"))
 	g.Expect(sbmServer.Configuration).To(Equal("Dell chassis-9015 / 2 GB RAM / 2 x hdd-model-404"))
 	g.Expect(sbmServer.PrivateIPv4Address).To(BeNil())
@@ -648,6 +659,7 @@ func TestHostsCreateSBMServers(t *testing.T) {
 	g.Expect(sbmServer.Title).To(Equal("example.bb"))
 	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
 	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.LocationCode).To(Equal("location2155"))
 	g.Expect(sbmServer.Status).To(Equal("init"))
 	g.Expect(sbmServer.Configuration).To(Equal("Dell chassis-9015 / 2 GB RAM / 2 x hdd-model-404"))
 	g.Expect(sbmServer.PrivateIPv4Address).To(BeNil())
@@ -681,6 +693,7 @@ func TestHostsGetSBMServer(t *testing.T) {
 	g.Expect(sbmServer.Title).To(Equal("example.aa"))
 	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
 	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.LocationCode).To(Equal("location2155"))
 	g.Expect(sbmServer.Status).To(Equal("active"))
 	g.Expect(sbmServer.Configuration).To(Equal("REMM R123"))
 	g.Expect(*sbmServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -716,6 +729,7 @@ func TestHostsUpdateSBMServer(t *testing.T) {
 	g.Expect(sbmServer.Title).To(Equal("example.aa"))
 	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
 	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.LocationCode).To(Equal("location2155"))
 	g.Expect(sbmServer.Status).To(Equal("active"))
 	g.Expect(sbmServer.Configuration).To(Equal("REMM R123"))
 	g.Expect(*sbmServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -749,6 +763,7 @@ func TestHostsReleaseSBMServer(t *testing.T) {
 	g.Expect(sbmServer.Title).To(Equal("example.aa"))
 	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
 	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.LocationCode).To(Equal("location2155"))
 	g.Expect(sbmServer.Status).To(Equal("active"))
 	g.Expect(sbmServer.Configuration).To(Equal("REMM R123"))
 	g.Expect(*sbmServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -781,6 +796,7 @@ func TestHostsPowerOnSBMServer(t *testing.T) {
 	g.Expect(sbmServer.Title).To(Equal("example.aa"))
 	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
 	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.LocationCode).To(Equal("location2155"))
 	g.Expect(sbmServer.Status).To(Equal("active"))
 	g.Expect(sbmServer.Configuration).To(Equal("REMM R123"))
 	g.Expect(*sbmServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -813,6 +829,7 @@ func TestHostsPowerOffSBMServer(t *testing.T) {
 	g.Expect(sbmServer.Title).To(Equal("example.aa"))
 	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
 	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.LocationCode).To(Equal("location2155"))
 	g.Expect(sbmServer.Status).To(Equal("active"))
 	g.Expect(sbmServer.Configuration).To(Equal("REMM R123"))
 	g.Expect(*sbmServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -845,6 +862,7 @@ func TestHostsPowerCycleSBMServer(t *testing.T) {
 	g.Expect(sbmServer.Title).To(Equal("example.aa"))
 	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
 	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.LocationCode).To(Equal("location2155"))
 	g.Expect(sbmServer.Status).To(Equal("active"))
 	g.Expect(sbmServer.Configuration).To(Equal("REMM R123"))
 	g.Expect(*sbmServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -877,6 +895,7 @@ func TestReinstallOperatingSystemForSBMServer(t *testing.T) {
 	g.Expect(sbmServer.Title).To(Equal("example.aa"))
 	g.Expect(sbmServer.Type).To(Equal("sbm_server"))
 	g.Expect(sbmServer.LocationID).To(Equal(int64(1)))
+	g.Expect(sbmServer.LocationCode).To(Equal("location2155"))
 	g.Expect(sbmServer.Status).To(Equal("active"))
 	g.Expect(sbmServer.Configuration).To(Equal("REMM R123"))
 	g.Expect(*sbmServer.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -908,6 +927,7 @@ func TestHostsGetKubernetesBaremetalNode(t *testing.T) {
 	g.Expect(node.ID).To(Equal(serverID))
 	g.Expect(node.Title).To(Equal("example.aa"))
 	g.Expect(node.LocationID).To(Equal(int64(1)))
+	g.Expect(node.LocationCode).To(Equal("location2155"))
 	g.Expect(node.Status).To(Equal("active"))
 	g.Expect(node.Configuration).To(Equal("REMM R123"))
 	g.Expect(*node.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -941,6 +961,7 @@ func TestHostsUpdateKubernetesBaremetalNode(t *testing.T) {
 	g.Expect(node.ID).To(Equal(serverID))
 	g.Expect(node.Title).To(Equal("example.aa"))
 	g.Expect(node.LocationID).To(Equal(int64(1)))
+	g.Expect(node.LocationCode).To(Equal("location2155"))
 	g.Expect(node.Status).To(Equal("active"))
 	g.Expect(node.Configuration).To(Equal("REMM R123"))
 	g.Expect(*node.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -974,6 +995,7 @@ func TestHostsPowerOnKubernetesBaremetalNode(t *testing.T) {
 	g.Expect(node.Title).To(Equal("example.aa"))
 	g.Expect(node.Type).To(Equal("kubernetes_baremetal_node"))
 	g.Expect(node.LocationID).To(Equal(int64(1)))
+	g.Expect(node.LocationCode).To(Equal("location2155"))
 	g.Expect(node.Status).To(Equal("active"))
 	g.Expect(node.Configuration).To(Equal("REMM R123"))
 	g.Expect(*node.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -1006,6 +1028,7 @@ func TestHostsPowerOffKubernetesBaremetalNode(t *testing.T) {
 	g.Expect(node.Title).To(Equal("example.aa"))
 	g.Expect(node.Type).To(Equal("kubernetes_baremetal_node"))
 	g.Expect(node.LocationID).To(Equal(int64(1)))
+	g.Expect(node.LocationCode).To(Equal("location2155"))
 	g.Expect(node.Status).To(Equal("active"))
 	g.Expect(node.Configuration).To(Equal("REMM R123"))
 	g.Expect(*node.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -1038,6 +1061,7 @@ func TestHostsPowerCycleKubernetesBaremetalNode(t *testing.T) {
 	g.Expect(node.Title).To(Equal("example.aa"))
 	g.Expect(node.Type).To(Equal("kubernetes_baremetal_node"))
 	g.Expect(node.LocationID).To(Equal(int64(1)))
+	g.Expect(node.LocationCode).To(Equal("location2155"))
 	g.Expect(node.Status).To(Equal("active"))
 	g.Expect(node.Configuration).To(Equal("REMM R123"))
 	g.Expect(*node.PrivateIPv4Address).To(Equal("10.0.0.1"))
@@ -1515,7 +1539,7 @@ func TestActivateOobPublicAccessFeature(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/features/oob_public_access/activate").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/features/oob_public_access/activate").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/feature_action_response.json").
 		WithResponseCode(202).
@@ -1537,7 +1561,7 @@ func TestDeactivateOobPublicAccessFeature(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/features/oob_public_access/deactivate").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/features/oob_public_access/deactivate").
 		WithRequestMethod("POST").
 		WithResponseBodyStubInline(`{"name":"oob_public_access","status":"deactivation"}`).
 		WithResponseCode(202).
@@ -1558,7 +1582,7 @@ func TestActivateHostRescueModeFeature(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/features/host_rescue_mode/activate").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/features/host_rescue_mode/activate").
 		WithRequestMethod("POST").
 		WithResponseBodyStubInline(`{"name":"host_rescue_mode","status":"activation"}`).
 		WithResponseCode(202).
@@ -1584,7 +1608,7 @@ func TestDeactivateHostRescueModeFeature(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/features/host_rescue_mode/deactivate").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/features/host_rescue_mode/deactivate").
 		WithRequestMethod("POST").
 		WithResponseBodyStubInline(`{"name":"host_rescue_mode","status":"deactivation"}`).
 		WithResponseCode(202).
@@ -1605,7 +1629,7 @@ func TestActivatePrivateIpxeBootFeature(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/features/private_ipxe_boot/activate").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/features/private_ipxe_boot/activate").
 		WithRequestMethod("POST").
 		WithResponseBodyStubInline(`{"name":"private_ipxe_boot","status":"activation"}`).
 		WithResponseCode(202).
@@ -1628,7 +1652,7 @@ func TestDeactivatePrivateIpxeBootFeature(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/features/private_ipxe_boot/deactivate").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/features/private_ipxe_boot/deactivate").
 		WithRequestMethod("POST").
 		WithResponseBodyStubInline(`{"name":"private_ipxe_boot","status":"deactivation"}`).
 		WithResponseCode(202).
@@ -1649,7 +1673,7 @@ func TestListDedicatedServerSSHKeys(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/ssh_keys").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/ssh_keys").
 		WithRequestMethod("GET").
 		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/ssh_keys/list_response.json").
 		WithResponseCode(200).
@@ -1674,7 +1698,7 @@ func TestAttachSSHKeysToDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/ssh_keys").
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/ssh_keys").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/ssh_keys/attach_response.json").
 		WithResponseCode(200).
@@ -1700,7 +1724,7 @@ func TestDetachSSHKeyFromDedicatedServer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/hosts/dedicated_servers/"+serverID+"/ssh_keys/"+sshFingerprint).
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/ssh_keys/" + sshFingerprint).
 		WithRequestMethod("DELETE").
 		WithResponseCode(204).
 		Build()
