@@ -6,6 +6,9 @@
   "location_ids": [
     541
   ],
+  "location_codes": [
+    "location541"
+  ],
   "labels": {
     "env": "test"
   },

@@ -56,6 +56,7 @@ func TestGetLoadBalancerCluster(t *testing.T) {
 	g.Expect(loadBalancerCluster.Status).To(Equal("active"))
 	g.Expect(loadBalancerCluster.Name).To(Equal("dedic-test-ams1"))
 	g.Expect(loadBalancerCluster.LocationID).To(Equal(int64(1)))
+	g.Expect(loadBalancerCluster.LocationCode).To(Equal("location2155"))
 	g.Expect(loadBalancerCluster.Created.String()).To(Equal("2024-10-17 08:38:07 +0000 UTC"))
 	g.Expect(loadBalancerCluster.Updated.String()).To(Equal("2024-10-17 08:39:40 +0000 UTC"))
 }

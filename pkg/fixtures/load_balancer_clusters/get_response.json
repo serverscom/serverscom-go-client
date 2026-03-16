@@ -2,6 +2,7 @@
     "id": "Jrb2XMeW",
     "name": "dedic-test-ams1",
     "location_id": 1,
+    "location_code": "location2155",
     "status": "active",
     "created_at": "2024-10-17T08:38:07Z",
     "updated_at": "2024-10-17T08:39:40Z"

@@ -10,6 +10,7 @@
         "10.0.0.1"
     ],
     "location_id": 1,
+    "location_code": "location2155",
     "geoip": false,
     "store_logs": true,
     "store_logs_region_id": 3,

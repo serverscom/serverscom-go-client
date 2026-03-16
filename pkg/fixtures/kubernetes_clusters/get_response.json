@@ -3,6 +3,7 @@
     "name": "k8s-cluster",
     "status": "pending",
     "location_id": 1,
+    "location_code": "location2155",
     "labels": {
         "env": "test"
     },

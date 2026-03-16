@@ -632,12 +632,13 @@ type Network struct {
 
 // L2LocationGroup represents l2 location groups
 type L2LocationGroup struct {
-	ID           int64    `json:"id"`
-	Name         string   `json:"name"`
-	Code         string   `json:"code"`
-	GroupType    string   `json:"group_type"`
-	LocationIDs  []int64  `json:"location_ids"`
-	Hyperscalers []string `json:"hyperscalers"`
+	ID            int64    `json:"id"`
+	Name          string   `json:"name"`
+	Code          string   `json:"code"`
+	GroupType     string   `json:"group_type"`
+	LocationIDs   []int64  `json:"location_ids"`
+	LocationCodes []string `json:"location_codes"`
+	Hyperscalers  []string `json:"hyperscalers"`
 }
 
 // HostPowerFeed represents feed status
@@ -718,14 +719,15 @@ type HostDriveSlot struct {
 
 // NetworkPool represents network pool
 type NetworkPool struct {
-	ID          string            `json:"id"`
-	Title       *string           `json:"title"`
-	CIDR        string            `json:"cidr"`
-	Type        string            `json:"type"`
-	LocationIDs []int             `json:"location_ids"`
-	Labels      map[string]string `json:"labels"`
-	Created     time.Time         `json:"created_at"`
-	Updated     time.Time         `json:"updated_at"`
+	ID            string            `json:"id"`
+	Title         *string           `json:"title"`
+	CIDR          string            `json:"cidr"`
+	Type          string            `json:"type"`
+	LocationIDs   []int             `json:"location_ids"`
+	LocationCodes []string          `json:"location_codes"`
+	Labels        map[string]string `json:"labels"`
+	Created       time.Time         `json:"created_at"`
+	Updated       time.Time         `json:"updated_at"`
 }
 
 // NetworkPoolInput represents network pool input
@@ -766,6 +768,7 @@ type LoadBalancer struct {
 	Status            string            `json:"status"`
 	ExternalAddresses []string          `json:"external_addresses"`
 	LocationID        int64             `json:"location_id"`
+	LocationCode      string            `json:"location_code"`
 	ClusterID         *string           `json:"cluster_id"`
 	Labels            map[string]string `json:"labels"`
 	Created           time.Time         `json:"created_at"`
@@ -780,6 +783,7 @@ type L4LoadBalancer struct {
 	Status            string            `json:"status"`
 	ExternalAddresses []string          `json:"external_addresses"`
 	LocationID        int64             `json:"location_id"`
+	LocationCode      string            `json:"location_code"`
 	StoreLogs         bool              `json:"store_logs"`
 	ClusterID         *string           `json:"cluster_id"`
 	Labels            map[string]string `json:"labels"`
@@ -845,6 +849,7 @@ type L7LoadBalancer struct {
 	Status            string            `json:"status"`
 	ExternalAddresses []string          `json:"external_addresses"`
 	LocationID        int64             `json:"location_id"`
+	LocationCode      string            `json:"location_code"`
 	Geoip             bool              `json:"geoip"`
 	StoreLogs         bool              `json:"store_logs"`
 	StoreLogsRegionID int64             `json:"store_logs_region_id"`
@@ -954,12 +959,13 @@ type SBMFlavor struct {
 
 // LoadBalancerCluster represents load balancer cluster
 type LoadBalancerCluster struct {
-	ID         string    `json:"id"`
-	Name       string    `json:"name"`
-	LocationID int64     `json:"location_id"`
-	Status     string    `json:"status"`
-	Created    time.Time `json:"created_at"`
-	Updated    time.Time `json:"updated_at"`
+	ID           string    `json:"id"`
+	Name         string    `json:"name"`
+	LocationID   int64     `json:"location_id"`
+	LocationCode string    `json:"location_code"`
+	Status       string    `json:"status"`
+	Created      time.Time `json:"created_at"`
+	Updated      time.Time `json:"updated_at"`
 }
 
 // DedicatedServerUpdateInput represents dedicated server update input
@@ -999,6 +1005,7 @@ type CloudBlockStorageVolume struct {
 	ID            string            `json:"id"`
 	OpenstackUUID *string           `json:"openstack_uuid"`
 	RegionID      int64             `json:"region_id"`
+	RegionCode    string            `json:"region_code"`
 	Size          int               `json:"size"`
 	Status        string            `json:"status"`
 	Bootable      bool              `json:"bootable"`
@@ -1054,6 +1061,7 @@ type CloudBlockStorageBackup struct {
 	OpenstackUUID       *string           `json:"openstack_uuid"`
 	OpenstackVolumeUUID string            `json:"openstack_volume_uuid"`
 	RegionID            int               `json:"region_id"`
+	RegionCode          string            `json:"region_code"`
 	Size                int               `json:"size"`
 	Status              string            `json:"status"`
 	Labels              map[string]string `json:"labels"`
@@ -1082,13 +1090,14 @@ type CloudBlockStorageBackupRestoreInput struct {
 
 // KubernetesCluster represents Kubernetes cluster
 type KubernetesCluster struct {
-	ID         string            `json:"id"`
-	Name       string            `json:"name"`
-	Status     string            `json:"status"`
-	LocationID int64             `json:"location_id"`
-	Labels     map[string]string `json:"labels"`
-	Created    time.Time         `json:"created_at"`
-	Updated    time.Time         `json:"updated_at"`
+	ID           string            `json:"id"`
+	Name         string            `json:"name"`
+	Status       string            `json:"status"`
+	LocationID   int64             `json:"location_id"`
+	LocationCode string            `json:"location_code"`
+	Labels       map[string]string `json:"labels"`
+	Created      time.Time         `json:"created_at"`
+	Updated      time.Time         `json:"updated_at"`
 }
 
 // KubernetesClusterNode represents Kubernetes cluster node

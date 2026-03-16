@@ -1,6 +1,8 @@
 {
   "id": "LDdwRb1Y",
   "openstack_uuid": "04e59a31-efe6-440c-9568-142fca1a6123",
+  "region_id": 1,
+  "region_code": "test",
   "status": "PROVISIONING",
   "name": "test-instance-2",
   "flavor_id": "102",

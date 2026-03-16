@@ -4,6 +4,7 @@
   "openstack_uuid": null,
   "openstack_volume_uuid": "1ac953dc-2414-4831-8124-c2dcbd405926",
   "region_id": 1,
+  "region_code": "test",
   "size": 1,
   "status": "pending",
   "labels": {

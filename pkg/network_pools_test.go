@@ -57,6 +57,8 @@ func TestNetworkPoolsGet(t *testing.T) {
 	g.Expect(networkPool.CIDR).To(Equal("10.0.0.0/20"))
 	g.Expect(networkPool.Type).To(Equal("private"))
 	g.Expect(networkPool.Labels).To(Equal(map[string]string{"env": "test"}))
+	g.Expect(networkPool.LocationIDs).To(Equal([]int{541}))
+	g.Expect(networkPool.LocationCodes).To(Equal([]string{"location541"}))
 	g.Expect(networkPool.Created.String()).To(Equal("2021-03-24 11:46:35 +0000 UTC"))
 	g.Expect(networkPool.Updated.String()).To(Equal("2021-03-24 11:46:35 +0000 UTC"))
 }
@@ -89,6 +91,8 @@ func TestNetworkPoolsUpdate(t *testing.T) {
 	g.Expect(networkPool.CIDR).To(Equal("10.0.0.0/20"))
 	g.Expect(networkPool.Type).To(Equal("private"))
 	g.Expect(networkPool.Labels).To(Equal(newLabels))
+	g.Expect(networkPool.LocationIDs).To(Equal([]int{551}))
+	g.Expect(networkPool.LocationCodes).To(Equal([]string{"location551"}))
 	g.Expect(networkPool.Created.String()).To(Equal("2021-03-24 11:46:37 +0000 UTC"))
 	g.Expect(networkPool.Updated.String()).To(Equal("2021-03-24 11:46:38 +0000 UTC"))
 }

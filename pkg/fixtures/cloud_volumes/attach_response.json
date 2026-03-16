@@ -2,6 +2,7 @@
     "id": "Jrb2KdWL",
     "openstack_uuid": "7318f292-8f6a-48f4-8924-6cb087710abe",
     "region_id": 1,
+    "region_code": "test",
     "name": "test-volume-1",
     "size": 101,
     "status": "attaching",
