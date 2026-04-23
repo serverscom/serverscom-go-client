@@ -483,6 +483,7 @@ type CloudComputingInstanceCreateInput struct {
 	FlavorID          string            `json:"flavor_id"`
 	ImageID           string            `json:"image_id"`
 	GPNEnabled        *bool             `json:"gpn_enabled,omitempty"`
+	IPv4Enabled       *bool             `json:"ipv4_enabled,omitempty"`
 	IPv6Enabled       *bool             `json:"ipv6_enabled,omitempty"`
 	SSHKeyFingerprint *string           `json:"ssh_key_fingerprint,omitempty"`
 	BackupCopies      *int              `json:"backup_copies,omitempty"`
