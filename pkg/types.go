@@ -294,6 +294,7 @@ type DedicatedServerCreateInput struct {
 	UplinkModels       DedicatedServerUplinkModelsInput `json:"uplink_models"`
 	Drives             DedicatedServerDrivesInput       `json:"drives"`
 	Features           []string                         `json:"features,omitempty"`
+	IPXEConfig         *string                          `json:"ipxe_config,omitempty"`
 	IPv6               bool                             `json:"ipv6"`
 	Hosts              []DedicatedServerHostInput       `json:"hosts"`
 	OperatingSystemID  *int64                           `json:"operating_system_id,omitempty"`
