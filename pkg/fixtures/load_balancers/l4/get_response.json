@@ -3,9 +3,11 @@
   "name": "name87",
   "type": "l4",
   "status": "active",
+  "network_type": "public",
   "external_addresses": [
     "101.0.0.14"
   ],
+  "internal_addresses": [],
   "location_id": 1,
   "location_code": "location2155",
   "proxy_protocol_enabled": false,

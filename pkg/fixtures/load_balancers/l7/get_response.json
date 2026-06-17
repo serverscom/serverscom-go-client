@@ -6,9 +6,11 @@
     "domains": [
         "updated.example.com"
     ],
+    "network_type": "public",
     "external_addresses": [
         "10.0.0.1"
     ],
+    "internal_addresses": [],
     "location_id": 1,
     "location_code": "location2155",
     "geoip": false,
