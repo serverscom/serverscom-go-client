@@ -465,6 +465,7 @@ func TestHostsReinstallOperatingSystemForDedicatedServer(t *testing.T) {
 	osUbuntuServerID := int64(1)
 	rootFilesystem := "ext4"
 	raidLevel := 0
+	userData := "#cloud-config\npackages:\n  - nginx\n"
 
 	input := OperatingSystemReinstallInput{
 		Hostname: "new-hostname",
@@ -482,6 +483,7 @@ func TestHostsReinstallOperatingSystemForDedicatedServer(t *testing.T) {
 		},
 		OperatingSystemID:  &osUbuntuServerID,
 		SSHKeyFingerprints: []string{"48:81:0c:43:99:12:71:5e:ba:fd:e7:2f:20:d7:95:e8"},
+		UserData:           &userData,
 	}
 
 	ctx := context.TODO()
