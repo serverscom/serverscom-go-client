@@ -701,6 +701,7 @@ type OperatingSystemReinstallInput struct {
 	Drives             OperatingSystemReinstallDrivesInput `json:"drives"`
 	OperatingSystemID  *int64                              `json:"operating_system_id,omitempty"`
 	SSHKeyFingerprints []string                            `json:"ssh_key_fingerprints,omitempty"`
+	UserData           *string                             `json:"user_data,omitempty"`
 }
 
 // OperatingSystemReinstallInput represents os reinstallation input
