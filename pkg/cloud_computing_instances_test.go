@@ -499,9 +499,9 @@ func TestCloudComputingInstancesCreatePTRRecord(t *testing.T) {
 	ttlValue := 60
 	priorityValue := 3
 
-	input := PTRRecordCreateInput{
+	input := CloudComputingInstancePTRRecordCreateInput{
 		IP:       "100.0.0.4",
-		Domain:   "ai.privateservergrid.com",
+		Data:     "ai.privateservergrid.com",
 		TTL:      &ttlValue,
 		Priority: &priorityValue,
 	}

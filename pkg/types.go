@@ -481,8 +481,16 @@ type CloudComputingInstance struct {
 	BackupCopies       int64             `json:"backup_copies"`
 	PublicPortBlocked  bool              `json:"public_port_blocked"`
 	Labels             map[string]string `json:"labels"`
+	ResourceGroupID    *string           `json:"resource_group_id"`
+	Vpn2gpnInstance    *Vpn2gpnInstance  `json:"vpn2gpn_instance"`
 	Created            time.Time         `json:"created_at"`
 	Updated            time.Time         `json:"updated_at"`
+}
+
+// Vpn2gpnInstance represents the cloud instance used for the VPN to Global Private Network service
+type Vpn2gpnInstance struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 // CloudComputingInstanceCreateInput represents cloud instance create input
@@ -529,14 +537,20 @@ type CloudComputingRegion struct {
 
 // CloudComputingImage represents cloud computing image
 type CloudComputingImage struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID             string   `json:"id"`
+	Name           string   `json:"name"`
+	AllowedFlavors []string `json:"allowed_flavors"`
+	ImageSize      int      `json:"image_size"`
+	MinDisk        int      `json:"min_disk"`
 }
 
 // CloudComputingFlavor represents cloud computing flavor
 type CloudComputingFlavor struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Disk  int    `json:"disk"`
+	Ram   int    `json:"ram"`
+	Vcpus int    `json:"vcpus"`
 }
 
 // CloudComputingRegionCredentials represents OpenStack credentials for a cloud region
@@ -678,6 +692,14 @@ type PTRRecord struct {
 type PTRRecordCreateInput struct {
 	IP       string `json:"ip"`
 	Domain   string `json:"domain"`
+	Priority *int   `json:"priority"`
+	TTL      *int   `json:"ttl"`
+}
+
+// CloudComputingInstancePTRRecordCreateInput represents ptr record create input for a cloud instance
+type CloudComputingInstancePTRRecordCreateInput struct {
+	Data     string `json:"data"`
+	IP       string `json:"ip"`
 	Priority *int   `json:"priority"`
 	TTL      *int   `json:"ttl"`
 }

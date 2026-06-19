@@ -48,7 +48,7 @@ type CloudComputingInstancesService interface {
 	PowerOn(ctx context.Context, id string) (*CloudComputingInstance, error)
 	PowerOff(ctx context.Context, id string) (*CloudComputingInstance, error)
 	Reboot(ctx context.Context, id string) (*CloudComputingInstance, error)
-	CreatePTRRecord(ctx context.Context, cloudInstanceID string, input PTRRecordCreateInput) (*PTRRecord, error)
+	CreatePTRRecord(ctx context.Context, cloudInstanceID string, input CloudComputingInstancePTRRecordCreateInput) (*PTRRecord, error)
 	DeletePTRRecord(ctx context.Context, cloudInstanceID string, ptrRecordID string) error
 
 	// Additional collections
@@ -350,10 +350,16 @@ func (h *CloudComputingInstancesHandler) PTRRecords(id string) Collection[PTRRec
 
 // CreatePTRRecord creates ptr record for the cloud instance
 // Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Cloud-Instance/operation/CreateAPtrRecordForACloudInstance
-func (h *CloudComputingInstancesHandler) CreatePTRRecord(ctx context.Context, cloudInstanceID string, input PTRRecordCreateInput) (*PTRRecord, error) {
+func (h *CloudComputingInstancesHandler) CreatePTRRecord(ctx context.Context, cloudInstanceID string, input CloudComputingInstancePTRRecordCreateInput) (*PTRRecord, error) {
+	payload, err := json.Marshal(input)
+
+	if err != nil {
+		return nil, err
+	}
+
 	url := h.client.buildURL(cloudInstanceCreatePTRRecordPath, cloudInstanceID)
 
-	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, payload)
 
 	if err != nil {
 		return nil, err
