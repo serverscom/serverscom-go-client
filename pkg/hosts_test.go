@@ -1437,6 +1437,122 @@ func TestSBMServerPTRRecordsCollection(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
+func TestSBMServerNetworksCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers/a/networks").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+	defer ts.Close()
+
+	collection := client.Hosts.SBMServerNetworks("a")
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
+func TestHostsGetSBMServerNetworkUsage(t *testing.T) {
+	g := NewGomegaWithT(t)
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers/" + serverID + "/network_utilization").
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/network_utilization.json").
+		WithResponseCode(200).
+		Build()
+	defer ts.Close()
+
+	ctx := context.TODO()
+	usage, err := client.Hosts.GetSBMServerNetworkUsage(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(usage).ToNot(BeNil())
+	g.Expect(usage.Type).To(Equal("traffic"))
+	g.Expect(usage.Utilization).ToNot(BeNil())
+	g.Expect(usage.Utilization.Value).To(Equal(int64(2000000)))
+	g.Expect(usage.Utilization.Commit).To(Equal(int64(1000000)))
+	g.Expect(usage.Utilization.Unit).To(Equal("KB"))
+}
+
+func TestHostsGetSBMServerNetwork(t *testing.T) {
+	g := NewGomegaWithT(t)
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers/" + serverID + "/networks/" + networkID).
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_network_response.json").
+		WithResponseCode(200).
+		Build()
+	defer ts.Close()
+
+	ctx := context.TODO()
+	network, err := client.Hosts.GetSBMServerNetwork(ctx, serverID, networkID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(network).ToNot(BeNil())
+	g.Expect(network.ID).To(Equal(networkID))
+	g.Expect(*network.Title).To(Equal("Public"))
+	g.Expect(network.Status).To(Equal("active"))
+	g.Expect(*network.Cidr).To(Equal("100.0.8.0/29"))
+	g.Expect(network.Family).To(Equal("ipv4"))
+	g.Expect(network.InterfaceType).To(Equal("public"))
+	g.Expect(network.DistributionMethod).To(Equal("gateway"))
+	g.Expect(network.Additional).To(Equal(false))
+	g.Expect(network.Created.String()).To(Equal("2025-07-31 11:03:36 +0000 UTC"))
+	g.Expect(network.Updated.String()).To(Equal("2025-07-31 11:03:36 +0000 UTC"))
+}
+
+func TestHostsAddSBMServerPrivateNetwork(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers/" + serverID + "/networks/private_ipv4").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_network_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	input := NetworkInput{
+		DistributionMethod: "gateway",
+		Mask:               29,
+	}
+
+	ctx := context.TODO()
+	network, err := client.Hosts.AddSBMServerPrivateIPv4Network(ctx, serverID, input)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(network).ToNot(BeNil())
+	g.Expect(network.ID).ToNot(BeEmpty())
+}
+
+func TestHostsDeleteSBMServerNetwork(t *testing.T) {
+	g := NewGomegaWithT(t)
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/sbm_servers/" + serverID + "/networks/" + networkID).
+		WithRequestMethod("DELETE").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/get_network_response.json").
+		WithResponseCode(202).
+		Build()
+	defer ts.Close()
+
+	ctx := context.TODO()
+	network, err := client.Hosts.DeleteSBMServerNetwork(ctx, serverID, networkID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(network).ToNot(BeNil())
+	g.Expect(network.ID).To(Equal(networkID))
+}
+
 func TestGetDedicatedServerOOBCredentials(t *testing.T) {
 	g := NewGomegaWithT(t)
 
