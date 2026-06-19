@@ -174,6 +174,7 @@ type KubernetesBaremetalNode struct {
 	OobIPv4Address              string               `json:"oob_ipv4_address"`
 	ConfigurationDetails        ConfigurationDetails `json:"configuration_details"`
 	Labels                      map[string]string    `json:"labels"`
+	ResourceGroupID             *string              `json:"resource_group_id"`
 	Created                     time.Time            `json:"created_at"`
 	Updated                     time.Time            `json:"updated_at"`
 }
@@ -197,6 +198,7 @@ type SBMServer struct {
 	OobIPv4Address       string               `json:"oob_ipv4_address"`
 	ConfigurationDetails ConfigurationDetails `json:"configuration_details"`
 	Labels               map[string]string    `json:"labels"`
+	ResourceGroupID      *string              `json:"resource_group_id"`
 	Created              time.Time            `json:"created_at"`
 	Updated              time.Time            `json:"updated_at"`
 }
@@ -1135,20 +1137,32 @@ type KubernetesCluster struct {
 
 // KubernetesClusterNode represents Kubernetes cluster node
 type KubernetesClusterNode struct {
-	ID                 string            `json:"id"`
-	Number             int64             `json:"number"`
-	Hostname           string            `json:"hostname"`
-	Configuration      string            `json:"configuration"`
-	Type               string            `json:"type"`
-	Role               string            `json:"role"`
-	Status             string            `json:"status"`
-	PrivateIPv4Address string            `json:"private_ipv4_address"`
-	PublicIPv4Address  string            `json:"public_ipv4_address"`
-	RefID              string            `json:"ref_id"`
-	ClusterID          string            `json:"cluster_id"`
-	Labels             map[string]string `json:"labels"`
-	Created            time.Time         `json:"created_at"`
-	Updated            time.Time         `json:"updated_at"`
+	ID                 string                     `json:"id"`
+	Number             int64                      `json:"number"`
+	Hostname           string                     `json:"hostname"`
+	Configuration      string                     `json:"configuration"`
+	Type               string                     `json:"type"`
+	Role               string                     `json:"role"`
+	Status             string                     `json:"status"`
+	PrivateIPv4Address string                     `json:"private_ipv4_address"`
+	PublicIPv4Address  string                     `json:"public_ipv4_address"`
+	RefID              string                     `json:"ref_id"`
+	ClusterID          string                     `json:"cluster_id"`
+	LocationID         int64                      `json:"location_id"`
+	LocationCode       string                     `json:"location_code"`
+	NodeGroup          KubernetesClusterNodeGroup `json:"node_group"`
+	Labels             map[string]string          `json:"labels"`
+	Created            time.Time                  `json:"created_at"`
+	Updated            time.Time                  `json:"updated_at"`
+}
+
+// KubernetesClusterNodeGroup represents the node group a kubernetes cluster node belongs to
+type KubernetesClusterNodeGroup struct {
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Description *string   `json:"description"`
+	Created     time.Time `json:"created_at"`
+	Updated     time.Time `json:"updated_at"`
 }
 
 // KubernetesClusterUpdateInput represents Kubernetes cluster update input
