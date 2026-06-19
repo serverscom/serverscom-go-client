@@ -381,7 +381,7 @@ func TestCloudComputingInstancesPowerOn(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/cloud_computing/instances/BDbDxbl2/switch_power_on").
+		WithRequestPath("/cloud_computing/instances/BDbDxbl2/switch_on").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/cloud_instances/power_on_response.json").
 		WithResponseCode(202).
@@ -451,7 +451,7 @@ func TestCloudComputingInstancesPowerOff(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/cloud_computing/instances/BDbDxbl2/switch_power_off").
+		WithRequestPath("/cloud_computing/instances/BDbDxbl2/switch_off").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/cloud_instances/power_off_response.json").
 		WithResponseCode(202).

@@ -156,7 +156,7 @@ func TestRemoteBlockStorageVolumesResetCredentials(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/remote_block_storage/volumes/" + rbsVolumeID + "/credentials/reset").
+		WithRequestPath("/remote_block_storage/volumes/" + rbsVolumeID + "/reset_credentials").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/rbs_volumes/reset_credentials_response.json").
 		WithResponseCode(200).

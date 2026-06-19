@@ -9,7 +9,7 @@ const (
 	remoteBlockStorageVolumePath       = "/remote_block_storage/volumes"
 	remoteBlockStorageVolumePathWithID = remoteBlockStorageVolumePath + "/%s"
 	actionGetCredentials               = "/credentials"
-	actionResetCredentials             = "/credentials/reset"
+	actionResetCredentials             = "/reset_credentials"
 )
 
 // RemoteBlockStorageVolumesService is an interface for interfacing with Remote Block Storage Volume endpoints
