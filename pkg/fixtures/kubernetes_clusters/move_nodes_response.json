@@ -1,0 +1,28 @@
+[
+    {
+        "id": "MYer06bO",
+        "number": 49,
+        "hostname": "name585",
+        "configuration": "SSD.50",
+        "type": "cloud",
+        "role": "node",
+        "status": "pending",
+        "private_ipv4_address": "127.0.3.1",
+        "public_ipv4_address": "127.0.5.2",
+        "ref_id": "y5eVMdEP",
+        "cluster_id": "YQdJqobO",
+        "labels": {
+            "env": "test"
+        },
+        "node_group": {
+            "id": "node-group-id",
+            "name": "workers",
+            "description": "worker node group",
+            "node_count": 3,
+            "created_at": "2024-11-11T09:57:56Z",
+            "updated_at": "2024-11-11T09:57:56Z"
+        },
+        "created_at": "2024-11-11T09:57:56Z",
+        "updated_at": "2024-11-11T09:57:56Z"
+    }
+]

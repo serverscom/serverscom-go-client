@@ -1260,6 +1260,7 @@ type KubernetesClusterNodeGroup struct {
 	ID          string    `json:"id"`
 	Name        string    `json:"name"`
 	Description *string   `json:"description"`
+	NodeCount   int64     `json:"node_count"`
 	Created     time.Time `json:"created_at"`
 	Updated     time.Time `json:"updated_at"`
 }
@@ -1267,6 +1268,29 @@ type KubernetesClusterNodeGroup struct {
 // KubernetesClusterUpdateInput represents Kubernetes cluster update input
 type KubernetesClusterUpdateInput struct {
 	Labels map[string]string `json:"labels,omitempty"`
+}
+
+// KubernetesClusterNodeGroupCreateInput represents input for creating a node group
+type KubernetesClusterNodeGroupCreateInput struct {
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
+}
+
+// KubernetesClusterNodeGroupUpdateInput represents input for updating a node group
+type KubernetesClusterNodeGroupUpdateInput struct {
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+}
+
+// KubernetesClusterMoveNodesInput represents input for moving nodes to a node group
+type KubernetesClusterMoveNodesInput struct {
+	NodeGroupID string   `json:"node_group_id"`
+	NodeIDs     []string `json:"node_ids"`
+}
+
+// KubernetesClusterNodeUpdateInput represents input for updating a node
+type KubernetesClusterNodeUpdateInput struct {
+	NodeGroupID string `json:"node_group_id"`
 }
 
 // InvoiceList represents invoices list
