@@ -31,6 +31,7 @@ type SSLCertificate struct {
 	DomainNames     []string          `json:"domain_names"`
 	Sha1Fingerprint string            `json:"sha1_fingerprint"`
 	Labels          map[string]string `json:"labels"`
+	ResourceGroupID *string           `json:"resource_group_id"`
 	Expires         *time.Time        `json:"expires_at"`
 	Created         time.Time         `json:"created_at"`
 	Updated         time.Time         `json:"updated_at"`
@@ -46,6 +47,7 @@ type SSLCertificateCustom struct {
 	DomainNames     []string          `json:"domain_names"`
 	Sha1Fingerprint string            `json:"sha1_fingerprint"`
 	Labels          map[string]string `json:"labels"`
+	ResourceGroupID *string           `json:"resource_group_id"`
 	Expires         *time.Time        `json:"expires_at"`
 	Created         time.Time         `json:"created_at"`
 	Updated         time.Time         `json:"updated_at"`
@@ -53,16 +55,17 @@ type SSLCertificateCustom struct {
 
 // SSLCertificateLE represents let's encrypt ssl certificate
 type SSLCertificateLE struct {
-	ID          string            `json:"id"`
-	Name        string            `json:"name"`
-	Type        string            `json:"type"`
-	Issuer      *string           `json:"issuer"`
-	Subject     string            `json:"subject"`
-	DomainNames []string          `json:"domain_names"`
-	Labels      map[string]string `json:"labels"`
-	Expires     *time.Time        `json:"expires_at"`
-	Created     time.Time         `json:"created_at"`
-	Updated     time.Time         `json:"updated_at"`
+	ID              string            `json:"id"`
+	Name            string            `json:"name"`
+	Type            string            `json:"type"`
+	Issuer          *string           `json:"issuer"`
+	Subject         string            `json:"subject"`
+	DomainNames     []string          `json:"domain_names"`
+	Labels          map[string]string `json:"labels"`
+	ResourceGroupID *string           `json:"resource_group_id"`
+	Expires         *time.Time        `json:"expires_at"`
+	Created         time.Time         `json:"created_at"`
+	Updated         time.Time         `json:"updated_at"`
 }
 
 // SSLCertificateCreateCustomInput represents custom ssl certificate create input
@@ -1113,11 +1116,12 @@ type SBMServerUpdateInput struct {
 
 // Rack represents rack
 type Rack struct {
-	ID           string            `json:"id"`
-	Name         string            `json:"name"`
-	LocationID   int64             `json:"location_id"`
-	LocationCode string            `json:"location_code"`
-	Labels       map[string]string `json:"labels,omitempty"`
+	ID              string            `json:"id"`
+	Name            string            `json:"name"`
+	LocationID      int64             `json:"location_id"`
+	LocationCode    string            `json:"location_code"`
+	Labels          map[string]string `json:"labels,omitempty"`
+	ResourceGroupID *string           `json:"resource_group_id"`
 }
 
 // RackUpdateInput represents rack update input
