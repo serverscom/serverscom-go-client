@@ -3,9 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"sort"
 	"strings"
+	"time"
 )
 
 // openAPI is the minimal subset of an OpenAPI 3.0 document we need.
@@ -73,6 +76,8 @@ type mediaType struct {
 type Schema struct {
 	Ref        string             `json:"$ref"`
 	Type       string             `json:"type"`
+	Format     string             `json:"format"`
+	Enum       []interface{}      `json:"enum"`
 	Properties map[string]*Schema `json:"properties"`
 	Items      *Schema            `json:"items"`
 	Required   []string           `json:"required"`
@@ -81,11 +86,12 @@ type Schema struct {
 
 const jsonMediaType = "application/json"
 
-// loadSpec parses an OpenAPI document and flattens it into SpecOps.
-func loadSpec(path string) (*openAPI, []SpecOp, error) {
-	raw, err := os.ReadFile(path)
+// loadSpec parses an OpenAPI document and flattens it into SpecOps. The source may be a
+// local file path or an http(s) URL (fetched with a short timeout).
+func loadSpec(src string) (*openAPI, []SpecOp, error) {
+	raw, err := readSpec(src)
 	if err != nil {
-		return nil, nil, fmt.Errorf("read spec: %w", err)
+		return nil, nil, err
 	}
 
 	var doc openAPI
@@ -125,6 +131,31 @@ func loadSpec(path string) (*openAPI, []SpecOp, error) {
 		return ops[i].Verb < ops[j].Verb
 	})
 	return &doc, ops, nil
+}
+
+// readSpec reads the spec bytes from a local path or an http(s) URL.
+func readSpec(src string) ([]byte, error) {
+	if strings.HasPrefix(src, "http://") || strings.HasPrefix(src, "https://") {
+		client := &http.Client{Timeout: 30 * time.Second}
+		resp, err := client.Get(src)
+		if err != nil {
+			return nil, fmt.Errorf("fetch spec %q: %w", src, err)
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			return nil, fmt.Errorf("fetch spec %q: HTTP %d", src, resp.StatusCode)
+		}
+		raw, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("read spec body %q: %w", src, err)
+		}
+		return raw, nil
+	}
+	raw, err := os.ReadFile(src)
+	if err != nil {
+		return nil, fmt.Errorf("read spec: %w", err)
+	}
+	return raw, nil
 }
 
 // pickSuccessSchema returns the lowest 2xx response with a JSON schema.
@@ -225,4 +256,76 @@ func (o *openAPI) resolve(s *Schema, seen map[string]bool) (resolved, bool) {
 	}
 
 	return resolved{}, false
+}
+
+// resolveFields reduces a schema node to ordered, typed fields. refToGo maps a spec
+// component schema name to its known Go struct name (for $ref fields). Fields are sorted
+// by name for deterministic output.
+func (o *openAPI) resolveFields(s *Schema, refToGo map[string]string) (name string, fields []FieldInfo, isList, ok bool) {
+	r, rok := o.resolveProps(s)
+	if !rok || len(r.props) == 0 {
+		return "", nil, r.isList, false
+	}
+	reqSet := make(map[string]bool, len(r.required))
+	for _, k := range r.required {
+		reqSet[k] = true
+	}
+	for prop, ps := range r.props {
+		gt, note := goType(ps, refToGo)
+		fields = append(fields, FieldInfo{Name: prop, GoType: gt, Required: reqSet[prop], Note: note})
+	}
+	sort.Slice(fields, func(i, j int) bool { return fields[i].Name < fields[j].Name })
+	return r.name, fields, r.isList, true
+}
+
+// goType maps a single schema node to a Go type and a short note (format / enum values /
+// nesting). It is intentionally single-level: nested objects collapse to "object" and
+// arrays of objects to "[]object", leaving the Go shape for a human/agent to refine.
+func goType(s *Schema, refToGo map[string]string) (gotype, note string) {
+	if s == nil {
+		return "interface{}", ""
+	}
+	if s.Ref != "" {
+		ref := strings.TrimPrefix(s.Ref, schemaRefPrefix)
+		if g, found := refToGo[ref]; found {
+			return g, ""
+		}
+		return "object", "schema " + ref
+	}
+	switch s.Type {
+	case "string":
+		if len(s.Enum) > 0 {
+			return "string", "enum: " + enumValues(s.Enum)
+		}
+		if s.Format != "" {
+			return "string", s.Format
+		}
+		return "string", ""
+	case "integer":
+		return "int", ""
+	case "number":
+		return "float64", ""
+	case "boolean":
+		return "bool", ""
+	case "array":
+		et, n := goType(s.Items, refToGo)
+		return "[]" + et, n
+	case "object":
+		if len(s.Properties) > 0 {
+			return "object", "nested object"
+		}
+		return "map[string]string", "free-form object"
+	}
+	if len(s.Properties) > 0 {
+		return "object", "nested object"
+	}
+	return "interface{}", ""
+}
+
+func enumValues(enum []interface{}) string {
+	parts := make([]string, 0, len(enum))
+	for _, e := range enum {
+		parts = append(parts, fmt.Sprintf("%v", e))
+	}
+	return strings.Join(parts, ", ")
 }

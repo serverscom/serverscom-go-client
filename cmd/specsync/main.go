@@ -10,10 +10,15 @@ import (
 	"sort"
 )
 
+const defaultSpecURL = "https://developers.servers.com/api-documentation/v1/index.json"
+
+// clientPkgDir is fixed: the client always lives in ./pkg.
+const clientPkgDir = "./pkg"
+
 type options struct {
 	specPath      string
-	pkgDir        string
 	jsonOut       bool
+	instructions  bool
 	tagFilter     string
 	failOnMissing bool
 	failOnStale   bool
@@ -22,9 +27,9 @@ type options struct {
 
 func main() {
 	var opt options
-	flag.StringVar(&opt.specPath, "spec", "./openapi_spec.json", "path to the OpenAPI spec JSON")
-	flag.StringVar(&opt.pkgDir, "pkg", "./pkg", "path to the Go client package directory")
+	flag.StringVar(&opt.specPath, "spec", defaultSpecURL, "OpenAPI spec source: an http(s) URL or a local file path")
 	flag.BoolVar(&opt.jsonOut, "json", false, "emit the full result as JSON")
+	flag.BoolVar(&opt.instructions, "instructions", false, "emit a Markdown brief for an AI agent instead of the text report")
 	flag.StringVar(&opt.tagFilter, "tag", "", "restrict the report to a single spec tag")
 	flag.BoolVar(&opt.failOnMissing, "fail-on-missing", false, "exit 1 if any spec operation is missing from the client")
 	flag.BoolVar(&opt.failOnStale, "fail-on-stale", false, "exit 1 if any client operation is absent from the spec")
@@ -36,21 +41,25 @@ func main() {
 		fmt.Fprintln(os.Stderr, "specsync:", err)
 		os.Exit(2)
 	}
-	cm, err := parseClient(opt.pkgDir)
+	cm, err := parseClient(clientPkgDir)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "specsync:", err)
 		os.Exit(2)
 	}
 
 	res := buildResult(specOps, cm)
-	res.FieldDiffs = computeFieldDiffs(doc, specOps, res, cm)
+	refToGo := buildRefIndex(doc, specOps, res, cm)
+	res.FieldDiffs = computeFieldDiffs(doc, specOps, res, cm, refToGo)
 
-	if opt.jsonOut {
+	switch {
+	case opt.instructions:
+		renderInstructions(os.Stdout, doc, res, refToGo, opt)
+	case opt.jsonOut:
 		if err := renderJSON(os.Stdout, res); err != nil {
 			fmt.Fprintln(os.Stderr, "specsync:", err)
 			os.Exit(2)
 		}
-	} else {
+	default:
 		renderText(os.Stdout, res, cm, opt)
 	}
 
@@ -64,16 +73,20 @@ func main() {
 	os.Exit(exit)
 }
 
-// buildResult matches the client against the spec and rolls up coverage.
+// buildResult matches the client against the spec and rolls up coverage. Renamed/moved
+// operations are paired and pulled out of the missing/stale lists; coverage counts treat
+// them as not-covered (the path no longer matches) but report them as a separate bucket.
 func buildResult(specOps []SpecOp, cm *clientModel) *MatchResult {
 	missing, stale, coveredBy := computeCoverage(specOps, cm.ops)
+	renames, missing, stale := pairRenames(missing, stale)
 	res := &MatchResult{
 		Missing:       missing,
 		Stale:         stale,
+		Renames:       renames,
 		CoveredBy:     coveredBy,
 		SpecOpCount:   len(specOps),
 		ClientOpCount: len(cm.ops),
-		CoveredCount:  len(specOps) - len(missing),
+		CoveredCount:  len(coveredBy),
 	}
 
 	tagTotals := map[string]int{}

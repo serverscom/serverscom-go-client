@@ -39,6 +39,7 @@ func renderText(w io.Writer, res *MatchResult, cm *clientModel, opt options) {
 	fmt.Fprintln(w)
 
 	renderMissing(w, filterMissingByTag(res.Missing, opt.tagFilter))
+	renderRenames(w, res.Renames, opt.tagFilter)
 	renderStale(w, res.Stale, opt.tagFilter)
 	renderFieldDiffs(w, res.FieldDiffs, opt.tagFilter)
 	renderSummary(w, res)
@@ -46,6 +47,37 @@ func renderText(w io.Writer, res *MatchResult, cm *clientModel, opt options) {
 	if opt.debug {
 		renderDebug(w, res, cm)
 	}
+}
+
+func filterRenamesByTag(renames []Rename, tag string) []Rename {
+	if tag == "" {
+		return renames
+	}
+	var out []Rename
+	for _, r := range renames {
+		if hasTag(r.Spec, tag) {
+			out = append(out, r)
+		}
+	}
+	return out
+}
+
+func renderRenames(w io.Writer, renames []Rename, tagFilter string) {
+	renames = filterRenamesByTag(renames, tagFilter)
+	fmt.Fprintf(w, "B. RENAMED / MOVED — same operation, path changed in the spec (%d)\n", len(renames))
+	if len(renames) == 0 {
+		fmt.Fprintln(w, "   (none)")
+		fmt.Fprintln(w)
+		return
+	}
+	tw := tabwriter.NewWriter(w, 0, 4, 2, ' ', 0)
+	for _, r := range renames {
+		fmt.Fprintf(tw, "   %s\t%s → %s\t%s\t%s.%s\t%s:%d\n",
+			r.Spec.Verb, r.Client.Norm.Raw, r.Spec.Norm.Raw,
+			r.Spec.OperationID, r.Client.RecvType, r.Client.Method, r.Client.File, r.Client.Line)
+	}
+	tw.Flush()
+	fmt.Fprintln(w)
 }
 
 func renderMissing(w io.Writer, missing []SpecOp) {
@@ -83,7 +115,7 @@ func renderMissing(w io.Writer, missing []SpecOp) {
 }
 
 func renderStale(w io.Writer, stale []ClientOp, tagFilter string) {
-	fmt.Fprintf(w, "B. STALE — in client, not found in spec (%d)\n", len(stale))
+	fmt.Fprintf(w, "C. STALE — in client, not found in spec and not a rename (%d)\n", len(stale))
 	if tagFilter != "" {
 		fmt.Fprintln(w, "   (note: stale detection is global; not affected by -tag)")
 	}
@@ -112,7 +144,7 @@ func renderFieldDiffs(w io.Writer, diffs []FieldDiff, tagFilter string) {
 		diffs = out
 	}
 
-	fmt.Fprintf(w, "C. FIELD DIFFS — advisory, matched operations only (%d)\n", len(diffs))
+	fmt.Fprintf(w, "D. FIELD DIFFS — advisory, matched operations only (%d)\n", len(diffs))
 	if len(diffs) == 0 {
 		fmt.Fprintln(w, "   (none)")
 		fmt.Fprintln(w)
@@ -125,11 +157,11 @@ func renderFieldDiffs(w io.Writer, diffs []FieldDiff, tagFilter string) {
 		}
 		fmt.Fprintf(w, "   %s %s  [%s]  %s ↔ %s%s\n",
 			d.Op.Verb, d.Op.RawPath, d.Kind, d.GoType, d.SpecRef, conf)
-		if len(d.MissingInGo) > 0 {
-			fmt.Fprintf(w, "      + in spec, missing from %s: %s\n", d.GoType, strings.Join(d.MissingInGo, ", "))
-		}
 		if len(d.MissingReqd) > 0 {
-			fmt.Fprintf(w, "      ! required by spec, missing from %s: %s\n", d.GoType, strings.Join(d.MissingReqd, ", "))
+			fmt.Fprintf(w, "      ! required by spec, missing from %s: %s\n", d.GoType, fieldList(d.MissingReqd))
+		}
+		if len(d.MissingInGo) > 0 {
+			fmt.Fprintf(w, "      + in spec, missing from %s: %s\n", d.GoType, fieldList(d.MissingInGo))
 		}
 		if len(d.MissingInSpec) > 0 {
 			fmt.Fprintf(w, "      - in %s, not in spec: %s\n", d.GoType, strings.Join(d.MissingInSpec, ", "))
@@ -138,8 +170,22 @@ func renderFieldDiffs(w io.Writer, diffs []FieldDiff, tagFilter string) {
 	fmt.Fprintln(w)
 }
 
+// fieldList renders typed fields as "name (GoType), name2 (GoType2 — note)".
+func fieldList(fields []FieldInfo) string {
+	parts := make([]string, 0, len(fields))
+	for _, f := range fields {
+		s := f.Name + " (" + f.GoType
+		if f.Note != "" {
+			s += " — " + f.Note
+		}
+		s += ")"
+		parts = append(parts, s)
+	}
+	return strings.Join(parts, ", ")
+}
+
 func renderSummary(w io.Writer, res *MatchResult) {
-	fmt.Fprintln(w, "D. SUMMARY")
+	fmt.Fprintln(w, "E. SUMMARY")
 	tw := tabwriter.NewWriter(w, 0, 4, 2, ' ', 0)
 	for _, c := range res.PerTag {
 		mark := ""
@@ -155,8 +201,9 @@ func renderSummary(w io.Writer, res *MatchResult) {
 		pct = 100 * float64(res.CoveredCount) / float64(res.SpecOpCount)
 	}
 	fmt.Fprintln(w, "   "+strings.Repeat("-", 50))
-	fmt.Fprintf(w, "   spec ops=%d  client ops=%d  covered=%d (%.1f%%)  missing=%d  stale=%d\n",
-		res.SpecOpCount, res.ClientOpCount, res.CoveredCount, pct, len(res.Missing), len(res.Stale))
+	fmt.Fprintf(w, "   spec ops=%d  client ops=%d  covered=%d (%.1f%%)  missing=%d  renamed=%d  stale=%d\n",
+		res.SpecOpCount, res.ClientOpCount, res.CoveredCount, pct,
+		len(res.Missing), len(res.Renames), len(res.Stale))
 	fmt.Fprintln(w)
 }
 
@@ -192,25 +239,56 @@ type jsonView struct {
 		ClientOps int     `json:"client_ops"`
 		Covered   int     `json:"covered"`
 		Missing   int     `json:"missing"`
+		Renamed   int     `json:"renamed"`
 		Stale     int     `json:"stale"`
 		Percent   float64 `json:"percent"`
 	} `json:"summary"`
 	PerTag  []Coverage      `json:"per_tag"`
 	Missing []jsonSpecOp    `json:"missing"`
+	Renames []jsonRename    `json:"renames"`
 	Stale   []jsonClientOp  `json:"stale"`
 	Fields  []jsonFieldDiff `json:"field_diffs"`
 }
 
+type jsonRename struct {
+	Verb        string `json:"verb"`
+	ClientPath  string `json:"client_path"`
+	SpecPath    string `json:"spec_path"`
+	OperationID string `json:"operation_id"`
+	Method      string `json:"method"`
+	File        string `json:"file"`
+	Line        int    `json:"line"`
+	Reason      string `json:"reason"`
+}
+
+type jsonField struct {
+	Name     string `json:"name"`
+	GoType   string `json:"go_type"`
+	Required bool   `json:"required,omitempty"`
+	Note     string `json:"note,omitempty"`
+}
+
 type jsonFieldDiff struct {
-	Verb          string   `json:"verb"`
-	Path          string   `json:"path"`
-	Kind          string   `json:"kind"`
-	GoType        string   `json:"go_type"`
-	SpecSchema    string   `json:"spec_schema"`
-	LowConfidence bool     `json:"low_confidence"`
-	MissingInGo   []string `json:"missing_in_go,omitempty"`
-	MissingReqd   []string `json:"missing_required,omitempty"`
-	MissingInSpec []string `json:"missing_in_spec,omitempty"`
+	Verb          string      `json:"verb"`
+	Path          string      `json:"path"`
+	Kind          string      `json:"kind"`
+	GoType        string      `json:"go_type"`
+	SpecSchema    string      `json:"spec_schema"`
+	LowConfidence bool        `json:"low_confidence"`
+	MissingInGo   []jsonField `json:"missing_in_go,omitempty"`
+	MissingReqd   []jsonField `json:"missing_required,omitempty"`
+	MissingInSpec []string    `json:"missing_in_spec,omitempty"`
+}
+
+func jsonFields(fields []FieldInfo) []jsonField {
+	if len(fields) == 0 {
+		return nil
+	}
+	out := make([]jsonField, 0, len(fields))
+	for _, f := range fields {
+		out = append(out, jsonField{Name: f.Name, GoType: f.GoType, Required: f.Required, Note: f.Note})
+	}
+	return out
 }
 
 type jsonSpecOp struct {
@@ -236,6 +314,7 @@ func renderJSON(w io.Writer, res *MatchResult) error {
 	v.Summary.ClientOps = res.ClientOpCount
 	v.Summary.Covered = res.CoveredCount
 	v.Summary.Missing = len(res.Missing)
+	v.Summary.Renamed = len(res.Renames)
 	v.Summary.Stale = len(res.Stale)
 	if res.SpecOpCount > 0 {
 		v.Summary.Percent = 100 * float64(res.CoveredCount) / float64(res.SpecOpCount)
@@ -244,6 +323,13 @@ func renderJSON(w io.Writer, res *MatchResult) error {
 	for _, m := range res.Missing {
 		v.Missing = append(v.Missing, jsonSpecOp{m.Verb, m.RawPath, m.OperationID, m.Summary, m.Tags})
 	}
+	for _, r := range res.Renames {
+		v.Renames = append(v.Renames, jsonRename{
+			Verb: r.Spec.Verb, ClientPath: r.Client.Norm.Raw, SpecPath: r.Spec.Norm.Raw,
+			OperationID: r.Spec.OperationID, Method: r.Client.RecvType + "." + r.Client.Method,
+			File: r.Client.File, Line: r.Client.Line, Reason: r.Reason,
+		})
+	}
 	for _, c := range res.Stale {
 		v.Stale = append(v.Stale, jsonClientOp{c.Verb, c.Norm.Raw, c.PathValue, c.RecvType + "." + c.Method, c.File, c.Line})
 	}
@@ -251,7 +337,7 @@ func renderJSON(w io.Writer, res *MatchResult) error {
 		v.Fields = append(v.Fields, jsonFieldDiff{
 			Verb: d.Op.Verb, Path: d.Op.RawPath, Kind: d.Kind,
 			GoType: d.GoType, SpecSchema: d.SpecRef, LowConfidence: d.LowConf,
-			MissingInGo: d.MissingInGo, MissingReqd: d.MissingReqd, MissingInSpec: d.MissingInSpec,
+			MissingInGo: jsonFields(d.MissingInGo), MissingReqd: jsonFields(d.MissingReqd), MissingInSpec: d.MissingInSpec,
 		})
 	}
 

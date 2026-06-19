@@ -20,6 +20,26 @@ type clientModel struct {
 	structDefs map[string]*ast.StructType // struct type name -> definition
 	ops        []ClientOp
 	unresolved []string // handler methods that look like API calls but didn't parse
+
+	// helpers indexes path-building methods by "Recv.Method" so that a thin wrapper
+	// which only delegates (e.g. ActivateOobPublicAccessFeature -> activateFeature)
+	// can be resolved to a concrete path: the wrapper's literal arguments are
+	// substituted into the helper's path-parameter wildcards.
+	helpers   map[string]helperInfo
+	opKeys    map[string]bool // "Recv.Method" that already produced a direct op
+	delegated map[string]bool // helper keys a wrapper delegated to (their own op is dropped)
+}
+
+// helperInfo captures what a path-building method needs in order to be resolved from a
+// delegating caller: the path template, and for each path wildcard the helper parameter
+// that fills it (so a caller passing a literal there pins that segment).
+type helperInfo struct {
+	verb       string
+	template   string
+	isList     bool
+	params     []string // flattened parameter names in signature order (ctx first)
+	baseSubsts []string // the helper's own resolved substitutions (consts pinned, params "")
+	fillBy     []string // fillBy[i] = parameter name filling path-wildcard i, or "" if not a param
 }
 
 // jsonFields returns the json field names of a struct, recursing one level into
@@ -58,6 +78,9 @@ func parseClient(pkgDir string) (*clientModel, error) {
 		rawConsts:  map[string]ast.Expr{},
 		consts:     map[string]string{},
 		structDefs: map[string]*ast.StructType{},
+		helpers:    map[string]helperInfo{},
+		opKeys:     map[string]bool{},
+		delegated:  map[string]bool{},
 	}
 	fset := token.NewFileSet()
 
@@ -80,7 +103,7 @@ func parseClient(pkgDir string) (*clientModel, error) {
 			continue
 		}
 		full := filepath.Join(pkgDir, name)
-		f, err := parser.ParseFile(fset, full, nil, 0)
+		f, err := parser.ParseFile(fset, full, nil, parser.ParseComments)
 		if err != nil {
 			return nil, fmt.Errorf("parse %s: %w", full, err)
 		}
@@ -93,9 +116,28 @@ func parseClient(pkgDir string) (*clientModel, error) {
 	}
 	m.foldConsts()
 
-	// Pass 2: extract operations from handler methods.
+	// Pass 2: extract operations from handler methods, and register every
+	// path-building method as a potential delegation target.
 	for _, pf := range files {
 		m.extractOps(pf.file, pf.path, fset)
+	}
+
+	// Pass 3: resolve thin wrappers that only delegate to a path-building helper,
+	// pinning the helper's path wildcards with the wrapper's literal arguments. Then
+	// drop the helper's own (wildcard) op so it no longer spuriously covers every
+	// literal a wrapper enumerates.
+	for _, pf := range files {
+		m.resolveDelegations(pf.file, pf.path, fset)
+	}
+	if len(m.delegated) > 0 {
+		kept := m.ops[:0]
+		for _, op := range m.ops {
+			if m.delegated[op.RecvType+"."+op.Method] && !ast.IsExported(op.Method) {
+				continue
+			}
+			kept = append(kept, op)
+		}
+		m.ops = kept
 	}
 
 	sort.Slice(m.ops, func(i, j int) bool {
@@ -277,19 +319,139 @@ func (m *clientModel) extractMethod(fn *ast.FuncDecl, recv, file string, fset *t
 	}
 
 	substs := m.substsOf(valueArgs)
+	key := recv + "." + fn.Name.Name
+	m.opKeys[key] = true
+	m.helpers[key] = helperInfo{
+		verb:       verb,
+		template:   template,
+		isList:     isList,
+		params:     paramNames(fn),
+		baseSubsts: substs,
+		fillBy:     fillByParams(valueArgs, fn),
+	}
 	m.ops = append(m.ops, ClientOp{
-		Verb:       verb,
-		PathValue:  template,
-		Substs:     substs,
-		Norm:       normalizeClientPath(template, substs),
-		RecvType:   recv,
-		Method:     fn.Name.Name,
-		File:       file,
-		Line:       line,
-		ReturnType: returnEntity(fn),
-		InputType:  m.inputStruct(fn),
-		IsList:     isList,
+		Verb:        verb,
+		PathValue:   template,
+		Substs:      substs,
+		Norm:        normalizeClientPath(template, substs),
+		RecvType:    recv,
+		Method:      fn.Name.Name,
+		File:        file,
+		Line:        line,
+		OperationID: operationID(fn.Doc),
+		ReturnType:  returnEntity(fn),
+		InputType:   m.inputStruct(fn),
+		IsList:      isList,
 	})
+}
+
+// resolveDelegations synthesizes an op for each handler method that builds no path of
+// its own but delegates to a registered path-building helper on the same receiver. The
+// wrapper's literal arguments are substituted into the helper's path-parameter wildcards,
+// so e.g. ActivateOobPublicAccessFeature resolves to .../features/oob_public_access/activate
+// instead of inheriting the helper's catch-all wildcard.
+func (m *clientModel) resolveDelegations(f *ast.File, file string, fset *token.FileSet) {
+	for _, decl := range f.Decls {
+		fn, ok := decl.(*ast.FuncDecl)
+		if !ok || fn.Recv == nil || len(fn.Recv.List) == 0 || fn.Body == nil {
+			continue
+		}
+		recv := recvTypeName(fn.Recv.List[0].Type)
+		if !strings.HasSuffix(recv, "Handler") || recv == "CollectionHandler" {
+			continue
+		}
+		if m.opKeys[recv+"."+fn.Name.Name] {
+			continue // already extracted a direct op
+		}
+		recvVar := recvVarName(fn)
+		if recvVar == "" {
+			continue
+		}
+
+		var (
+			call *ast.CallExpr
+			info helperInfo
+			hkey string
+		)
+		ast.Inspect(fn.Body, func(n ast.Node) bool {
+			ce, ok := n.(*ast.CallExpr)
+			if !ok || call != nil {
+				return call == nil
+			}
+			sel, ok := ce.Fun.(*ast.SelectorExpr)
+			if !ok {
+				return true
+			}
+			id, ok := sel.X.(*ast.Ident)
+			if !ok || id.Name != recvVar {
+				return true
+			}
+			if hi, found := m.helpers[recv+"."+sel.Sel.Name]; found {
+				call, info, hkey = ce, hi, recv+"."+sel.Sel.Name
+			}
+			return call == nil
+		})
+		if call == nil {
+			continue
+		}
+
+		substs := make([]string, len(info.baseSubsts))
+		copy(substs, info.baseSubsts)
+		for i, pname := range info.fillBy {
+			if pname == "" {
+				continue // const-pinned or runtime in the helper; inherit baseSubsts[i]
+			}
+			idx := indexOf(info.params, pname)
+			if idx < 0 || idx >= len(call.Args) {
+				continue
+			}
+			if lit, ok := call.Args[idx].(*ast.BasicLit); ok && lit.Kind == token.STRING {
+				if v, err := strconv.Unquote(lit.Value); err == nil {
+					substs[i] = v
+				}
+			}
+		}
+
+		m.delegated[hkey] = true
+		m.ops = append(m.ops, ClientOp{
+			Verb:        info.verb,
+			PathValue:   info.template,
+			Substs:      substs,
+			Norm:        normalizeClientPath(info.template, substs),
+			RecvType:    recv,
+			Method:      fn.Name.Name,
+			File:        file,
+			Line:        fset.Position(fn.Pos()).Line,
+			OperationID: operationID(fn.Doc),
+			ReturnType:  returnEntity(fn),
+			InputType:   m.inputStruct(fn),
+			IsList:      info.isList,
+		})
+	}
+}
+
+// operationID extracts the spec operationId from a method's doc comment, which the
+// client annotates as ".../operation/<ID>". Returns "" when absent.
+func operationID(doc *ast.CommentGroup) string {
+	if doc == nil {
+		return ""
+	}
+	const marker = "operation/"
+	text := doc.Text()
+	i := strings.Index(text, marker)
+	if i < 0 {
+		return ""
+	}
+	rest := text[i+len(marker):]
+	end := 0
+	for end < len(rest) && isOpIDChar(rest[end]) {
+		end++
+	}
+	return rest[:end]
+}
+
+func isOpIDChar(b byte) bool {
+	return b >= 'a' && b <= 'z' || b >= 'A' && b <= 'Z' || b >= '0' && b <= '9' || b == '_'
 }
 
 // resolvePath reduces a path expression to a format template and its substitution
@@ -347,6 +509,63 @@ func (m *clientModel) substsOf(valueArgs []ast.Expr) []string {
 		}
 	}
 	return substs
+}
+
+// paramNames returns the method's parameter names flattened in signature order,
+// expanding grouped declarations ("serverID, feature string" -> two names). An unnamed
+// parameter contributes "" to keep positions aligned with the call's argument list.
+func paramNames(fn *ast.FuncDecl) []string {
+	if fn.Type.Params == nil {
+		return nil
+	}
+	var names []string
+	for _, p := range fn.Type.Params.List {
+		if len(p.Names) == 0 {
+			names = append(names, "")
+			continue
+		}
+		for _, n := range p.Names {
+			names = append(names, n.Name)
+		}
+	}
+	return names
+}
+
+// fillByParams maps each path wildcard to the parameter name that supplies it: a value
+// arg that is a plain parameter ident yields that name; anything else (a const, a runtime
+// expression) yields "" so the helper's own resolution is kept.
+func fillByParams(valueArgs []ast.Expr, fn *ast.FuncDecl) []string {
+	params := map[string]bool{}
+	for _, n := range paramNames(fn) {
+		if n != "" {
+			params[n] = true
+		}
+	}
+	out := make([]string, len(valueArgs))
+	for i, a := range valueArgs {
+		if id, ok := a.(*ast.Ident); ok && params[id.Name] {
+			out[i] = id.Name
+		}
+	}
+	return out
+}
+
+// recvVarName returns the receiver variable name (e.g. "h" in "func (h *X) ..."), or ""
+// when the receiver is unnamed.
+func recvVarName(fn *ast.FuncDecl) string {
+	if fn.Recv == nil || len(fn.Recv.List) == 0 || len(fn.Recv.List[0].Names) == 0 {
+		return ""
+	}
+	return fn.Recv.List[0].Names[0].Name
+}
+
+func indexOf(ss []string, want string) int {
+	for i, s := range ss {
+		if s == want {
+			return i
+		}
+	}
+	return -1
 }
 
 func secondArg(call *ast.CallExpr) ast.Expr {

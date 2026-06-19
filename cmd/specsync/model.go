@@ -40,6 +40,8 @@ type ClientOp struct {
 	File     string
 	Line     int
 
+	OperationID string // spec operationId from the method's "operation/<ID>" doc comment, or ""
+
 	ReturnType string // base entity type name (pointer/slice/Collection unwrapped), or ""
 	InputType  string // request input struct name, or ""
 	IsList     bool   // discovered via NewCollection[T]
@@ -71,6 +73,23 @@ func (s SpecOp) PrimaryTag() string {
 // matchKey is a stable identity for a spec operation, used as a map key.
 func (s SpecOp) matchKey() string { return s.Verb + " " + s.RawPath }
 
+// FieldInfo is a spec property reduced to a Go-facing shape: its json name, the mapped
+// Go type, whether the spec marks it required, and a short note (format/enum/nesting).
+type FieldInfo struct {
+	Name     string
+	GoType   string
+	Required bool
+	Note     string
+}
+
+// Rename pairs a stale client op with a missing spec op that is the same operation under
+// a changed path (the client const points at the old path).
+type Rename struct {
+	Client ClientOp
+	Spec   SpecOp
+	Reason string // "operationId" or "path-similarity"
+}
+
 // FieldDiff is the advisory field-level comparison for one matched operation.
 type FieldDiff struct {
 	Op       SpecOp
@@ -82,9 +101,9 @@ type FieldDiff struct {
 	LowConf   bool   // resolution was heuristic (e.g. inline list items)
 	LowReason string
 
-	MissingInGo   []string // properties in spec, absent from the Go struct
-	MissingInSpec []string // json fields in the Go struct, absent from the spec
-	MissingReqd   []string // required spec properties absent from the Go struct
+	MissingInGo   []FieldInfo // properties in spec, absent from the Go struct
+	MissingInSpec []string    // json fields in the Go struct, absent from the spec
+	MissingReqd   []FieldInfo // required spec properties absent from the Go struct
 }
 
 func (d FieldDiff) empty() bool {
@@ -100,8 +119,9 @@ type Coverage struct {
 
 // MatchResult is the full comparison outcome, also the shape emitted by -json.
 type MatchResult struct {
-	Missing    []SpecOp    `json:"-"` // spec ops with no client match
-	Stale      []ClientOp  `json:"-"` // client ops with no spec match
+	Missing    []SpecOp    `json:"-"` // spec ops with no client match (renames removed)
+	Stale      []ClientOp  `json:"-"` // client ops with no spec match (renames removed)
+	Renames    []Rename    `json:"-"` // stale↔missing pairs that are the same op, path changed
 	FieldDiffs []FieldDiff `json:"-"`
 
 	// CoveredBy maps a spec op key to the client ops that cover it (for -debug/audit).
