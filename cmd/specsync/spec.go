@@ -189,8 +189,6 @@ type resolved struct {
 	required  []string
 	name      string // component name, or "(inline)"
 	isList    bool   // came through an array/items wrapper
-	lowConf   bool
-	lowReason string
 }
 
 // resolveProps reduces a schema node to its effective object property set.

@@ -315,7 +315,7 @@ func jsonFields(fields []FieldInfo) []jsonField {
 	}
 	out := make([]jsonField, 0, len(fields))
 	for _, f := range fields {
-		out = append(out, jsonField{Name: f.Name, GoType: f.GoType, Required: f.Required, Note: f.Note})
+		out = append(out, jsonField(f))
 	}
 	return out
 }
