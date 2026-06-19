@@ -90,20 +90,25 @@ type SSLCertificateUpdateLEInput struct {
 
 // Host represents host
 type Host struct {
-	ID                 string     `json:"id"`
-	Type               string     `json:"type"`
-	Title              string     `json:"title"`
-	LocationID         int64      `json:"location_id"`
-	LocationCode       string     `json:"location_code"`
-	Status             string     `json:"status"`
-	OperationalStatus  string     `json:"operational_status"`
-	PowerStatus        string     `json:"power_status"`
-	Configuration      string     `json:"configuration"`
-	PrivateIPv4Address *string    `json:"private_ipv4_address"`
-	PublicIPv4Address  *string    `json:"public_ipv4_address"`
-	ScheduledRelease   *time.Time `json:"scheduled_release_at"`
-	Created            time.Time  `json:"created_at"`
-	Updated            time.Time  `json:"updated_at"`
+	ID                 string            `json:"id"`
+	Type               string            `json:"type"`
+	Title              string            `json:"title"`
+	LocationID         int64             `json:"location_id"`
+	LocationCode       string            `json:"location_code"`
+	Status             string            `json:"status"`
+	OperationalStatus  string            `json:"operational_status"`
+	PowerStatus        string            `json:"power_status"`
+	Configuration      string            `json:"configuration"`
+	PrivateIPv4Address *string           `json:"private_ipv4_address"`
+	PublicIPv4Address  *string           `json:"public_ipv4_address"`
+	ScheduledRelease   *time.Time        `json:"scheduled_release_at"`
+	LeaseStart         *string           `json:"lease_start_at"`
+	OobIPv4Address     *string           `json:"oob_ipv4_address"`
+	RackID             *string           `json:"rack_id"`
+	ResourceGroupID    *string           `json:"resource_group_id"`
+	Labels             map[string]string `json:"labels"`
+	Created            time.Time         `json:"created_at"`
+	Updated            time.Time         `json:"updated_at"`
 }
 
 // ConfigurationDetails represents host configuration details
