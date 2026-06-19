@@ -83,6 +83,7 @@ type Schema struct {
 	Required   []string           `json:"required"`
 	AllOf      []*Schema          `json:"allOf"`
 	Nullable   bool               `json:"nullable"`
+	Deprecated bool               `json:"deprecated"`
 }
 
 const jsonMediaType = "application/json"
@@ -272,6 +273,9 @@ func (o *openAPI) resolveFields(s *Schema, refToGo map[string]string) (name stri
 		reqSet[k] = true
 	}
 	for prop, ps := range r.props {
+		if ps != nil && ps.Deprecated {
+			continue
+		}
 		gt, note := goType(ps, refToGo)
 		fields = append(fields, FieldInfo{Name: prop, GoType: gt, Required: reqSet[prop], Note: note})
 	}
