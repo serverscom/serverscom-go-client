@@ -46,6 +46,8 @@ type Client struct {
 
 	RemoteBlockStorageVolumes RemoteBlockStorageVolumesService
 
+	Metrics MetricsService
+
 	client *resty.Client
 }
 
@@ -107,6 +109,7 @@ func (cli *Client) configureResources() {
 	cli.Invoices = &InvoiceHandler{cli}
 	cli.Account = &AccountHandler{cli}
 	cli.RemoteBlockStorageVolumes = &RemoteBlockStorageVolumesHandler{cli}
+	cli.Metrics = &MetricsHandler{cli}
 }
 
 func (cli *Client) buildURL(path string, values ...interface{}) string {
