@@ -145,6 +145,9 @@ type DedicatedServer struct {
 	OobIPv4Address       string               `json:"oob_ipv4_address"`
 	ConfigurationDetails ConfigurationDetails `json:"configuration_details"`
 	Labels               map[string]string    `json:"labels"`
+	IpxeConfig           *string              `json:"ipxe_config"`
+	ResourceGroupID      *string              `json:"resource_group_id"`
+	UserdataSha256       *string              `json:"userdata_sha256"`
 	Created              time.Time            `json:"created_at"`
 	Updated              time.Time            `json:"updated_at"`
 }
