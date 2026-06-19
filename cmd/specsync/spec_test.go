@@ -22,6 +22,11 @@ func TestGoType(t *testing.T) {
 		{"known ref", &Schema{Ref: schemaRefPrefix + "v1-cloud-computing-instances-entity"}, "CloudComputingInstance", ""},
 		{"unknown ref", &Schema{Ref: schemaRefPrefix + "v1-mystery"}, "object", "schema v1-mystery"},
 		{"nil", nil, "interface{}", ""},
+		{"nullable string", &Schema{Type: "string", Nullable: true}, "*string", ""},
+		{"nullable integer", &Schema{Type: "integer", Nullable: true}, "*int", ""},
+		{"nullable string with format", &Schema{Type: "string", Format: "date-time", Nullable: true}, "*string", "date-time"},
+		{"nullable ref", &Schema{Ref: schemaRefPrefix + "v1-cloud-computing-instances-entity", Nullable: true}, "*CloudComputingInstance", ""},
+		{"nullable array stays slice", &Schema{Type: "array", Items: &Schema{Type: "string"}, Nullable: true}, "[]string", ""},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

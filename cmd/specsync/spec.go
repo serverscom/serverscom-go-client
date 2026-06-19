@@ -82,6 +82,7 @@ type Schema struct {
 	Items      *Schema            `json:"items"`
 	Required   []string           `json:"required"`
 	AllOf      []*Schema          `json:"allOf"`
+	Nullable   bool               `json:"nullable"`
 }
 
 const jsonMediaType = "application/json"
@@ -281,7 +282,31 @@ func (o *openAPI) resolveFields(s *Schema, refToGo map[string]string) (name stri
 // goType maps a single schema node to a Go type and a short note (format / enum values /
 // nesting). It is intentionally single-level: nested objects collapse to "object" and
 // arrays of objects to "[]object", leaving the Go shape for a human/agent to refine.
+// A nullable scalar or struct field is reported as a pointer (e.g. *string).
 func goType(s *Schema, refToGo map[string]string) (gotype, note string) {
+	gt, note := baseGoType(s, refToGo)
+	if s != nil && s.Nullable && pointerable(gt) {
+		gt = "*" + gt
+	}
+	return gt, note
+}
+
+// pointerable reports whether prefixing "*" is meaningful. Slices, maps and
+// interface{} are already nil-able in Go, and "object" is a placeholder we
+// don't refine, so they are left as-is.
+func pointerable(gt string) bool {
+	switch {
+	case strings.HasPrefix(gt, "[]"),
+		strings.HasPrefix(gt, "map["),
+		gt == "interface{}",
+		gt == "object":
+		return false
+	}
+	return true
+}
+
+// baseGoType maps a schema node to its Go type without considering nullability.
+func baseGoType(s *Schema, refToGo map[string]string) (gotype, note string) {
 	if s == nil {
 		return "interface{}", ""
 	}

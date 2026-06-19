@@ -42,7 +42,7 @@ func renderText(w io.Writer, res *MatchResult, cm *clientModel, opt options) {
 	renderRenames(w, res.Renames, opt.tagFilter)
 	renderStale(w, res.Stale, opt.tagFilter)
 	renderFieldDiffs(w, res.FieldDiffs, opt.tagFilter)
-	renderSummary(w, res)
+	renderSummary(w, res, opt.tagFilter)
 
 	if opt.debug {
 		renderDebug(w, res, cm)
@@ -184,10 +184,23 @@ func fieldList(fields []FieldInfo) string {
 	return strings.Join(parts, ", ")
 }
 
-func renderSummary(w io.Writer, res *MatchResult) {
-	fmt.Fprintln(w, "E. SUMMARY")
+func renderSummary(w io.Writer, res *MatchResult, tagFilter string) {
+	if tagFilter != "" {
+		fmt.Fprintf(w, "E. SUMMARY (tag: %s)\n", tagFilter)
+	} else {
+		fmt.Fprintln(w, "E. SUMMARY")
+	}
+
 	tw := tabwriter.NewWriter(w, 0, 4, 2, ' ', 0)
+	var total, covered int
+	matched := false
 	for _, c := range res.PerTag {
+		if tagFilter != "" && !strings.EqualFold(c.Tag, tagFilter) {
+			continue
+		}
+		matched = true
+		total += c.Total
+		covered += c.Covered
 		mark := ""
 		if c.Covered < c.Total {
 			mark = "  <"
@@ -196,11 +209,27 @@ func renderSummary(w io.Writer, res *MatchResult) {
 	}
 	tw.Flush()
 
+	fmt.Fprintln(w, "   "+strings.Repeat("-", 50))
+	if tagFilter != "" {
+		if !matched {
+			fmt.Fprintf(w, "   (no spec operations tagged %q)\n", tagFilter)
+		}
+		pct := 0.0
+		if total > 0 {
+			pct = 100 * float64(covered) / float64(total)
+		}
+		// stale is reported globally: client ops carry no spec tag to filter by.
+		fmt.Fprintf(w, "   spec ops=%d  covered=%d (%.1f%%)  missing=%d  renamed=%d  stale=%d (global)\n",
+			total, covered, pct,
+			len(filterMissingByTag(res.Missing, tagFilter)), len(filterRenamesByTag(res.Renames, tagFilter)), len(res.Stale))
+		fmt.Fprintln(w)
+		return
+	}
+
 	pct := 0.0
 	if res.SpecOpCount > 0 {
 		pct = 100 * float64(res.CoveredCount) / float64(res.SpecOpCount)
 	}
-	fmt.Fprintln(w, "   "+strings.Repeat("-", 50))
 	fmt.Fprintf(w, "   spec ops=%d  client ops=%d  covered=%d (%.1f%%)  missing=%d  renamed=%d  stale=%d\n",
 		res.SpecOpCount, res.ClientOpCount, res.CoveredCount, pct,
 		len(res.Missing), len(res.Renames), len(res.Stale))

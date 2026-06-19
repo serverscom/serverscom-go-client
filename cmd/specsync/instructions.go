@@ -13,32 +13,34 @@ import (
 func renderInstructions(w io.Writer, doc *openAPI, res *MatchResult, refToGo map[string]string, opt options) {
 	missing := filterMissingByTag(res.Missing, opt.tagFilter)
 	renames := filterRenamesByTag(res.Renames, opt.tagFilter)
+	fields := actionableFieldDiffs(res.FieldDiffs, opt.tagFilter)
 
-	fmt.Fprintln(w, "# specsync — sync instructions")
-	fmt.Fprintln(w)
-	fmt.Fprintf(w, "Spec: `%s`\n\n", opt.specPath)
-	if opt.tagFilter != "" {
-		fmt.Fprintf(w, "Filtered to tag **%s**.\n\n", opt.tagFilter)
+	// Sections with nothing to do are skipped entirely; the remaining ones are
+	// numbered sequentially so the headings stay 1..N with no gaps.
+	n := 0
+	if len(renames) > 0 {
+		n++
+		instrRenames(w, n, renames)
 	}
-	pct := 0.0
-	if res.SpecOpCount > 0 {
-		pct = 100 * float64(res.CoveredCount) / float64(res.SpecOpCount)
+	if len(missing) > 0 {
+		n++
+		instrMissing(w, n, doc, missing, refToGo)
 	}
-	fmt.Fprintf(w, "Coverage: %d/%d (%.1f%%) — missing=%d, renamed=%d, stale=%d.\n\n",
-		res.CoveredCount, res.SpecOpCount, pct, len(res.Missing), len(res.Renames), len(res.Stale))
-
-	instrRenames(w, renames)
-	instrMissing(w, doc, missing, refToGo)
-	instrStructFields(w, res.FieldDiffs, opt.tagFilter)
-	instrStale(w, res.Stale)
+	if len(fields) > 0 {
+		n++
+		instrStructFields(w, n, fields)
+	}
+	if len(res.Stale) > 0 {
+		n++
+		instrStale(w, n, res.Stale)
+	}
+	if n == 0 {
+		fmt.Fprintln(w, "_Nothing to do — client is in sync with the spec._")
+	}
 }
 
-func instrRenames(w io.Writer, renames []Rename) {
-	fmt.Fprintf(w, "## 1. Renames to fix (%d)\n\n", len(renames))
-	if len(renames) == 0 {
-		fmt.Fprint(w, "_None._\n\n")
-		return
-	}
+func instrRenames(w io.Writer, n int, renames []Rename) {
+	fmt.Fprintf(w, "## %d. Renames to fix (%d)\n\n", n, len(renames))
 	fmt.Fprint(w, "The client path constant points at the old path; update it to the spec path. No other change is needed.\n\n")
 	for _, r := range renames {
 		fmt.Fprintf(w, "- **%s** — `%s`\n", r.Spec.OperationID, r.Spec.Verb)
@@ -49,12 +51,8 @@ func instrRenames(w io.Writer, renames []Rename) {
 	fmt.Fprintln(w)
 }
 
-func instrMissing(w io.Writer, doc *openAPI, missing []SpecOp, refToGo map[string]string) {
-	fmt.Fprintf(w, "## 2. Missing endpoints to add (%d)\n\n", len(missing))
-	if len(missing) == 0 {
-		fmt.Fprint(w, "_None._\n\n")
-		return
-	}
+func instrMissing(w io.Writer, n int, doc *openAPI, missing []SpecOp, refToGo map[string]string) {
+	fmt.Fprintf(w, "## %d. Missing endpoints to add (%d)\n\n", n, len(missing))
 
 	byTag := map[string][]SpecOp{}
 	for _, op := range missing {
@@ -124,29 +122,23 @@ func reqNote(f FieldInfo) string {
 	return "  (" + strings.Join(extra, "; ") + ")"
 }
 
-func instrStructFields(w io.Writer, diffs []FieldDiff, tagFilter string) {
-	if tagFilter != "" {
-		var out []FieldDiff
-		for _, d := range diffs {
-			if hasTag(d.Op, tagFilter) {
-				out = append(out, d)
-			}
-		}
-		diffs = out
-	}
-	// Only diffs that add fields to a Go struct are actionable here.
+// actionableFieldDiffs returns the field diffs that add fields to a Go struct,
+// honoring the tag filter. These are the only struct-field diffs worth emitting.
+func actionableFieldDiffs(diffs []FieldDiff, tagFilter string) []FieldDiff {
 	var actionable []FieldDiff
 	for _, d := range diffs {
+		if tagFilter != "" && !hasTag(d.Op, tagFilter) {
+			continue
+		}
 		if len(d.MissingInGo) > 0 || len(d.MissingReqd) > 0 {
 			actionable = append(actionable, d)
 		}
 	}
+	return actionable
+}
 
-	fmt.Fprintf(w, "## 3. Struct fields to add (%d)\n\n", len(actionable))
-	if len(actionable) == 0 {
-		fmt.Fprint(w, "_None._\n\n")
-		return
-	}
+func instrStructFields(w io.Writer, n int, actionable []FieldDiff) {
+	fmt.Fprintf(w, "## %d. Struct fields to add (%d)\n\n", n, len(actionable))
 	fmt.Fprint(w, "Spec properties present on matched operations but absent from the Go struct.\n\n")
 	for _, d := range actionable {
 		conf := ""
@@ -161,12 +153,8 @@ func instrStructFields(w io.Writer, diffs []FieldDiff, tagFilter string) {
 	fmt.Fprintln(w)
 }
 
-func instrStale(w io.Writer, stale []ClientOp) {
-	fmt.Fprintf(w, "## 4. Stale to investigate / remove (%d)\n\n", len(stale))
-	if len(stale) == 0 {
-		fmt.Fprint(w, "_None._\n\n")
-		return
-	}
+func instrStale(w io.Writer, n int, stale []ClientOp) {
+	fmt.Fprintf(w, "## %d. Stale to investigate / remove (%d)\n\n", n, len(stale))
 	fmt.Fprint(w, "Client operations with no spec match and no rename pair — confirm whether the endpoint was removed.\n\n")
 	for _, c := range stale {
 		fmt.Fprintf(w, "- `%s %s` — `%s.%s` (`%s:%d`)\n", c.Verb, c.Norm.Raw, c.RecvType, c.Method, c.File, c.Line)
