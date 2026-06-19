@@ -805,6 +805,7 @@ type LoadBalancer struct {
 	LocationID        int64             `json:"location_id"`
 	LocationCode      string            `json:"location_code"`
 	ClusterID         *string           `json:"cluster_id"`
+	SharedCluster     bool              `json:"shared_cluster"`
 	Labels            map[string]string `json:"labels"`
 	Created           time.Time         `json:"created_at"`
 	Updated           time.Time         `json:"updated_at"`
@@ -820,10 +821,49 @@ type L4LoadBalancer struct {
 	LocationID        int64             `json:"location_id"`
 	LocationCode      string            `json:"location_code"`
 	StoreLogs         bool              `json:"store_logs"`
+	StoreLogsRegionID int64             `json:"store_logs_region_id"`
 	ClusterID         *string           `json:"cluster_id"`
+	SharedCluster     bool              `json:"shared_cluster"`
+	VHostZones        []L4VHostZone     `json:"vhost_zones"`
+	UpstreamZones     []L4UpstreamZone  `json:"upstream_zones"`
 	Labels            map[string]string `json:"labels"`
 	Created           time.Time         `json:"created_at"`
 	Updated           time.Time         `json:"updated_at"`
+}
+
+// LoadBalancerUpstream represents a load balancer upstream server
+type LoadBalancerUpstream struct {
+	IP          string `json:"ip"`
+	Port        int32  `json:"port"`
+	Weight      int32  `json:"weight"`
+	MaxFails    int32  `json:"max_fails"`
+	FailTimeout int32  `json:"fail_timeout"`
+	MaxConns    int32  `json:"max_conns"`
+	Status      string `json:"status"`
+}
+
+// L4VHostZone represents l4 vhost zone
+type L4VHostZone struct {
+	ID            string   `json:"id"`
+	UpstreamID    string   `json:"upstream_id"`
+	Ports         []int32  `json:"ports"`
+	UDP           bool     `json:"udp"`
+	ProxyProtocol bool     `json:"proxy_protocol"`
+	ACLAllow      bool     `json:"acl_allow"`
+	ACLList       []string `json:"acl_list"`
+	Description   string   `json:"description"`
+}
+
+// L4UpstreamZone represents l4 upstream zone
+type L4UpstreamZone struct {
+	ID         string                 `json:"id"`
+	Method     string                 `json:"method"`
+	UDP        bool                   `json:"udp"`
+	HCInterval int                    `json:"hc_interval"`
+	HCJitter   int                    `json:"hc_jitter"`
+	HCFails    int                    `json:"hc_fails"`
+	HCPasses   int                    `json:"hc_passes"`
+	Upstreams  []LoadBalancerUpstream `json:"upstreams"`
 }
 
 // L4VHostZoneInput represents l4 vhost zone input
@@ -855,24 +895,28 @@ type L4UpstreamZoneInput struct {
 
 // L4LoadBalancerUpdateInput represents l4 load balancer update input
 type L4LoadBalancerUpdateInput struct {
-	Name          *string               `json:"name,omitempty"`
-	StoreLogs     *bool                 `json:"store_logs,omitempty"`
-	ClusterID     *string               `json:"cluster_id,omitempty"`
-	SharedCluster *bool                 `json:"shared_cluster,omitempty"`
-	VHostZones    []L4VHostZoneInput    `json:"vhost_zones,omitempty"`
-	UpstreamZones []L4UpstreamZoneInput `json:"upstream_zones,omitempty"`
-	Labels        map[string]string     `json:"labels,omitempty"`
+	Name                *string               `json:"name,omitempty"`
+	StoreLogs           *bool                 `json:"store_logs,omitempty"`
+	StoreLogsRegionID   *int                  `json:"store_logs_region_id,omitempty"`
+	ClusterID           *string               `json:"cluster_id,omitempty"`
+	SharedCluster       *bool                 `json:"shared_cluster,omitempty"`
+	NewExternalIpsCount *int                  `json:"new_external_ips_count,omitempty"`
+	DeleteExternalIps   []string              `json:"delete_external_ips,omitempty"`
+	VHostZones          []L4VHostZoneInput    `json:"vhost_zones,omitempty"`
+	UpstreamZones       []L4UpstreamZoneInput `json:"upstream_zones,omitempty"`
+	Labels              map[string]string     `json:"labels,omitempty"`
 }
 
 // L4LoadBalancerUpdateInput represents l4 load balancer create input
 type L4LoadBalancerCreateInput struct {
-	Name          string                `json:"name"`
-	LocationID    int64                 `json:"location_id"`
-	StoreLogs     *bool                 `json:"store_logs,omitempty"`
-	ClusterID     *string               `json:"cluster_id,omitempty"`
-	VHostZones    []L4VHostZoneInput    `json:"vhost_zones"`
-	UpstreamZones []L4UpstreamZoneInput `json:"upstream_zones"`
-	Labels        map[string]string     `json:"labels,omitempty"`
+	Name              string                `json:"name"`
+	LocationID        int64                 `json:"location_id"`
+	StoreLogs         *bool                 `json:"store_logs,omitempty"`
+	StoreLogsRegionID *int                  `json:"store_logs_region_id,omitempty"`
+	ClusterID         *string               `json:"cluster_id,omitempty"`
+	VHostZones        []L4VHostZoneInput    `json:"vhost_zones"`
+	UpstreamZones     []L4UpstreamZoneInput `json:"upstream_zones"`
+	Labels            map[string]string     `json:"labels,omitempty"`
 }
 
 // L7LoadBalancer represents l7 load balancer
@@ -889,9 +933,55 @@ type L7LoadBalancer struct {
 	StoreLogs         bool              `json:"store_logs"`
 	StoreLogsRegionID int64             `json:"store_logs_region_id"`
 	ClusterID         *string           `json:"cluster_id"`
+	SharedCluster     bool              `json:"shared_cluster"`
+	VHostZones        []L7VHostZone     `json:"vhost_zones"`
+	UpstreamZones     []L7UpstreamZone  `json:"upstream_zones"`
 	Labels            map[string]string `json:"labels"`
 	Created           time.Time         `json:"created_at"`
 	Updated           time.Time         `json:"updated_at"`
+}
+
+// L7LocationZone represents l7 location zone
+type L7LocationZone struct {
+	Location     string `json:"location"`
+	UpstreamID   string `json:"upstream_id"`
+	UpstreamPath string `json:"upstream_path"`
+	Redirect     bool   `json:"redirect"`
+}
+
+// L7VHostZone represents l7 vhost zone
+type L7VHostZone struct {
+	ID                  string           `json:"id"`
+	Ports               []int32          `json:"ports"`
+	SSL                 bool             `json:"ssl"`
+	HTTP2               bool             `json:"http2"`
+	HTTPToHttpsRedirect bool             `json:"http_to_https_redirect"`
+	HTTP2PushPreload    bool             `json:"http2_push_preload"`
+	Domains             []string         `json:"domains"`
+	SSLCertID           string           `json:"ssl_certificate_id"`
+	TLSPreset           string           `json:"tls_preset"`
+	LocationZones       []L7LocationZone `json:"location_zones"`
+	RealIPHeader        *RealIPHeader    `json:"real_ip_header"`
+}
+
+// L7UpstreamZone represents l7 upstream zone
+type L7UpstreamZone struct {
+	ID            string                 `json:"id"`
+	Method        string                 `json:"method"`
+	SSL           bool                   `json:"ssl"`
+	Sticky        bool                   `json:"sticky"`
+	HCInterval    int                    `json:"hc_interval"`
+	HCJitter      int                    `json:"hc_jitter"`
+	HCFails       int                    `json:"hc_fails"`
+	HCPasses      int                    `json:"hc_passes"`
+	HCDomain      string                 `json:"hc_domain"`
+	HCPath        string                 `json:"hc_path"`
+	HCMethod      string                 `json:"hc_method"`
+	HCMandatory   bool                   `json:"hc_mandatory"`
+	GRPC          bool                   `json:"grpc"`
+	HCGRPCService string                 `json:"hc_grpc_service"`
+	HCGRPCStatus  int                    `json:"hc_grpc_status"`
+	Upstreams     []LoadBalancerUpstream `json:"upstreams"`
 }
 
 // L7LocationZoneInput represents l7 location zone input

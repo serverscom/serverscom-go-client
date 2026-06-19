@@ -1449,7 +1449,7 @@ func TestGetDedicatedServerOOBCredentials(t *testing.T) {
 	defer ts.Close()
 
 	ctx := context.TODO()
-	params := map[string]string{} // можно добавить параметры, если нужно
+	params := map[string]string{}
 
 	credentials, err := client.Hosts.GetDedicatedServerOOBCredentials(ctx, "a", params)
 
@@ -1475,9 +1475,8 @@ func TestHostsSBMServerPowerFeeds(t *testing.T) {
 	powerFeeds, err := client.Hosts.SBMServerPowerFeeds(ctx, "a")
 
 	g.Expect(err).To(BeNil())
-	g.Expect(len(powerFeeds)).To(Equal(2)) // или ожидаемое количество элементов
+	g.Expect(len(powerFeeds)).To(Equal(2))
 
-	// Проверка первых элементов
 	g.Expect(powerFeeds[0].Name).To(Equal("Power 1"))
 	g.Expect(powerFeeds[0].Status).To(Equal("on"))
 
