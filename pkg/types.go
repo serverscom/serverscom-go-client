@@ -465,6 +465,11 @@ type PrivateIpxeBootFeatureInput struct {
 	IPXEConfig string `json:"ipxe_config"`
 }
 
+// PublicIpxeBootFeatureInput represents input for activating the public_ipxe_boot feature
+type PublicIpxeBootFeatureInput struct {
+	IPXEConfig string `json:"ipxe_config"`
+}
+
 // CloudComputingInstance represents cloud instance
 type CloudComputingInstance struct {
 	Name               string            `json:"name"`

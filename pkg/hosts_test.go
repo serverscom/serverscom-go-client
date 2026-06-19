@@ -1670,6 +1670,50 @@ func TestDeactivatePrivateIpxeBootFeature(t *testing.T) {
 	g.Expect(feature.Status).To(Equal("deactivation"))
 }
 
+func TestActivatePublicIpxeBootFeature(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/features/public_ipxe_boot/activate").
+		WithRequestMethod("POST").
+		WithResponseBodyStubInline(`{"name":"public_ipxe_boot","status":"activation"}`).
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	input := PublicIpxeBootFeatureInput{IPXEConfig: "#!ipxe\nchain http://boot.example.com"}
+
+	feature, err := client.Hosts.ActivatePublicIpxeBootFeature(ctx, serverID, input)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(feature).ToNot(BeNil())
+	g.Expect(feature.Name).To(Equal("public_ipxe_boot"))
+}
+
+func TestDeactivatePublicIpxeBootFeature(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/features/public_ipxe_boot/deactivate").
+		WithRequestMethod("POST").
+		WithResponseBodyStubInline(`{"name":"public_ipxe_boot","status":"deactivation"}`).
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	feature, err := client.Hosts.DeactivatePublicIpxeBootFeature(ctx, serverID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(feature).ToNot(BeNil())
+	g.Expect(feature.Status).To(Equal("deactivation"))
+}
+
 func TestListDedicatedServerSSHKeys(t *testing.T) {
 	g := NewGomegaWithT(t)
 
@@ -1693,6 +1737,31 @@ func TestListDedicatedServerSSHKeys(t *testing.T) {
 	g.Expect(keys[0].Labels).To(Equal(map[string]string{"env": "test"}))
 	g.Expect(keys[0].Created.String()).To(Equal("2020-04-22 06:23:09 +0000 UTC"))
 	g.Expect(keys[0].Updated.String()).To(Equal("2020-04-22 06:23:09 +0000 UTC"))
+}
+
+func TestGetDedicatedServerSSHKey(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/hosts/dedicated_servers/" + serverID + "/ssh_keys/" + sshFingerprint).
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/hosts/dedicated_servers/ssh_keys/get_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	key, err := client.Hosts.GetDedicatedServerSSHKey(ctx, serverID, sshFingerprint)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(key).ToNot(BeNil())
+	g.Expect(key.Name).To(Equal("test-key"))
+	g.Expect(key.Fingerprint).To(Equal(sshFingerprint))
+	g.Expect(key.Labels).To(Equal(map[string]string{"env": "test"}))
+	g.Expect(key.Created.String()).To(Equal("2020-04-22 06:23:09 +0000 UTC"))
+	g.Expect(key.Updated.String()).To(Equal("2020-04-22 06:23:09 +0000 UTC"))
 }
 
 func TestAttachSSHKeysToDedicatedServer(t *testing.T) {

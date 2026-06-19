@@ -140,9 +140,12 @@ type HostsService interface {
 	DeactivateHostRescueModeFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error)
 	ActivatePrivateIpxeBootFeature(ctx context.Context, serverID string, input PrivateIpxeBootFeatureInput) (*DedicatedServerFeature, error)
 	DeactivatePrivateIpxeBootFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error)
+	ActivatePublicIpxeBootFeature(ctx context.Context, serverID string, input PublicIpxeBootFeatureInput) (*DedicatedServerFeature, error)
+	DeactivatePublicIpxeBootFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error)
 
 	// dedicated server ssh keys
 	ListDedicatedServerSSHKeys(ctx context.Context, id string) ([]SSHKey, error)
+	GetDedicatedServerSSHKey(ctx context.Context, serverID, fingerprint string) (*SSHKey, error)
 	AttachSSHKeysToDedicatedServer(ctx context.Context, id string, input SSHKeyAttachInput) ([]SSHKey, error)
 	DetachSSHKeyFromDedicatedServer(ctx context.Context, serverID, fingerprint string) error
 
@@ -1065,6 +1068,23 @@ func (h *HostsHandler) DeactivatePrivateIpxeBootFeature(ctx context.Context, ser
 	return h.deactivateFeature(ctx, serverID, "private_ipxe_boot")
 }
 
+// ActivatePublicIpxeBootFeature activates the public_ipxe_boot feature.
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ActivatePublicIpxeBootFeatureForADedicatedServer
+func (h *HostsHandler) ActivatePublicIpxeBootFeature(ctx context.Context, serverID string, input PublicIpxeBootFeatureInput) (*DedicatedServerFeature, error) {
+	payload, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	return h.activateFeature(ctx, serverID, "public_ipxe_boot", payload)
+}
+
+// DeactivatePublicIpxeBootFeature deactivates the public_ipxe_boot feature.
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/DeactivatePublicIpxeBootFeatureForADedicatedServer
+func (h *HostsHandler) DeactivatePublicIpxeBootFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error) {
+	return h.deactivateFeature(ctx, serverID, "public_ipxe_boot")
+}
+
 // ListDedicatedServerSSHKeys returns all SSH keys attached to a dedicated server.
 // Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ListSshKeysForADedicatedServer
 func (h *HostsHandler) ListDedicatedServerSSHKeys(ctx context.Context, id string) ([]SSHKey, error) {
@@ -1081,6 +1101,24 @@ func (h *HostsHandler) ListDedicatedServerSSHKeys(ctx context.Context, id string
 	}
 
 	return keys, nil
+}
+
+// GetDedicatedServerSSHKey returns a single SSH key attached to a dedicated server.
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/GetAnSshKeyForADedicatedServer
+func (h *HostsHandler) GetDedicatedServerSSHKey(ctx context.Context, serverID, fingerprint string) (*SSHKey, error) {
+	url := h.client.buildURL(dedicatedServerSSHKeyPath, serverID, fingerprint)
+
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	key := new(SSHKey)
+	if err := json.Unmarshal(body, key); err != nil {
+		return nil, err
+	}
+
+	return key, nil
 }
 
 // AttachSSHKeysToDedicatedServer attaches one or more SSH keys to a dedicated server.
