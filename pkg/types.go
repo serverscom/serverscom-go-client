@@ -784,7 +784,9 @@ type L4LoadBalancer struct {
 	Name              string            `json:"name"`
 	Type              string            `json:"type"`
 	Status            string            `json:"status"`
+	NetworkType       string            `json:"network_type"`
 	ExternalAddresses []string          `json:"external_addresses"`
+	InternalAddresses []string          `json:"internal_addresses"`
 	LocationID        int64             `json:"location_id"`
 	LocationCode      string            `json:"location_code"`
 	StoreLogs         bool              `json:"store_logs"`
@@ -836,6 +838,7 @@ type L4LoadBalancerUpdateInput struct {
 type L4LoadBalancerCreateInput struct {
 	Name          string                `json:"name"`
 	LocationID    int64                 `json:"location_id"`
+	NetworkType   string                `json:"network_type,omitempty"`
 	StoreLogs     *bool                 `json:"store_logs,omitempty"`
 	ClusterID     *string               `json:"cluster_id,omitempty"`
 	VHostZones    []L4VHostZoneInput    `json:"vhost_zones"`
@@ -850,7 +853,9 @@ type L7LoadBalancer struct {
 	Type              string            `json:"type"`
 	Domains           []string          `json:"domains"`
 	Status            string            `json:"status"`
+	NetworkType       string            `json:"network_type"`
 	ExternalAddresses []string          `json:"external_addresses"`
+	InternalAddresses []string          `json:"internal_addresses"`
 	LocationID        int64             `json:"location_id"`
 	LocationCode      string            `json:"location_code"`
 	Geoip             bool              `json:"geoip"`
@@ -934,6 +939,7 @@ type L7LoadBalancerUpdateInput struct {
 type L7LoadBalancerCreateInput struct {
 	Name              string                `json:"name"`
 	LocationID        int64                 `json:"location_id"`
+	NetworkType       string                `json:"network_type,omitempty"`
 	StoreLogs         *bool                 `json:"store_logs,omitempty"`
 	StoreLogsRegionID *int                  `json:"store_logs_region_id,,omitempty"`
 	Geoip             *bool                 `json:"geoip,omitempty"`
