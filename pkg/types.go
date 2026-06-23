@@ -1088,7 +1088,6 @@ type LoadBalancerCluster struct {
 	Name         string    `json:"name"`
 	LocationID   int64     `json:"location_id"`
 	LocationCode string    `json:"location_code"`
-	Status       string    `json:"status"`
 	Created      time.Time `json:"created_at"`
 	Updated      time.Time `json:"updated_at"`
 }

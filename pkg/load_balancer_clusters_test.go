@@ -53,7 +53,6 @@ func TestGetLoadBalancerCluster(t *testing.T) {
 	g.Expect(loadBalancerCluster).ToNot(BeNil())
 
 	g.Expect(loadBalancerCluster.ID).To(Equal("Jrb2XMeW"))
-	g.Expect(loadBalancerCluster.Status).To(Equal("active"))
 	g.Expect(loadBalancerCluster.Name).To(Equal("dedic-test-ams1"))
 	g.Expect(loadBalancerCluster.LocationID).To(Equal(int64(1)))
 	g.Expect(loadBalancerCluster.LocationCode).To(Equal("location2155"))
