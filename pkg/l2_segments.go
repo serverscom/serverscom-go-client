@@ -41,7 +41,7 @@ type L2SegmentsService interface {
 
 	// Additional collections
 	Members(segmentID string) Collection[L2Member]
-	Networks(segmentID string) Collection[Network]
+	Networks(segmentID string) Collection[L2SegmentNetwork]
 }
 
 // L2SegmentsHandler handles  operatings around l2 segments
@@ -148,11 +148,11 @@ func (h *L2SegmentsHandler) Members(segmentID string) Collection[L2Member] {
 	return NewCollection[L2Member](h.client, path)
 }
 
-// Networks builds a new L2NetworksCollection interface
-func (h *L2SegmentsHandler) Networks(segmentID string) Collection[Network] {
+// Networks builds a new Collection[L2SegmentNetwork] interface
+func (h *L2SegmentsHandler) Networks(segmentID string) Collection[L2SegmentNetwork] {
 	path := h.client.buildPath(l2NetworksListPath, []interface{}{segmentID}...)
 
-	return NewCollection[Network](h.client, path)
+	return NewCollection[L2SegmentNetwork](h.client, path)
 }
 
 // ChangeNetworks changes networks set

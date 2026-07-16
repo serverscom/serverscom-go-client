@@ -649,11 +649,24 @@ type Network struct {
 	InterfaceType      string    `json:"interface_type"`
 	DistributionMethod string    `json:"distribution_method"`
 	Additional         bool      `json:"additional"`
+	FirstIP            *string   `json:"first_ip,omitempty"`
+	Gateway            *string   `json:"gateway,omitempty"`
 	Created            time.Time `json:"created_at"`
 	Updated            time.Time `json:"updated_at"`
+}
 
-	// DEPRECATED: should be replaced by Statu
-	State string `json:"state"`
+// L2SegmentNetwork represents a network attached to an L2 segment
+type L2SegmentNetwork struct {
+	ID                 string    `json:"id"`
+	Title              *string   `json:"title,omitempty"`
+	Status             string    `json:"status"`
+	Cidr               *string   `json:"cidr,omitempty"`
+	Family             string    `json:"family"`
+	InterfaceType      string    `json:"interface_type"`
+	DistributionMethod string    `json:"distribution_method"`
+	Additional         bool      `json:"additional"`
+	Created            time.Time `json:"created_at"`
+	Updated            time.Time `json:"updated_at"`
 }
 
 // L2LocationGroup represents l2 location groups
@@ -1164,8 +1177,6 @@ type CloudBlockStorageVolumeCreateInput struct {
 type CloudBlockStorageVolumeUpdateInput struct {
 	Name        string            `json:"name"`
 	Description string            `json:"description,omitempty"`
-	ImageID     string            `json:"image_id,omitempty"`
-	SnapshotID  string            `json:"snapshot_id,omitempty"`
 	Labels      map[string]string `json:"labels,omitempty"`
 }
 

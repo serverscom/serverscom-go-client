@@ -1200,6 +1200,8 @@ func TestHostsGetDedicatedServerNetwork(t *testing.T) {
 	g.Expect(network.InterfaceType).To(Equal("public"))
 	g.Expect(network.DistributionMethod).To(Equal("gateway"))
 	g.Expect(network.Additional).To(Equal(false))
+	g.Expect(*network.FirstIP).To(Equal("100.0.8.1"))
+	g.Expect(*network.Gateway).To(Equal("100.0.8.1"))
 	g.Expect(network.Created.String()).To(Equal("2025-07-31 11:03:36 +0000 UTC"))
 	g.Expect(network.Updated.String()).To(Equal("2025-07-31 11:03:36 +0000 UTC"))
 }
@@ -1506,6 +1508,8 @@ func TestHostsGetSBMServerNetwork(t *testing.T) {
 	g.Expect(network.InterfaceType).To(Equal("public"))
 	g.Expect(network.DistributionMethod).To(Equal("gateway"))
 	g.Expect(network.Additional).To(Equal(false))
+	g.Expect(*network.FirstIP).To(Equal("100.0.8.1"))
+	g.Expect(*network.Gateway).To(Equal("100.0.8.1"))
 	g.Expect(network.Created.String()).To(Equal("2025-07-31 11:03:36 +0000 UTC"))
 	g.Expect(network.Updated.String()).To(Equal("2025-07-31 11:03:36 +0000 UTC"))
 }
