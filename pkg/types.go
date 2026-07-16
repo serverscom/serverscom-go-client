@@ -1431,3 +1431,88 @@ type DedicatedServerOOBCredentials struct {
 type ScheduleReleaseInput struct {
 	ReleaseAfter string `json:"release_after,omitempty"`
 }
+
+// DNSDomainDelegationStatus represents dns domain delegation status
+type DNSDomainDelegationStatus string
+
+const (
+	DNSDomainDelegated   DNSDomainDelegationStatus = "delegated"
+	DNSDomainVerified    DNSDomainDelegationStatus = "verified"
+	DNSDomainUndelegated DNSDomainDelegationStatus = "undelegated"
+)
+
+// DNSRecordType represents dns record type
+type DNSRecordType string
+
+const (
+	DNSRecordTypeA     DNSRecordType = "A"
+	DNSRecordTypeAAAA  DNSRecordType = "AAAA"
+	DNSRecordTypeCNAME DNSRecordType = "CNAME"
+	DNSRecordTypeMX    DNSRecordType = "MX"
+	DNSRecordTypeTXT   DNSRecordType = "TXT"
+	DNSRecordTypeNS    DNSRecordType = "NS"
+	DNSRecordTypeSRV   DNSRecordType = "SRV"
+	DNSRecordTypeCAA   DNSRecordType = "CAA"
+)
+
+// DNSDomain represents a dns domain
+type DNSDomain struct {
+	ID               string                    `json:"id"`
+	Name             string                    `json:"name"`
+	Email            string                    `json:"email"`
+	TTL              int                       `json:"ttl"`
+	DelegationStatus DNSDomainDelegationStatus `json:"delegation_status"`
+	Labels           map[string]string         `json:"labels"`
+	UnpublishDate    *time.Time                `json:"unpublish_date"`
+	Created          time.Time                 `json:"created_at"`
+	Updated          time.Time                 `json:"updated_at"`
+}
+
+// DNSDomainCreateInput represents dns domain create input
+type DNSDomainCreateInput struct {
+	Name   string            `json:"name"`
+	Email  string            `json:"email"`
+	TTL    int               `json:"ttl,omitempty"`
+	Labels map[string]string `json:"labels,omitempty"`
+}
+
+// DNSDomainUpdateInput represents dns domain update input
+type DNSDomainUpdateInput struct {
+	Labels map[string]string `json:"labels"`
+}
+
+// DNSDomainDelegationData represents dns domain delegation data
+type DNSDomainDelegationData struct {
+	Nameservers []string `json:"nameservers"`
+	RequiredTxt string   `json:"required_txt"`
+}
+
+// DNSRecord represents a dns record
+type DNSRecord struct {
+	ID       string        `json:"id"`
+	DomainID string        `json:"domain_id"`
+	Name     string        `json:"name"`
+	Type     DNSRecordType `json:"type"`
+	Data     *string       `json:"data"`
+	TTL      *int          `json:"ttl"`
+	Priority *int          `json:"priority"`
+	Created  time.Time     `json:"created_at"`
+	Updated  time.Time     `json:"updated_at"`
+}
+
+// DNSRecordCreateInput represents dns record create input
+type DNSRecordCreateInput struct {
+	Name     string        `json:"name"`
+	Type     DNSRecordType `json:"type"`
+	Data     string        `json:"data"`
+	TTL      int           `json:"ttl,omitempty"`
+	Priority int           `json:"priority,omitempty"`
+}
+
+// DNSRecordUpdateInput represents dns record update input
+type DNSRecordUpdateInput struct {
+	Data     string `json:"data,omitempty"`
+	Name     string `json:"name,omitempty"`
+	Priority int    `json:"priority,omitempty"`
+	TTL      int    `json:"ttl,omitempty"`
+}

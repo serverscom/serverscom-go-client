@@ -48,6 +48,8 @@ type Client struct {
 
 	Metrics MetricsService
 
+	DNS DNSService
+
 	client *resty.Client
 }
 
@@ -110,6 +112,7 @@ func (cli *Client) configureResources() {
 	cli.Account = &AccountHandler{cli}
 	cli.RemoteBlockStorageVolumes = &RemoteBlockStorageVolumesHandler{cli}
 	cli.Metrics = &MetricsHandler{cli}
+	cli.DNS = &DNSHandler{cli}
 }
 
 func (cli *Client) buildURL(path string, values ...interface{}) string {

@@ -1,0 +1,13 @@
+{
+  "id": "aXmDk39e",
+  "name": "example.com",
+  "email": "admin@example.com",
+  "ttl": 3600,
+  "delegation_status": "undelegated",
+  "labels": {
+    "env": "test"
+  },
+  "unpublish_date": null,
+  "created_at": "2023-05-10T12:00:00Z",
+  "updated_at": "2023-05-10T12:00:00Z"
+}

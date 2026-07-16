@@ -1,0 +1,7 @@
+{
+  "nameservers": [
+    "ns1.servers.com",
+    "ns2.servers.com"
+  ],
+  "required_txt": "servers-com-verification=abc123"
+}

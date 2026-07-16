@@ -1,0 +1,11 @@
+{
+  "id": "rEc0rd01",
+  "domain_id": "aXmDk39e",
+  "name": "@",
+  "type": "A",
+  "data": "192.0.2.1",
+  "ttl": 3600,
+  "priority": null,
+  "created_at": "2023-05-10T12:00:00Z",
+  "updated_at": "2023-05-10T12:00:00Z"
+}
