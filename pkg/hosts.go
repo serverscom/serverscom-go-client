@@ -45,12 +45,11 @@ const (
 	dedicatedServerDeleteNetworkPath         = "/hosts/dedicated_servers/%s/networks/%s"
 
 	// kbm nodes
-	kubernetesBaremetalNodePath               = "/hosts/kubernetes_baremetal_nodes/%s"
-	kubernetesBaremetalNodePowerOnPath        = "/hosts/kubernetes_baremetal_nodes/%s/power_on"
-	kubernetesBaremetalNodePowerOffPath       = "/hosts/kubernetes_baremetal_nodes/%s/power_off"
-	kubernetesBaremetalNodePowerCyclePath     = "/hosts/kubernetes_baremetal_nodes/%s/power_cycle"
-	kubernetesBaremetalNodeListDriveSlotsPath = "/hosts/kubernetes_baremetal_nodes/%s/drive_slots"
-	kubernetesBaremetalNodesListPath          = "/hosts/kubernetes_baremetal_nodes"
+	kubernetesBaremetalNodePath           = "/hosts/kubernetes_baremetal_nodes/%s"
+	kubernetesBaremetalNodePowerOnPath    = "/hosts/kubernetes_baremetal_nodes/%s/power_on"
+	kubernetesBaremetalNodePowerOffPath   = "/hosts/kubernetes_baremetal_nodes/%s/power_off"
+	kubernetesBaremetalNodePowerCyclePath = "/hosts/kubernetes_baremetal_nodes/%s/power_cycle"
+	kubernetesBaremetalNodesListPath      = "/hosts/kubernetes_baremetal_nodes"
 
 	// sbm nodes
 	sbmServerCreatePath          = "/hosts/sbm_servers"
@@ -62,6 +61,12 @@ const (
 	sbmServersListPath           = "/hosts/sbm_servers"
 	sbmServerPTRRecordCreatePath = "/hosts/sbm_servers/%s/ptr_records"
 	sbmServerPTRRecordDeletePath = "/hosts/sbm_servers/%s/ptr_records/%s"
+
+	// sbm networks
+	sbmServerNetworkUsagePath          = "/hosts/sbm_servers/%s/network_utilization"
+	sbmServerNetworkPath               = "/hosts/sbm_servers/%s/networks/%s"
+	sbmServerAddPrivateIPv4NetworkPath = "/hosts/sbm_servers/%s/networks/private_ipv4"
+	sbmServerDeleteNetworkPath         = "/hosts/sbm_servers/%s/networks/%s"
 )
 
 // HostsService is an interface for interfacing with Host, Dedicated Server endpoints
@@ -118,6 +123,12 @@ type HostsService interface {
 	CreatePTRRecordForSBMServer(ctx context.Context, id string, input PTRRecordCreateInput) (*PTRRecord, error)
 	DeletePTRRecordForSBMServer(ctx context.Context, serverID string, ptrRecordID string) error
 
+	// sbm network methods
+	GetSBMServerNetworkUsage(ctx context.Context, id string) (*NetworkUsage, error)
+	GetSBMServerNetwork(ctx context.Context, serverID string, networkID string) (*Network, error)
+	AddSBMServerPrivateIPv4Network(ctx context.Context, id string, input NetworkInput) (*Network, error)
+	DeleteSBMServerNetwork(ctx context.Context, serverID string, networkID string) (*Network, error)
+
 	// kubernetes
 	PowerOnKubernetesBaremetalNode(ctx context.Context, id string) (*KubernetesBaremetalNode, error)
 	PowerOffKubernetesBaremetalNode(ctx context.Context, id string) (*KubernetesBaremetalNode, error)
@@ -140,9 +151,12 @@ type HostsService interface {
 	DeactivateHostRescueModeFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error)
 	ActivatePrivateIpxeBootFeature(ctx context.Context, serverID string, input PrivateIpxeBootFeatureInput) (*DedicatedServerFeature, error)
 	DeactivatePrivateIpxeBootFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error)
+	ActivatePublicIpxeBootFeature(ctx context.Context, serverID string, input PublicIpxeBootFeatureInput) (*DedicatedServerFeature, error)
+	DeactivatePublicIpxeBootFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error)
 
 	// dedicated server ssh keys
 	ListDedicatedServerSSHKeys(ctx context.Context, id string) ([]SSHKey, error)
+	GetDedicatedServerSSHKey(ctx context.Context, serverID, fingerprint string) (*SSHKey, error)
 	AttachSSHKeysToDedicatedServer(ctx context.Context, id string, input SSHKeyAttachInput) ([]SSHKey, error)
 	DetachSSHKeyFromDedicatedServer(ctx context.Context, serverID, fingerprint string) error
 
@@ -159,6 +173,7 @@ type HostsService interface {
 	ListSBMServers() Collection[SBMServer]
 	SBMServerPowerFeeds(ctx context.Context, id string) ([]HostPowerFeed, error)
 	SBMServerPTRRecords(id string) Collection[PTRRecord]
+	SBMServerNetworks(id string) Collection[Network]
 	KubernetesBaremetalNodePowerFeeds(ctx context.Context, id string) ([]HostPowerFeed, error)
 	KubernetesBaremetalNodeNetworks(id string) Collection[Network]
 	KubernetesBaremetalNodeDriveSlots(id string) Collection[HostDriveSlot]
@@ -1065,6 +1080,23 @@ func (h *HostsHandler) DeactivatePrivateIpxeBootFeature(ctx context.Context, ser
 	return h.deactivateFeature(ctx, serverID, "private_ipxe_boot")
 }
 
+// ActivatePublicIpxeBootFeature activates the public_ipxe_boot feature.
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ActivatePublicIpxeBootFeatureForADedicatedServer
+func (h *HostsHandler) ActivatePublicIpxeBootFeature(ctx context.Context, serverID string, input PublicIpxeBootFeatureInput) (*DedicatedServerFeature, error) {
+	payload, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	return h.activateFeature(ctx, serverID, "public_ipxe_boot", payload)
+}
+
+// DeactivatePublicIpxeBootFeature deactivates the public_ipxe_boot feature.
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/DeactivatePublicIpxeBootFeatureForADedicatedServer
+func (h *HostsHandler) DeactivatePublicIpxeBootFeature(ctx context.Context, serverID string) (*DedicatedServerFeature, error) {
+	return h.deactivateFeature(ctx, serverID, "public_ipxe_boot")
+}
+
 // ListDedicatedServerSSHKeys returns all SSH keys attached to a dedicated server.
 // Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/ListSshKeysForADedicatedServer
 func (h *HostsHandler) ListDedicatedServerSSHKeys(ctx context.Context, id string) ([]SSHKey, error) {
@@ -1081,6 +1113,24 @@ func (h *HostsHandler) ListDedicatedServerSSHKeys(ctx context.Context, id string
 	}
 
 	return keys, nil
+}
+
+// GetDedicatedServerSSHKey returns a single SSH key attached to a dedicated server.
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Dedicated-Server/operation/GetAnSshKeyForADedicatedServer
+func (h *HostsHandler) GetDedicatedServerSSHKey(ctx context.Context, serverID, fingerprint string) (*SSHKey, error) {
+	url := h.client.buildURL(dedicatedServerSSHKeyPath, serverID, fingerprint)
+
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	key := new(SSHKey)
+	if err := json.Unmarshal(body, key); err != nil {
+		return nil, err
+	}
+
+	return key, nil
 }
 
 // AttachSSHKeysToDedicatedServer attaches one or more SSH keys to a dedicated server.
@@ -1194,4 +1244,89 @@ func (h *HostsHandler) DeletePTRRecordForSBMServer(ctx context.Context, hostID s
 	_, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
 
 	return err
+}
+
+// SBMServerNetworks builds a new Collection[Network] interface
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Scalable-Baremetal-Server/operation/ListNetworksForAnSbmServer
+func (h *HostsHandler) SBMServerNetworks(id string) Collection[Network] {
+	path := h.client.buildPath(hostNetworksListPath, []interface{}{sbmPrefix, id}...)
+
+	return NewCollection[Network](h.client, path)
+}
+
+// GetSBMServerNetworkUsage returns network utilization for an SBM server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Scalable-Baremetal-Server/operation/GetNetworkUtilizationForAnSbmServer
+func (h *HostsHandler) GetSBMServerNetworkUsage(ctx context.Context, id string) (*NetworkUsage, error) {
+	url := h.client.buildURL(sbmServerNetworkUsagePath, id)
+
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var networkUsage NetworkUsage
+	if err := json.Unmarshal(body, &networkUsage); err != nil {
+		return nil, err
+	}
+
+	return &networkUsage, nil
+}
+
+// GetSBMServerNetwork returns network details for an SBM server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Scalable-Baremetal-Server/operation/GetANetworkForAnSbmServer
+func (h *HostsHandler) GetSBMServerNetwork(ctx context.Context, serverID, networkID string) (*Network, error) {
+	url := h.client.buildURL(sbmServerNetworkPath, serverID, networkID)
+
+	body, err := h.client.buildAndExecRequest(ctx, "GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var network Network
+	if err := json.Unmarshal(body, &network); err != nil {
+		return nil, err
+	}
+
+	return &network, nil
+}
+
+// AddSBMServerPrivateIPv4Network adds a private IPv4 network to an SBM server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Scalable-Baremetal-Server/operation/CreateAPrivateIpv4NetworkForAnSbmServer
+func (h *HostsHandler) AddSBMServerPrivateIPv4Network(ctx context.Context, id string, input NetworkInput) (*Network, error) {
+	payload, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	url := h.client.buildURL(sbmServerAddPrivateIPv4NetworkPath, id)
+
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, payload)
+	if err != nil {
+		return nil, err
+	}
+
+	var network Network
+	if err := json.Unmarshal(body, &network); err != nil {
+		return nil, err
+	}
+
+	return &network, nil
+}
+
+// DeleteSBMServerNetwork deletes a network from an SBM server
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Scalable-Baremetal-Server/operation/DeleteANetworkForAnSbmServer
+func (h *HostsHandler) DeleteSBMServerNetwork(ctx context.Context, serverID, networkID string) (*Network, error) {
+	url := h.client.buildURL(sbmServerDeleteNetworkPath, serverID, networkID)
+
+	body, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var network Network
+	if err := json.Unmarshal(body, &network); err != nil {
+		return nil, err
+	}
+
+	return &network, nil
 }

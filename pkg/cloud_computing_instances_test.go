@@ -381,7 +381,7 @@ func TestCloudComputingInstancesPowerOn(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/cloud_computing/instances/BDbDxbl2/switch_power_on").
+		WithRequestPath("/cloud_computing/instances/BDbDxbl2/switch_on").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/cloud_instances/power_on_response.json").
 		WithResponseCode(202).
@@ -451,7 +451,7 @@ func TestCloudComputingInstancesPowerOff(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	ts, client := newFakeServer().
-		WithRequestPath("/cloud_computing/instances/BDbDxbl2/switch_power_off").
+		WithRequestPath("/cloud_computing/instances/BDbDxbl2/switch_off").
 		WithRequestMethod("POST").
 		WithResponseBodyStubFile("fixtures/cloud_instances/power_off_response.json").
 		WithResponseCode(202).
@@ -499,9 +499,9 @@ func TestCloudComputingInstancesCreatePTRRecord(t *testing.T) {
 	ttlValue := 60
 	priorityValue := 3
 
-	input := PTRRecordCreateInput{
+	input := CloudComputingInstancePTRRecordCreateInput{
 		IP:       "100.0.0.4",
-		Domain:   "ai.privateservergrid.com",
+		Data:     "ai.privateservergrid.com",
 		TTL:      &ttlValue,
 		Priority: &priorityValue,
 	}

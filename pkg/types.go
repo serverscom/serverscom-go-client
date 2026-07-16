@@ -90,20 +90,24 @@ type SSLCertificateUpdateLEInput struct {
 
 // Host represents host
 type Host struct {
-	ID                 string     `json:"id"`
-	Type               string     `json:"type"`
-	Title              string     `json:"title"`
-	LocationID         int64      `json:"location_id"`
-	LocationCode       string     `json:"location_code"`
-	Status             string     `json:"status"`
-	OperationalStatus  string     `json:"operational_status"`
-	PowerStatus        string     `json:"power_status"`
-	Configuration      string     `json:"configuration"`
-	PrivateIPv4Address *string    `json:"private_ipv4_address"`
-	PublicIPv4Address  *string    `json:"public_ipv4_address"`
-	ScheduledRelease   *time.Time `json:"scheduled_release_at"`
-	Created            time.Time  `json:"created_at"`
-	Updated            time.Time  `json:"updated_at"`
+	ID                 string            `json:"id"`
+	Type               string            `json:"type"`
+	Title              string            `json:"title"`
+	LocationID         int64             `json:"location_id"`
+	LocationCode       string            `json:"location_code"`
+	Status             string            `json:"status"`
+	OperationalStatus  string            `json:"operational_status"`
+	PowerStatus        string            `json:"power_status"`
+	Configuration      string            `json:"configuration"`
+	PrivateIPv4Address *string           `json:"private_ipv4_address"`
+	PublicIPv4Address  *string           `json:"public_ipv4_address"`
+	ScheduledRelease   *time.Time        `json:"scheduled_release_at"`
+	LeaseStart         *string           `json:"lease_start_at"`
+	OobIPv4Address     *string           `json:"oob_ipv4_address"`
+	RackID             *string           `json:"rack_id"`
+	Labels             map[string]string `json:"labels"`
+	Created            time.Time         `json:"created_at"`
+	Updated            time.Time         `json:"updated_at"`
 }
 
 // ConfigurationDetails represents host configuration details
@@ -140,6 +144,8 @@ type DedicatedServer struct {
 	OobIPv4Address       string               `json:"oob_ipv4_address"`
 	ConfigurationDetails ConfigurationDetails `json:"configuration_details"`
 	Labels               map[string]string    `json:"labels"`
+	IpxeConfig           *string              `json:"ipxe_config"`
+	UserdataSha256       *string              `json:"userdata_sha256"`
 	Created              time.Time            `json:"created_at"`
 	Updated              time.Time            `json:"updated_at"`
 }
@@ -452,6 +458,11 @@ type PrivateIpxeBootFeatureInput struct {
 	IPXEConfig string `json:"ipxe_config"`
 }
 
+// PublicIpxeBootFeatureInput represents input for activating the public_ipxe_boot feature
+type PublicIpxeBootFeatureInput struct {
+	IPXEConfig string `json:"ipxe_config"`
+}
+
 // CloudComputingInstance represents cloud instance
 type CloudComputingInstance struct {
 	Name               string            `json:"name"`
@@ -473,8 +484,15 @@ type CloudComputingInstance struct {
 	BackupCopies       int64             `json:"backup_copies"`
 	PublicPortBlocked  bool              `json:"public_port_blocked"`
 	Labels             map[string]string `json:"labels"`
+	Vpn2gpnInstance    *Vpn2gpnInstance  `json:"vpn2gpn_instance"`
 	Created            time.Time         `json:"created_at"`
 	Updated            time.Time         `json:"updated_at"`
+}
+
+// Vpn2gpnInstance represents the cloud instance used for the VPN to Global Private Network service
+type Vpn2gpnInstance struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 // CloudComputingInstanceCreateInput represents cloud instance create input
@@ -521,14 +539,20 @@ type CloudComputingRegion struct {
 
 // CloudComputingImage represents cloud computing image
 type CloudComputingImage struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID             string   `json:"id"`
+	Name           string   `json:"name"`
+	AllowedFlavors []string `json:"allowed_flavors"`
+	ImageSize      int      `json:"image_size"`
+	MinDisk        int      `json:"min_disk"`
 }
 
 // CloudComputingFlavor represents cloud computing flavor
 type CloudComputingFlavor struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Disk  int    `json:"disk"`
+	Ram   int    `json:"ram"`
+	Vcpus int    `json:"vcpus"`
 }
 
 // CloudComputingRegionCredentials represents OpenStack credentials for a cloud region
@@ -625,11 +649,24 @@ type Network struct {
 	InterfaceType      string    `json:"interface_type"`
 	DistributionMethod string    `json:"distribution_method"`
 	Additional         bool      `json:"additional"`
+	FirstIP            *string   `json:"first_ip,omitempty"`
+	Gateway            *string   `json:"gateway,omitempty"`
 	Created            time.Time `json:"created_at"`
 	Updated            time.Time `json:"updated_at"`
+}
 
-	// DEPRECATED: should be replaced by Statu
-	State string `json:"state"`
+// L2SegmentNetwork represents a network attached to an L2 segment
+type L2SegmentNetwork struct {
+	ID                 string    `json:"id"`
+	Title              *string   `json:"title,omitempty"`
+	Status             string    `json:"status"`
+	Cidr               *string   `json:"cidr,omitempty"`
+	Family             string    `json:"family"`
+	InterfaceType      string    `json:"interface_type"`
+	DistributionMethod string    `json:"distribution_method"`
+	Additional         bool      `json:"additional"`
+	Created            time.Time `json:"created_at"`
+	Updated            time.Time `json:"updated_at"`
 }
 
 // L2LocationGroup represents l2 location groups
@@ -670,6 +707,14 @@ type PTRRecord struct {
 type PTRRecordCreateInput struct {
 	IP       string `json:"ip"`
 	Domain   string `json:"domain"`
+	Priority *int   `json:"priority"`
+	TTL      *int   `json:"ttl"`
+}
+
+// CloudComputingInstancePTRRecordCreateInput represents ptr record create input for a cloud instance
+type CloudComputingInstancePTRRecordCreateInput struct {
+	Data     string `json:"data"`
+	IP       string `json:"ip"`
 	Priority *int   `json:"priority"`
 	TTL      *int   `json:"ttl"`
 }
@@ -773,6 +818,7 @@ type LoadBalancer struct {
 	LocationID        int64             `json:"location_id"`
 	LocationCode      string            `json:"location_code"`
 	ClusterID         *string           `json:"cluster_id"`
+	SharedCluster     bool              `json:"shared_cluster"`
 	Labels            map[string]string `json:"labels"`
 	Created           time.Time         `json:"created_at"`
 	Updated           time.Time         `json:"updated_at"`
@@ -788,10 +834,49 @@ type L4LoadBalancer struct {
 	LocationID        int64             `json:"location_id"`
 	LocationCode      string            `json:"location_code"`
 	StoreLogs         bool              `json:"store_logs"`
+	StoreLogsRegionID int64             `json:"store_logs_region_id"`
 	ClusterID         *string           `json:"cluster_id"`
+	SharedCluster     bool              `json:"shared_cluster"`
+	VHostZones        []L4VHostZone     `json:"vhost_zones"`
+	UpstreamZones     []L4UpstreamZone  `json:"upstream_zones"`
 	Labels            map[string]string `json:"labels"`
 	Created           time.Time         `json:"created_at"`
 	Updated           time.Time         `json:"updated_at"`
+}
+
+// LoadBalancerUpstream represents a load balancer upstream server
+type LoadBalancerUpstream struct {
+	IP          string `json:"ip"`
+	Port        int32  `json:"port"`
+	Weight      int32  `json:"weight"`
+	MaxFails    int32  `json:"max_fails"`
+	FailTimeout int32  `json:"fail_timeout"`
+	MaxConns    int32  `json:"max_conns"`
+	Status      string `json:"status"`
+}
+
+// L4VHostZone represents l4 vhost zone
+type L4VHostZone struct {
+	ID            string   `json:"id"`
+	UpstreamID    string   `json:"upstream_id"`
+	Ports         []int32  `json:"ports"`
+	UDP           bool     `json:"udp"`
+	ProxyProtocol bool     `json:"proxy_protocol"`
+	ACLAllow      bool     `json:"acl_allow"`
+	ACLList       []string `json:"acl_list"`
+	Description   string   `json:"description"`
+}
+
+// L4UpstreamZone represents l4 upstream zone
+type L4UpstreamZone struct {
+	ID         string                 `json:"id"`
+	Method     string                 `json:"method"`
+	UDP        bool                   `json:"udp"`
+	HCInterval int                    `json:"hc_interval"`
+	HCJitter   int                    `json:"hc_jitter"`
+	HCFails    int                    `json:"hc_fails"`
+	HCPasses   int                    `json:"hc_passes"`
+	Upstreams  []LoadBalancerUpstream `json:"upstreams"`
 }
 
 // L4VHostZoneInput represents l4 vhost zone input
@@ -823,24 +908,28 @@ type L4UpstreamZoneInput struct {
 
 // L4LoadBalancerUpdateInput represents l4 load balancer update input
 type L4LoadBalancerUpdateInput struct {
-	Name          *string               `json:"name,omitempty"`
-	StoreLogs     *bool                 `json:"store_logs,omitempty"`
-	ClusterID     *string               `json:"cluster_id,omitempty"`
-	SharedCluster *bool                 `json:"shared_cluster,omitempty"`
-	VHostZones    []L4VHostZoneInput    `json:"vhost_zones,omitempty"`
-	UpstreamZones []L4UpstreamZoneInput `json:"upstream_zones,omitempty"`
-	Labels        map[string]string     `json:"labels,omitempty"`
+	Name                *string               `json:"name,omitempty"`
+	StoreLogs           *bool                 `json:"store_logs,omitempty"`
+	StoreLogsRegionID   *int                  `json:"store_logs_region_id,omitempty"`
+	ClusterID           *string               `json:"cluster_id,omitempty"`
+	SharedCluster       *bool                 `json:"shared_cluster,omitempty"`
+	NewExternalIpsCount *int                  `json:"new_external_ips_count,omitempty"`
+	DeleteExternalIps   []string              `json:"delete_external_ips,omitempty"`
+	VHostZones          []L4VHostZoneInput    `json:"vhost_zones,omitempty"`
+	UpstreamZones       []L4UpstreamZoneInput `json:"upstream_zones,omitempty"`
+	Labels              map[string]string     `json:"labels,omitempty"`
 }
 
 // L4LoadBalancerUpdateInput represents l4 load balancer create input
 type L4LoadBalancerCreateInput struct {
-	Name          string                `json:"name"`
-	LocationID    int64                 `json:"location_id"`
-	StoreLogs     *bool                 `json:"store_logs,omitempty"`
-	ClusterID     *string               `json:"cluster_id,omitempty"`
-	VHostZones    []L4VHostZoneInput    `json:"vhost_zones"`
-	UpstreamZones []L4UpstreamZoneInput `json:"upstream_zones"`
-	Labels        map[string]string     `json:"labels,omitempty"`
+	Name              string                `json:"name"`
+	LocationID        int64                 `json:"location_id"`
+	StoreLogs         *bool                 `json:"store_logs,omitempty"`
+	StoreLogsRegionID *int                  `json:"store_logs_region_id,omitempty"`
+	ClusterID         *string               `json:"cluster_id,omitempty"`
+	VHostZones        []L4VHostZoneInput    `json:"vhost_zones"`
+	UpstreamZones     []L4UpstreamZoneInput `json:"upstream_zones"`
+	Labels            map[string]string     `json:"labels,omitempty"`
 }
 
 // L7LoadBalancer represents l7 load balancer
@@ -857,9 +946,55 @@ type L7LoadBalancer struct {
 	StoreLogs         bool              `json:"store_logs"`
 	StoreLogsRegionID int64             `json:"store_logs_region_id"`
 	ClusterID         *string           `json:"cluster_id"`
+	SharedCluster     bool              `json:"shared_cluster"`
+	VHostZones        []L7VHostZone     `json:"vhost_zones"`
+	UpstreamZones     []L7UpstreamZone  `json:"upstream_zones"`
 	Labels            map[string]string `json:"labels"`
 	Created           time.Time         `json:"created_at"`
 	Updated           time.Time         `json:"updated_at"`
+}
+
+// L7LocationZone represents l7 location zone
+type L7LocationZone struct {
+	Location     string `json:"location"`
+	UpstreamID   string `json:"upstream_id"`
+	UpstreamPath string `json:"upstream_path"`
+	Redirect     bool   `json:"redirect"`
+}
+
+// L7VHostZone represents l7 vhost zone
+type L7VHostZone struct {
+	ID                  string           `json:"id"`
+	Ports               []int32          `json:"ports"`
+	SSL                 bool             `json:"ssl"`
+	HTTP2               bool             `json:"http2"`
+	HTTPToHttpsRedirect bool             `json:"http_to_https_redirect"`
+	HTTP2PushPreload    bool             `json:"http2_push_preload"`
+	Domains             []string         `json:"domains"`
+	SSLCertID           string           `json:"ssl_certificate_id"`
+	TLSPreset           string           `json:"tls_preset"`
+	LocationZones       []L7LocationZone `json:"location_zones"`
+	RealIPHeader        *RealIPHeader    `json:"real_ip_header"`
+}
+
+// L7UpstreamZone represents l7 upstream zone
+type L7UpstreamZone struct {
+	ID            string                 `json:"id"`
+	Method        string                 `json:"method"`
+	SSL           bool                   `json:"ssl"`
+	Sticky        bool                   `json:"sticky"`
+	HCInterval    int                    `json:"hc_interval"`
+	HCJitter      int                    `json:"hc_jitter"`
+	HCFails       int                    `json:"hc_fails"`
+	HCPasses      int                    `json:"hc_passes"`
+	HCDomain      string                 `json:"hc_domain"`
+	HCPath        string                 `json:"hc_path"`
+	HCMethod      string                 `json:"hc_method"`
+	HCMandatory   bool                   `json:"hc_mandatory"`
+	GRPC          bool                   `json:"grpc"`
+	HCGRPCService string                 `json:"hc_grpc_service"`
+	HCGRPCStatus  int                    `json:"hc_grpc_status"`
+	Upstreams     []LoadBalancerUpstream `json:"upstreams"`
 }
 
 // L7LocationZoneInput represents l7 location zone input
@@ -966,7 +1101,6 @@ type LoadBalancerCluster struct {
 	Name         string    `json:"name"`
 	LocationID   int64     `json:"location_id"`
 	LocationCode string    `json:"location_code"`
-	Status       string    `json:"status"`
 	Created      time.Time `json:"created_at"`
 	Updated      time.Time `json:"updated_at"`
 }
@@ -1043,8 +1177,6 @@ type CloudBlockStorageVolumeCreateInput struct {
 type CloudBlockStorageVolumeUpdateInput struct {
 	Name        string            `json:"name"`
 	Description string            `json:"description,omitempty"`
-	ImageID     string            `json:"image_id,omitempty"`
-	SnapshotID  string            `json:"snapshot_id,omitempty"`
 	Labels      map[string]string `json:"labels,omitempty"`
 }
 
@@ -1105,25 +1237,61 @@ type KubernetesCluster struct {
 
 // KubernetesClusterNode represents Kubernetes cluster node
 type KubernetesClusterNode struct {
-	ID                 string            `json:"id"`
-	Number             int64             `json:"number"`
-	Hostname           string            `json:"hostname"`
-	Configuration      string            `json:"configuration"`
-	Type               string            `json:"type"`
-	Role               string            `json:"role"`
-	Status             string            `json:"status"`
-	PrivateIPv4Address string            `json:"private_ipv4_address"`
-	PublicIPv4Address  string            `json:"public_ipv4_address"`
-	RefID              string            `json:"ref_id"`
-	ClusterID          string            `json:"cluster_id"`
-	Labels             map[string]string `json:"labels"`
-	Created            time.Time         `json:"created_at"`
-	Updated            time.Time         `json:"updated_at"`
+	ID                 string                     `json:"id"`
+	Number             int64                      `json:"number"`
+	Hostname           string                     `json:"hostname"`
+	Configuration      string                     `json:"configuration"`
+	Type               string                     `json:"type"`
+	Role               string                     `json:"role"`
+	Status             string                     `json:"status"`
+	PrivateIPv4Address string                     `json:"private_ipv4_address"`
+	PublicIPv4Address  string                     `json:"public_ipv4_address"`
+	RefID              string                     `json:"ref_id"`
+	ClusterID          string                     `json:"cluster_id"`
+	LocationID         int64                      `json:"location_id"`
+	LocationCode       string                     `json:"location_code"`
+	NodeGroup          KubernetesClusterNodeGroup `json:"node_group"`
+	Labels             map[string]string          `json:"labels"`
+	Created            time.Time                  `json:"created_at"`
+	Updated            time.Time                  `json:"updated_at"`
+}
+
+// KubernetesClusterNodeGroup represents the node group a kubernetes cluster node belongs to
+type KubernetesClusterNodeGroup struct {
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Description *string   `json:"description"`
+	NodeCount   int64     `json:"node_count"`
+	Created     time.Time `json:"created_at"`
+	Updated     time.Time `json:"updated_at"`
 }
 
 // KubernetesClusterUpdateInput represents Kubernetes cluster update input
 type KubernetesClusterUpdateInput struct {
 	Labels map[string]string `json:"labels,omitempty"`
+}
+
+// KubernetesClusterNodeGroupCreateInput represents input for creating a node group
+type KubernetesClusterNodeGroupCreateInput struct {
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
+}
+
+// KubernetesClusterNodeGroupUpdateInput represents input for updating a node group
+type KubernetesClusterNodeGroupUpdateInput struct {
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+}
+
+// KubernetesClusterMoveNodesInput represents input for moving nodes to a node group
+type KubernetesClusterMoveNodesInput struct {
+	NodeGroupID string   `json:"node_group_id"`
+	NodeIDs     []string `json:"node_ids"`
+}
+
+// KubernetesClusterNodeUpdateInput represents input for updating a node
+type KubernetesClusterNodeUpdateInput struct {
+	NodeGroupID string `json:"node_group_id"`
 }
 
 // InvoiceList represents invoices list
@@ -1273,4 +1441,89 @@ type DedicatedServerOOBCredentials struct {
 // ScheduleReleaseInput represents input for dedicated server schedule release request
 type ScheduleReleaseInput struct {
 	ReleaseAfter string `json:"release_after,omitempty"`
+}
+
+// DNSDomainDelegationStatus represents dns domain delegation status
+type DNSDomainDelegationStatus string
+
+const (
+	DNSDomainDelegated   DNSDomainDelegationStatus = "delegated"
+	DNSDomainVerified    DNSDomainDelegationStatus = "verified"
+	DNSDomainUndelegated DNSDomainDelegationStatus = "undelegated"
+)
+
+// DNSRecordType represents dns record type
+type DNSRecordType string
+
+const (
+	DNSRecordTypeA     DNSRecordType = "A"
+	DNSRecordTypeAAAA  DNSRecordType = "AAAA"
+	DNSRecordTypeCNAME DNSRecordType = "CNAME"
+	DNSRecordTypeMX    DNSRecordType = "MX"
+	DNSRecordTypeTXT   DNSRecordType = "TXT"
+	DNSRecordTypeNS    DNSRecordType = "NS"
+	DNSRecordTypeSRV   DNSRecordType = "SRV"
+	DNSRecordTypeCAA   DNSRecordType = "CAA"
+)
+
+// DNSDomain represents a dns domain
+type DNSDomain struct {
+	ID               string                    `json:"id"`
+	Name             string                    `json:"name"`
+	Email            string                    `json:"email"`
+	TTL              int                       `json:"ttl"`
+	DelegationStatus DNSDomainDelegationStatus `json:"delegation_status"`
+	Labels           map[string]string         `json:"labels"`
+	UnpublishDate    *time.Time                `json:"unpublish_date"`
+	Created          time.Time                 `json:"created_at"`
+	Updated          time.Time                 `json:"updated_at"`
+}
+
+// DNSDomainCreateInput represents dns domain create input
+type DNSDomainCreateInput struct {
+	Name   string            `json:"name"`
+	Email  string            `json:"email"`
+	TTL    int               `json:"ttl,omitempty"`
+	Labels map[string]string `json:"labels,omitempty"`
+}
+
+// DNSDomainUpdateInput represents dns domain update input
+type DNSDomainUpdateInput struct {
+	Labels map[string]string `json:"labels"`
+}
+
+// DNSDomainDelegationData represents dns domain delegation data
+type DNSDomainDelegationData struct {
+	Nameservers []string `json:"nameservers"`
+	RequiredTxt string   `json:"required_txt"`
+}
+
+// DNSRecord represents a dns record
+type DNSRecord struct {
+	ID       string        `json:"id"`
+	DomainID string        `json:"domain_id"`
+	Name     string        `json:"name"`
+	Type     DNSRecordType `json:"type"`
+	Data     *string       `json:"data"`
+	TTL      *int          `json:"ttl"`
+	Priority *int          `json:"priority"`
+	Created  time.Time     `json:"created_at"`
+	Updated  time.Time     `json:"updated_at"`
+}
+
+// DNSRecordCreateInput represents dns record create input
+type DNSRecordCreateInput struct {
+	Name     string        `json:"name"`
+	Type     DNSRecordType `json:"type"`
+	Data     string        `json:"data"`
+	TTL      int           `json:"ttl,omitempty"`
+	Priority int           `json:"priority,omitempty"`
+}
+
+// DNSRecordUpdateInput represents dns record update input
+type DNSRecordUpdateInput struct {
+	Data     string `json:"data,omitempty"`
+	Name     string `json:"name,omitempty"`
+	Priority int    `json:"priority,omitempty"`
+	TTL      int    `json:"ttl,omitempty"`
 }
