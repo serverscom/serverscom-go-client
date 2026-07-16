@@ -1,6 +1,6 @@
 module github.com/serverscom/serverscom-go-client
 
-go 1.23.0
+go 1.25.0
 
 require (
 	github.com/go-resty/resty/v2 v2.17.2
@@ -9,7 +9,7 @@ require (
 
 require (
 	github.com/google/go-cmp v0.6.0 // indirect
-	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/text v0.28.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
