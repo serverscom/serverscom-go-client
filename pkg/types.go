@@ -1464,6 +1464,9 @@ const (
 	DNSRecordTypeNS    DNSRecordType = "NS"
 	DNSRecordTypeSRV   DNSRecordType = "SRV"
 	DNSRecordTypeCAA   DNSRecordType = "CAA"
+	DNSRecordTypeALIAS DNSRecordType = "ALIAS"
+	DNSRecordTypePTR   DNSRecordType = "PTR" // read-only: returned by list, not accepted by create
+	DNSRecordTypeSOA   DNSRecordType = "SOA" // read-only: returned by list, not accepted by create
 )
 
 // DNSDomain represents a dns domain
