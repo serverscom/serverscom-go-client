@@ -1519,14 +1519,14 @@ type DNSRecordCreateInput struct {
 	Name     string        `json:"name"`
 	Type     DNSRecordType `json:"type"`
 	Data     string        `json:"data"`
-	TTL      int           `json:"ttl,omitempty"`
-	Priority int           `json:"priority,omitempty"`
+	TTL      *int          `json:"ttl,omitempty"`
+	Priority *int          `json:"priority,omitempty"`
 }
 
 // DNSRecordUpdateInput represents dns record update input
 type DNSRecordUpdateInput struct {
 	Data     string `json:"data,omitempty"`
 	Name     string `json:"name,omitempty"`
-	Priority int    `json:"priority,omitempty"`
-	TTL      int    `json:"ttl,omitempty"`
+	Priority *int   `json:"priority,omitempty"`
+	TTL      *int   `json:"ttl,omitempty"`
 }
