@@ -199,11 +199,12 @@ func TestDNSCreateRecord(t *testing.T) {
 
 	ctx := context.TODO()
 
+	ttl := 3600
 	dnsRecord, err := client.DNS.CreateRecord(ctx, dnsDomainID, DNSRecordCreateInput{
 		Name: "www",
 		Type: DNSRecordTypeA,
 		Data: "192.0.2.1",
-		TTL:  3600,
+		TTL:  &ttl,
 	})
 
 	g.Expect(err).To(BeNil())
@@ -254,10 +255,11 @@ func TestDNSUpdateRecord(t *testing.T) {
 
 	ctx := context.TODO()
 
+	ttl := 7200
 	dnsRecord, err := client.DNS.UpdateRecord(ctx, dnsDomainID, dnsRecordID, DNSRecordUpdateInput{
 		Data: "192.0.2.2",
 		Name: "www",
-		TTL:  7200,
+		TTL:  &ttl,
 	})
 
 	g.Expect(err).To(BeNil())
