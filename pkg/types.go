@@ -1054,7 +1054,7 @@ type L7UpstreamZoneInput struct {
 type L7LoadBalancerUpdateInput struct {
 	Name                string                `json:"name,omitempty"`
 	StoreLogs           *bool                 `json:"store_logs,omitempty"`
-	StoreLogsRegionID   *int                  `json:"store_logs_region_id,,omitempty"`
+	StoreLogsRegionID   *int                  `json:"store_logs_region_id,omitempty"`
 	Geoip               *bool                 `json:"geoip,omitempty"`
 	NewExternalIpsCount *int                  `json:"new_external_ips_count,omitempty"`
 	DeleteExternalIps   []string              `json:"delete_external_ips,omitempty"`
@@ -1070,7 +1070,7 @@ type L7LoadBalancerCreateInput struct {
 	Name              string                `json:"name"`
 	LocationID        int64                 `json:"location_id"`
 	StoreLogs         *bool                 `json:"store_logs,omitempty"`
-	StoreLogsRegionID *int                  `json:"store_logs_region_id,,omitempty"`
+	StoreLogsRegionID *int                  `json:"store_logs_region_id,omitempty"`
 	Geoip             *bool                 `json:"geoip,omitempty"`
 	ClusterID         *string               `json:"cluster_id,omitempty"`
 	VHostZones        []L7VHostZoneInput    `json:"vhost_zones"`
