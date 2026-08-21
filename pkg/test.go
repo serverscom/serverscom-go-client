@@ -160,20 +160,19 @@ func (fs *fakeServer) Build() (*fakeServer, *Client) {
 		if currentRequest.RequestPath == "" || r.URL.Path == finalURL {
 			if currentRequest.RequestMethod != "" && currentRequest.RequestMethod != r.Method {
 				w.WriteHeader(http.StatusTeapot)
-				_, err := w.Write([]byte(fmt.Sprintf(
+				_, err := fmt.Fprintf(w,
 					"Unexpected request method, expected: %s %s, but got: %s %s",
 					currentRequest.RequestMethod,
 					finalURL,
 					r.Method,
-					r.URL.Path,
-				)))
+					r.URL.Path)
 				crashIfErrorPresent(err)
 				return
 			}
 
 			if currentRequest.RequestParams != "" && currentRequest.RequestParams != r.URL.Query().Encode() {
 				w.WriteHeader(http.StatusTeapot)
-				_, err := w.Write([]byte(fmt.Sprintf("Unexpected query params, expected: %s, but got: %s", currentRequest.RequestParams, r.URL.Query().Encode())))
+				_, err := fmt.Fprintf(w, "Unexpected query params, expected: %s, but got: %s", currentRequest.RequestParams, r.URL.Query().Encode())
 				crashIfErrorPresent(err)
 				return
 			}
@@ -188,7 +187,7 @@ func (fs *fakeServer) Build() (*fakeServer, *Client) {
 
 				if currentRequest.RequestBody != string(b) {
 					w.WriteHeader(http.StatusTeapot)
-					_, err := w.Write([]byte(fmt.Sprintf("Unexpected request body: %s", string(b))))
+					_, err := fmt.Fprintf(w, "Unexpected request body: %s", string(b))
 					crashIfErrorPresent(err)
 					return
 				}
@@ -209,7 +208,7 @@ func (fs *fakeServer) Build() (*fakeServer, *Client) {
 			crashIfErrorPresent(err)
 		} else {
 			w.WriteHeader(http.StatusTeapot)
-			_, err := w.Write([]byte(fmt.Sprintf("Unhandled route: %s %s, expected: %s %s", r.Method, r.URL.String(), currentRequest.RequestMethod, finalURL)))
+			_, err := fmt.Fprintf(w, "Unhandled route: %s %s, expected: %s %s", r.Method, r.URL.String(), currentRequest.RequestMethod, finalURL)
 			crashIfErrorPresent(err)
 		}
 	}))

@@ -284,6 +284,7 @@ func TestKubernetesClusterMoveNodes(t *testing.T) {
 	g.Expect(nodes[0].ID).To(Equal(nodeID))
 	g.Expect(nodes[0].NodeGroup.ID).To(Equal(nodeGroupID))
 	g.Expect(nodes[0].NodeGroup.Name).To(Equal("workers"))
+	g.Expect(nodes[0].NodeGroup.Type).To(Equal("static"))
 }
 
 func TestKubernetesClusterUpdateNode(t *testing.T) {
@@ -309,4 +310,5 @@ func TestKubernetesClusterUpdateNode(t *testing.T) {
 	g.Expect(node.ID).To(Equal(nodeID))
 	g.Expect(node.NodeGroup.ID).To(Equal(nodeGroupID))
 	g.Expect(node.NodeGroup.Name).To(Equal("workers"))
+	g.Expect(node.NodeGroup.Type).To(Equal("static"))
 }
