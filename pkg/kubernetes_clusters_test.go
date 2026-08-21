@@ -8,9 +8,10 @@ import (
 )
 
 const (
-	clusterID   = "YQdJqobO"
-	nodeID      = "MYer06bO"
-	nodeGroupID = "node-group-id"
+	clusterID            = "YQdJqobO"
+	nodeID               = "MYer06bO"
+	nodeGroupID          = "node-group-id"
+	autoscaleNodeGroupID = "autoscale-node-group-id"
 )
 
 func TestKubernetesClusterCollection(t *testing.T) {
@@ -311,4 +312,250 @@ func TestKubernetesClusterUpdateNode(t *testing.T) {
 	g.Expect(node.NodeGroup.ID).To(Equal(nodeGroupID))
 	g.Expect(node.NodeGroup.Name).To(Equal("workers"))
 	g.Expect(node.NodeGroup.Type).To(Equal("static"))
+}
+
+func TestKubernetesClusterAutoscaleNodeGroupsCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/kubernetes_clusters/" + clusterID + "/autoscale_node_groups").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.KubernetesClusters.AutoscaleNodeGroups(clusterID)
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
+}
+
+func TestKubernetesClusterCreateAutoscaleNodeGroup(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/kubernetes_clusters/" + clusterID + "/autoscale_node_groups").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/kubernetes_clusters/autoscale_node_group_response.json").
+		WithResponseCode(201).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	nodeGroup, err := client.KubernetesClusters.CreateAutoscaleNodeGroup(ctx, clusterID, KubernetesClusterAutoscaleNodeGroupCreateInput{
+		Name:     "autoscale-workers",
+		NodeType: "sbm",
+		MinNodes: 1,
+		MaxNodes: 5,
+		NodeSpec: map[string]any{"flavor_id": "flavor-id"},
+	})
+
+	g.Expect(err).To(BeNil())
+	g.Expect(nodeGroup).ToNot(BeNil())
+	g.Expect(nodeGroup.ID).To(Equal(autoscaleNodeGroupID))
+	g.Expect(nodeGroup.Name).To(Equal("autoscale-workers"))
+	g.Expect(*nodeGroup.Description).To(Equal("autoscale worker node group"))
+	g.Expect(nodeGroup.Type).To(Equal("autoscale"))
+	g.Expect(nodeGroup.NodeType).To(Equal("sbm"))
+	g.Expect(nodeGroup.MinNodes).To(Equal(int64(1)))
+	g.Expect(nodeGroup.MaxNodes).To(Equal(int64(5)))
+	g.Expect(nodeGroup.TargetNodes).To(Equal(int64(2)))
+	g.Expect(nodeGroup.CurrentNodes).To(Equal(int64(2)))
+	g.Expect(nodeGroup.Created.String()).To(Equal("2024-11-11 09:57:56 +0000 UTC"))
+	g.Expect(nodeGroup.Updated.String()).To(Equal("2024-11-11 09:57:56 +0000 UTC"))
+}
+
+func TestKubernetesClusterGetAutoscaleNodeGroup(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/kubernetes_clusters/" + clusterID + "/autoscale_node_groups/" + autoscaleNodeGroupID).
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/kubernetes_clusters/autoscale_node_group_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	nodeGroup, err := client.KubernetesClusters.GetAutoscaleNodeGroup(ctx, clusterID, autoscaleNodeGroupID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(nodeGroup).ToNot(BeNil())
+	g.Expect(nodeGroup.ID).To(Equal(autoscaleNodeGroupID))
+	g.Expect(nodeGroup.Name).To(Equal("autoscale-workers"))
+}
+
+func TestKubernetesClusterUpdateAutoscaleNodeGroup(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/kubernetes_clusters/" + clusterID + "/autoscale_node_groups/" + autoscaleNodeGroupID).
+		WithRequestMethod("PUT").
+		WithResponseBodyStubFile("fixtures/kubernetes_clusters/autoscale_node_group_response.json").
+		WithResponseCode(202).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	nodeGroup, err := client.KubernetesClusters.UpdateAutoscaleNodeGroup(ctx, clusterID, autoscaleNodeGroupID, KubernetesClusterAutoscaleNodeGroupUpdateInput{
+		Name:     "autoscale-workers",
+		MaxNodes: 5,
+	})
+
+	g.Expect(err).To(BeNil())
+	g.Expect(nodeGroup).ToNot(BeNil())
+	g.Expect(nodeGroup.ID).To(Equal(autoscaleNodeGroupID))
+	g.Expect(nodeGroup.Name).To(Equal("autoscale-workers"))
+}
+
+func TestKubernetesClusterDeleteAutoscaleNodeGroup(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/kubernetes_clusters/" + clusterID + "/autoscale_node_groups/" + autoscaleNodeGroupID).
+		WithRequestMethod("DELETE").
+		WithResponseCode(204).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	err := client.KubernetesClusters.DeleteAutoscaleNodeGroup(ctx, clusterID, autoscaleNodeGroupID)
+
+	g.Expect(err).To(BeNil())
+}
+
+func TestKubernetesClusterGetAutoscaleNodeGroupTemplate(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/kubernetes_clusters/" + clusterID + "/autoscale_node_groups/" + autoscaleNodeGroupID + "/autoscale_template").
+		WithRequestMethod("GET").
+		WithResponseBodyStubFile("fixtures/kubernetes_clusters/autoscale_node_group_template_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	template, err := client.KubernetesClusters.GetAutoscaleNodeGroupTemplate(ctx, clusterID, autoscaleNodeGroupID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(template).ToNot(BeNil())
+	g.Expect(template.FlavorName).To(Equal("SBM-Autoscale-Flavor"))
+	g.Expect(*template.LogicalCPUCount).To(Equal(int64(32)))
+	g.Expect(*template.RAMSize).To(Equal(int64(128)))
+}
+
+func TestKubernetesClusterDecreaseAutoscaleNodeGroupTargetSize(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/kubernetes_clusters/" + clusterID + "/autoscale_node_groups/" + autoscaleNodeGroupID + "/decrease_target_size").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/kubernetes_clusters/autoscale_node_group_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	nodeGroup, err := client.KubernetesClusters.DecreaseAutoscaleNodeGroupTargetSize(ctx, clusterID, autoscaleNodeGroupID, KubernetesClusterAutoscaleNodeGroupDecreaseTargetSizeInput{
+		Delta: 1,
+	})
+
+	g.Expect(err).To(BeNil())
+	g.Expect(nodeGroup).ToNot(BeNil())
+	g.Expect(nodeGroup.ID).To(Equal(autoscaleNodeGroupID))
+}
+
+func TestKubernetesClusterIncreaseAutoscaleNodeGroupSize(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/kubernetes_clusters/" + clusterID + "/autoscale_node_groups/" + autoscaleNodeGroupID + "/increase_size").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/kubernetes_clusters/autoscale_node_group_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	nodeGroup, err := client.KubernetesClusters.IncreaseAutoscaleNodeGroupSize(ctx, clusterID, autoscaleNodeGroupID, KubernetesClusterAutoscaleNodeGroupIncreaseSizeInput{
+		Delta: 1,
+	})
+
+	g.Expect(err).To(BeNil())
+	g.Expect(nodeGroup).ToNot(BeNil())
+	g.Expect(nodeGroup.ID).To(Equal(autoscaleNodeGroupID))
+}
+
+func TestKubernetesClusterDeleteAutoscaleNodeGroupNodes(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/kubernetes_clusters/" + clusterID + "/autoscale_node_groups/" + autoscaleNodeGroupID + "/delete_nodes").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/kubernetes_clusters/autoscale_node_group_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	nodeGroup, err := client.KubernetesClusters.DeleteAutoscaleNodeGroupNodes(ctx, clusterID, autoscaleNodeGroupID, KubernetesClusterAutoscaleNodeGroupDeleteNodesInput{
+		NodeIDs: []string{nodeID},
+	})
+
+	g.Expect(err).To(BeNil())
+	g.Expect(nodeGroup).ToNot(BeNil())
+	g.Expect(nodeGroup.ID).To(Equal(autoscaleNodeGroupID))
+}
+
+func TestKubernetesClusterAutoscaleNodeGroupNodesCollection(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/kubernetes_clusters/" + clusterID + "/autoscale_node_groups/" + autoscaleNodeGroupID + "/nodes").
+		WithRequestMethod("GET").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	collection := client.KubernetesClusters.AutoscaleNodeGroupNodes(clusterID, autoscaleNodeGroupID)
+
+	ctx := context.TODO()
+
+	list, err := collection.List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+	g.Expect(collection.HasNextPage()).To(Equal(false))
+	g.Expect(collection.HasPreviousPage()).To(Equal(false))
+	g.Expect(collection.HasFirstPage()).To(Equal(false))
+	g.Expect(collection.HasLastPage()).To(Equal(false))
 }

@@ -1261,6 +1261,7 @@ type KubernetesClusterNodeGroup struct {
 	ID          string    `json:"id"`
 	Name        string    `json:"name"`
 	Description *string   `json:"description"`
+	Type        string    `json:"type"`
 	NodeCount   int64     `json:"node_count"`
 	Created     time.Time `json:"created_at"`
 	Updated     time.Time `json:"updated_at"`
@@ -1302,6 +1303,65 @@ type KubernetesClusterMoveNodesInput struct {
 // KubernetesClusterNodeUpdateInput represents input for updating a node
 type KubernetesClusterNodeUpdateInput struct {
 	NodeGroupID string `json:"node_group_id"`
+}
+
+// KubernetesClusterAutoscaleNodeGroup represents a Kubernetes cluster autoscale node group
+type KubernetesClusterAutoscaleNodeGroup struct {
+	ID           string         `json:"id"`
+	Name         string         `json:"name"`
+	Description  *string        `json:"description"`
+	Type         string         `json:"type"`
+	NodeType     string         `json:"node_type"`
+	MinNodes     int64          `json:"min_nodes"`
+	MaxNodes     int64          `json:"max_nodes"`
+	TargetNodes  int64          `json:"target_nodes"`
+	CurrentNodes int64          `json:"current_nodes"`
+	NodeSpec     map[string]any `json:"node_spec"`
+	NodeTemplate map[string]any `json:"node_template"`
+	Created      time.Time      `json:"created_at"`
+	Updated      time.Time      `json:"updated_at"`
+}
+
+// KubernetesClusterAutoscaleNodeGroupTemplate represents what a node of an autoscale node group looks like
+type KubernetesClusterAutoscaleNodeGroupTemplate struct {
+	FlavorName      string `json:"flavor_name"`
+	LogicalCPUCount *int64 `json:"logical_cpu_count"`
+	RAMSize         *int64 `json:"ram_size"`
+}
+
+// KubernetesClusterAutoscaleNodeGroupCreateInput represents input for creating an autoscale node group
+type KubernetesClusterAutoscaleNodeGroupCreateInput struct {
+	Name         string         `json:"name"`
+	Description  string         `json:"description,omitempty"`
+	NodeType     string         `json:"node_type"`
+	MinNodes     int64          `json:"min_nodes"`
+	MaxNodes     int64          `json:"max_nodes"`
+	NodeSpec     map[string]any `json:"node_spec"`
+	NodeTemplate map[string]any `json:"node_template,omitempty"`
+}
+
+// KubernetesClusterAutoscaleNodeGroupUpdateInput represents input for updating an autoscale node group
+type KubernetesClusterAutoscaleNodeGroupUpdateInput struct {
+	Name         string            `json:"name,omitempty"`
+	Description  string            `json:"description,omitempty"`
+	MinNodes     int64             `json:"min_nodes,omitempty"`
+	MaxNodes     int64             `json:"max_nodes,omitempty"`
+	NodeTemplate map[string]string `json:"node_template,omitempty"`
+}
+
+// KubernetesClusterAutoscaleNodeGroupDecreaseTargetSizeInput represents input for lowering the target size of an autoscale node group
+type KubernetesClusterAutoscaleNodeGroupDecreaseTargetSizeInput struct {
+	Delta int64 `json:"delta"`
+}
+
+// KubernetesClusterAutoscaleNodeGroupIncreaseSizeInput represents input for raising the target size of an autoscale node group
+type KubernetesClusterAutoscaleNodeGroupIncreaseSizeInput struct {
+	Delta int64 `json:"delta"`
+}
+
+// KubernetesClusterAutoscaleNodeGroupDeleteNodesInput represents input for releasing nodes of an autoscale node group
+type KubernetesClusterAutoscaleNodeGroupDeleteNodesInput struct {
+	NodeIDs []string `json:"node_ids"`
 }
 
 // InvoiceList represents invoices list
