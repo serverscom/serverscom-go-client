@@ -1307,19 +1307,20 @@ type KubernetesClusterNodeUpdateInput struct {
 
 // KubernetesClusterAutoscaleNodeGroup represents a Kubernetes cluster autoscale node group
 type KubernetesClusterAutoscaleNodeGroup struct {
-	ID           string         `json:"id"`
-	Name         string         `json:"name"`
-	Description  *string        `json:"description"`
-	Type         string         `json:"type"`
-	NodeType     string         `json:"node_type"`
-	MinNodes     int64          `json:"min_nodes"`
-	MaxNodes     int64          `json:"max_nodes"`
-	TargetNodes  int64          `json:"target_nodes"`
-	CurrentNodes int64          `json:"current_nodes"`
-	NodeSpec     map[string]any `json:"node_spec"`
-	NodeTemplate map[string]any `json:"node_template"`
-	Created      time.Time      `json:"created_at"`
-	Updated      time.Time      `json:"updated_at"`
+	ID               string         `json:"id"`
+	Name             string         `json:"name"`
+	Description      *string        `json:"description"`
+	Type             string         `json:"type"`
+	NodeType         string         `json:"node_type"`
+	MinNodes         int64          `json:"min_nodes"`
+	MaxNodes         int64          `json:"max_nodes"`
+	AutoscaleEnabled bool           `json:"autoscale_enabled"`
+	TargetNodes      int64          `json:"target_nodes"`
+	CurrentNodes     int64          `json:"current_nodes"`
+	NodeSpec         map[string]any `json:"node_spec"`
+	NodeTemplate     map[string]any `json:"node_template"`
+	Created          time.Time      `json:"created_at"`
+	Updated          time.Time      `json:"updated_at"`
 }
 
 // KubernetesClusterAutoscaleNodeGroupTemplate represents what a node of an autoscale node group looks like
