@@ -340,6 +340,31 @@ func TestKubernetesClusterAutoscaleNodeGroupsCollection(t *testing.T) {
 	g.Expect(collection.HasLastPage()).To(Equal(false))
 }
 
+// The autoscale_enabled filter is a plain query param on the listing endpoint, so it has to
+// survive the way a collection assembles its URL.
+func TestKubernetesClusterAutoscaleNodeGroupsCollectionFilteredByAutoscaleEnabled(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/kubernetes_clusters/" + clusterID + "/autoscale_node_groups").
+		WithRequestMethod("GET").
+		WithRequestParams("autoscale_enabled=true").
+		WithResponseBodyStubInline(`[]`).
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	list, err := client.KubernetesClusters.AutoscaleNodeGroups(clusterID).
+		SetParam("autoscale_enabled", "true").
+		List(ctx)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(list).To(BeEmpty())
+}
+
 func TestKubernetesClusterCreateAutoscaleNodeGroup(t *testing.T) {
 	g := NewGomegaWithT(t)
 
@@ -397,6 +422,7 @@ func TestKubernetesClusterGetAutoscaleNodeGroup(t *testing.T) {
 	g.Expect(nodeGroup).ToNot(BeNil())
 	g.Expect(nodeGroup.ID).To(Equal(autoscaleNodeGroupID))
 	g.Expect(nodeGroup.Name).To(Equal("autoscale-workers"))
+	g.Expect(nodeGroup.AutoscaleEnabled).To(Equal(true))
 }
 
 func TestKubernetesClusterUpdateAutoscaleNodeGroup(t *testing.T) {
@@ -440,6 +466,50 @@ func TestKubernetesClusterDeleteAutoscaleNodeGroup(t *testing.T) {
 	err := client.KubernetesClusters.DeleteAutoscaleNodeGroup(ctx, clusterID, autoscaleNodeGroupID)
 
 	g.Expect(err).To(BeNil())
+}
+
+func TestKubernetesClusterEnableAutoscaleNodeGroup(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/kubernetes_clusters/" + clusterID + "/autoscale_node_groups/" + autoscaleNodeGroupID + "/enable").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/kubernetes_clusters/autoscale_node_group_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	nodeGroup, err := client.KubernetesClusters.EnableAutoscaleNodeGroup(ctx, clusterID, autoscaleNodeGroupID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(nodeGroup).ToNot(BeNil())
+	g.Expect(nodeGroup.ID).To(Equal(autoscaleNodeGroupID))
+	g.Expect(nodeGroup.AutoscaleEnabled).To(Equal(true))
+}
+
+func TestKubernetesClusterDisableAutoscaleNodeGroup(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	ts, client := newFakeServer().
+		WithRequestPath("/kubernetes_clusters/" + clusterID + "/autoscale_node_groups/" + autoscaleNodeGroupID + "/disable").
+		WithRequestMethod("POST").
+		WithResponseBodyStubFile("fixtures/kubernetes_clusters/autoscale_node_group_disabled_response.json").
+		WithResponseCode(200).
+		Build()
+
+	defer ts.Close()
+
+	ctx := context.TODO()
+
+	nodeGroup, err := client.KubernetesClusters.DisableAutoscaleNodeGroup(ctx, clusterID, autoscaleNodeGroupID)
+
+	g.Expect(err).To(BeNil())
+	g.Expect(nodeGroup).ToNot(BeNil())
+	g.Expect(nodeGroup.ID).To(Equal(autoscaleNodeGroupID))
+	g.Expect(nodeGroup.AutoscaleEnabled).To(Equal(false))
 }
 
 func TestKubernetesClusterGetAutoscaleNodeGroupTemplate(t *testing.T) {

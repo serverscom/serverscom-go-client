@@ -20,6 +20,8 @@ const (
 	kubernetesClusterAutoscaleNodeGroupTemplatePath     = kubernetesClusterAutoscaleNodeGroupPathWithID + "/autoscale_template"
 	kubernetesClusterAutoscaleNodeGroupDecreaseSizePath = kubernetesClusterAutoscaleNodeGroupPathWithID + "/decrease_target_size"
 	kubernetesClusterAutoscaleNodeGroupDeleteNodesPath  = kubernetesClusterAutoscaleNodeGroupPathWithID + "/delete_nodes"
+	kubernetesClusterAutoscaleNodeGroupDisablePath      = kubernetesClusterAutoscaleNodeGroupPathWithID + "/disable"
+	kubernetesClusterAutoscaleNodeGroupEnablePath       = kubernetesClusterAutoscaleNodeGroupPathWithID + "/enable"
 	kubernetesClusterAutoscaleNodeGroupIncreaseSizePath = kubernetesClusterAutoscaleNodeGroupPathWithID + "/increase_size"
 	kubernetesClusterAutoscaleNodeGroupNodesPath        = kubernetesClusterAutoscaleNodeGroupPathWithID + "/nodes"
 )
@@ -49,6 +51,8 @@ type KubernetesClustersService interface {
 	CreateAutoscaleNodeGroup(ctx context.Context, clusterID string, input KubernetesClusterAutoscaleNodeGroupCreateInput) (*KubernetesClusterAutoscaleNodeGroup, error)
 	UpdateAutoscaleNodeGroup(ctx context.Context, clusterID string, nodeGroupID string, input KubernetesClusterAutoscaleNodeGroupUpdateInput) (*KubernetesClusterAutoscaleNodeGroup, error)
 	DeleteAutoscaleNodeGroup(ctx context.Context, clusterID string, nodeGroupID string) error
+	EnableAutoscaleNodeGroup(ctx context.Context, clusterID string, nodeGroupID string) (*KubernetesClusterAutoscaleNodeGroup, error)
+	DisableAutoscaleNodeGroup(ctx context.Context, clusterID string, nodeGroupID string) (*KubernetesClusterAutoscaleNodeGroup, error)
 	GetAutoscaleNodeGroupTemplate(ctx context.Context, clusterID string, nodeGroupID string) (*KubernetesClusterAutoscaleNodeGroupTemplate, error)
 	DecreaseAutoscaleNodeGroupTargetSize(ctx context.Context, clusterID string, nodeGroupID string, input KubernetesClusterAutoscaleNodeGroupDecreaseTargetSizeInput) (*KubernetesClusterAutoscaleNodeGroup, error)
 	IncreaseAutoscaleNodeGroupSize(ctx context.Context, clusterID string, nodeGroupID string, input KubernetesClusterAutoscaleNodeGroupIncreaseSizeInput) (*KubernetesClusterAutoscaleNodeGroup, error)
@@ -356,6 +360,44 @@ func (h *KubernetesClustersHandler) DeleteAutoscaleNodeGroup(ctx context.Context
 	_, err := h.client.buildAndExecRequest(ctx, "DELETE", url, nil)
 
 	return err
+}
+
+// EnableAutoscaleNodeGroup switches autoscaling on for an autoscale node group of a Kubernetes cluster
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Kubernetes-Cluster/operation/EnableAutoscalingForANodeGroup
+func (h *KubernetesClustersHandler) EnableAutoscaleNodeGroup(ctx context.Context, clusterID string, nodeGroupID string) (*KubernetesClusterAutoscaleNodeGroup, error) {
+	url := h.client.buildURL(kubernetesClusterAutoscaleNodeGroupEnablePath, []interface{}{clusterID, nodeGroupID}...)
+
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var nodeGroup KubernetesClusterAutoscaleNodeGroup
+	if err := json.Unmarshal(body, &nodeGroup); err != nil {
+		return nil, err
+	}
+
+	return &nodeGroup, nil
+}
+
+// DisableAutoscaleNodeGroup switches autoscaling off for an autoscale node group of a Kubernetes cluster
+// Endpoint: https://developers.servers.com/api-documentation/v1/#tag/Kubernetes-Cluster/operation/DisableAutoscalingForANodeGroup
+func (h *KubernetesClustersHandler) DisableAutoscaleNodeGroup(ctx context.Context, clusterID string, nodeGroupID string) (*KubernetesClusterAutoscaleNodeGroup, error) {
+	url := h.client.buildURL(kubernetesClusterAutoscaleNodeGroupDisablePath, []interface{}{clusterID, nodeGroupID}...)
+
+	body, err := h.client.buildAndExecRequest(ctx, "POST", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var nodeGroup KubernetesClusterAutoscaleNodeGroup
+	if err := json.Unmarshal(body, &nodeGroup); err != nil {
+		return nil, err
+	}
+
+	return &nodeGroup, nil
 }
 
 // GetAutoscaleNodeGroupTemplate shows what a node of an autoscale node group looks like

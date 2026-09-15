@@ -6,7 +6,7 @@
     "node_type": "sbm",
     "min_nodes": 1,
     "max_nodes": 5,
-    "autoscale_enabled": true,
+    "autoscale_enabled": false,
     "target_nodes": 2,
     "current_nodes": 2,
     "node_spec": {
